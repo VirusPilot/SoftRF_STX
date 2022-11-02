@@ -34,7 +34,9 @@ If you want to compile SoftRF without all those modifications, simply disable th
 
 **Recommendations (be careful as you may render your device unusable):**
 - load OGN database for T-Beam: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
-- modify SoftRF settings (e.g. Protocol or Aircraft type) through serial console commands: http://soaringweather.no-ip.info/SoftRF/settings.html
+- modify SoftRF settings by **downloading** the following scripts, **opening** them in a browser to generate the appropriate $PSRFC sentences and then **sending** these generated $PSRFC sentences to SoftRF via a serial console:
+  - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/basic.html (e.g. Protocol, Aircraft type, Aircraft ID)
+  - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/ui.html (e.g. Units, e-Paper 'ghosts' removal)
 
 ## Features
 
