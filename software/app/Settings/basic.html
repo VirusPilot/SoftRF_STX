@@ -20,6 +20,8 @@ const version = 1;
 const volume  = 2;
 const pointer = 2;
 
+var aircraft_id = "000000";
+
 // Compute NMEA checksum and display it
 function UpdateChecksum()
 {
@@ -42,7 +44,8 @@ function UpdateChecksum()
       + document.getElementById("d1090").value + ","
       + document.getElementById("stealth").value + ","
       + document.getElementById("no_track").value + ","
-      + document.getElementById("powersave").value;
+      + document.getElementById("powersave").value + ","
+      + aircraft_id;
 
 
   // Compute the checksum by XORing all the character values in the string.
@@ -208,6 +211,17 @@ function SelTrack()
   UpdateChecksum();
 }
 
+function SelAircraftID()
+{
+  var aid = document.getElementById('aircraft_id').value;
+  var reg = new RegExp('^[0-9A-Fa-f]{1,6}$', 'g');
+  if (reg.test(aid)) {
+    aircraft_id = parseInt(aid, 16)
+    UpdateChecksum();
+  }
+
+}
+
 function InitSettings()
 {
 //  document.getElementById("ver").value      = 1;
@@ -231,6 +245,7 @@ function InitSettings()
   document.getElementById("powersave").value  = 0;
   document.getElementById("stealth").value    = 0;
   document.getElementById("no_track").value   = 0;
+  aircraft_id   = '000000';
 
   UpdateChecksum();
 }
@@ -425,6 +440,12 @@ If you are affected - please, consider to update
 <td align=right>
 <input type='radio' name='no_track' value='0' onchange="SelTrack()" checked>Off
 <input type='radio' name='no_track' value='1' onchange="SelTrack()">On
+</td>
+</tr>
+<tr>
+<th align=left>Aitcraft ID (hex)</th>
+<td align=right>
+<INPUT type="text" id="aircraft_id" maxlength="6" size="6" style="width:60px" value="000000" onkeyup="SelAircraftID()" onchange="SelAircraftID()">
 </td>
 </tr>
 </table>

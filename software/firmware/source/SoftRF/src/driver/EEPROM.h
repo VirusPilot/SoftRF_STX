@@ -72,6 +72,7 @@ typedef struct Settings {
     uint8_t  json:2;
 
     uint8_t  power_save;
+    uint32_t aircraft_id;
 
     int8_t   freq_corr; /* +/-, kHz */
     uint8_t  resvd2;

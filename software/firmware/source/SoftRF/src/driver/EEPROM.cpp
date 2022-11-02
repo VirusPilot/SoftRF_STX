@@ -95,6 +95,7 @@ void EEPROM_defaults()
                                               RF_TX_POWER_OFF : RF_TX_POWER_FULL;
   eeprom_block.field.settings.bluetooth     = BLUETOOTH_OFF;
   eeprom_block.field.settings.alarm         = TRAFFIC_ALARM_DISTANCE;
+  eeprom_block.field.settings.aircraft_id   = 0;
 
   /* This will speed up 'factory' boot sequence on Editions other than Standalone */
   if (hw_info.model == SOFTRF_MODEL_STANDALONE) {

@@ -167,7 +167,12 @@ void setup()
 
   SoC->Button_setup();
 
-  ThisAircraft.addr = SoC->getChipId() & 0x00FFFFFF;
+  // When the users select 0 for aircraft type we will use the default of the chip
+  if (settings->aircraft_id == 0) {
+    ThisAircraft.addr = SoC->getChipId() & 0x00FFFFFF;
+  } else {
+    ThisAircraft.addr = settings->aircraft_id & 0x00FFFFFF;
+  }
 
   hw_info.rf = RF_setup();
 

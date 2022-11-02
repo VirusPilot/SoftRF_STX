@@ -86,7 +86,8 @@ TinyGPSCustom C_GDL90_Output;
 TinyGPSCustom C_D1090_Output;
 TinyGPSCustom C_Stealth;
 TinyGPSCustom C_noTrack;
-TinyGPSCustom C_PowerSave; /* 19 */
+TinyGPSCustom C_PowerSave;
+TinyGPSCustom C_Aircraft_id; /* 20 */
 
 #if defined(USE_OGN_ENCRYPTION)
 /* Security and privacy */
@@ -167,7 +168,8 @@ void NMEA_setup()
   C_D1090_Output.begin (gnss, psrf_c, term_num++);
   C_Stealth.begin      (gnss, psrf_c, term_num++);
   C_noTrack.begin      (gnss, psrf_c, term_num++);
-  C_PowerSave.begin    (gnss, psrf_c, term_num  ); /* 19 */
+  C_PowerSave.begin    (gnss, psrf_c, term_num++);
+  C_Aircraft_id.begin  (gnss, psrf_c, term_num  ); /* 20 */
 
 #if defined(USE_OGN_ENCRYPTION)
 /* Security and privacy */
@@ -728,14 +730,15 @@ void NMEA_Process_SRF_SKV_Sentences()
           char psrfc_buf[MAX_PSRFC_LEN];
 
           snprintf_P(psrfc_buf, sizeof(psrfc_buf),
-              PSTR("$PSRFC,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d*"),
+              PSTR("$PSRFC,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d*"),
               PSRFC_VERSION,        settings->mode,     settings->rf_protocol,
               settings->band,       settings->aircraft_type, settings->alarm,
               settings->txpower,    settings->volume,   settings->pointer,
               settings->nmea_g,     settings->nmea_p,   settings->nmea_l,
               settings->nmea_s,     settings->nmea_out, settings->gdl90,
               settings->d1090,      settings->stealth,  settings->no_track,
-              settings->power_save );
+              settings->power_save,
+              settings->aircraft_id);
 
           NMEA_add_checksum(psrfc_buf, sizeof(psrfc_buf) - strlen(psrfc_buf));
 
@@ -856,6 +859,12 @@ void NMEA_Process_SRF_SKV_Sentences()
           {
             settings->power_save = atoi(C_PowerSave.value());
             Serial.print(F("PowerSave = ")); Serial.println(settings->power_save);
+            cfg_is_updated = true;
+          }
+          if (C_Aircraft_id.isUpdated())
+          {
+            settings->aircraft_id = atoi(C_Aircraft_id.value());
+            Serial.print(F("Aircraft id = ")); Serial.println(settings->aircraft_id);
             cfg_is_updated = true;
           }
 
