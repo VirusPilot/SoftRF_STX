@@ -216,7 +216,7 @@ function SelAircraftID()
   var aid = document.getElementById('aircraft_id').value;
   var reg = new RegExp('^[0-9A-Fa-f]{1,6}$', 'g');
   if (reg.test(aid)) {
-    aircraft_id = parseInt(aid, 16)
+    aircraft_id = aid;
     UpdateChecksum();
   }
 

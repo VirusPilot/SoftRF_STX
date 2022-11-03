@@ -730,7 +730,7 @@ void NMEA_Process_SRF_SKV_Sentences()
           char psrfc_buf[MAX_PSRFC_LEN];
 
           snprintf_P(psrfc_buf, sizeof(psrfc_buf),
-              PSTR("$PSRFC,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d*"),
+              PSTR("$PSRFC,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%X*"),
               PSRFC_VERSION,        settings->mode,     settings->rf_protocol,
               settings->band,       settings->aircraft_type, settings->alarm,
               settings->txpower,    settings->volume,   settings->pointer,
@@ -863,7 +863,7 @@ void NMEA_Process_SRF_SKV_Sentences()
           }
           if (C_Aircraft_id.isUpdated())
           {
-            settings->aircraft_id = atoi(C_Aircraft_id.value());
+            sscanf(C_Aircraft_id.value(), "%X", &settings->aircraft_id);
             Serial.print(F("Aircraft id = ")); Serial.println(settings->aircraft_id);
             cfg_is_updated = true;
           }
