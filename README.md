@@ -1,10 +1,11 @@
 # SoftRF DIY - Stratux compatible fork
 
-## Modifications in this fork enable SoftRF to work as a proper GPS and Baro source for Stratux
+- enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
+- option to modify Aircraft ID (through serial USB console, see below)
 
 **IMPORTANT**: All modifications are provided only in the source code so you need to be familiar with Arduino to compile and flash it for your platform. You need to install Arduino IDE (v1.8 or later) and add the following two entries into the Additional Board Manager URLs:
-- `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
-- `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+- T-Beam: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+- T-Echo: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
 For the T-Beam you need to select the `ESP32 Dev Module` board, for the T-Echo the `Nordic nRF52840 DK` board. For more details please read the related upstream WiKi section.
 
@@ -14,7 +15,7 @@ If you want to compile SoftRF without all those modifications, simply disable th
 - u-blox GPS configuration:
   - enable GSA, GSV, VTG
   - enable GPS, GALILEO, BEIDOU and SBAS
-  - enable NMEA extended
+  - enable NMEA extended protocol
 - default connection with Stratux: **USB**
 - WiFi disabled to avoid conflicts with Stratux WiFi
 - LEGACY traffic messages over serial connection are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
