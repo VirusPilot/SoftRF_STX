@@ -31,4 +31,4 @@ URL="http://ddb.glidernet.org/download/?t=1"
 rm -f $CSV $DB
 wget -q -O - $URL | tail -n +2 | gawk -f $GAWK > $CSV
 sqlite3 -init $SQL $DB .exit
-#rm -f $CSV
+rm -f $CSV
