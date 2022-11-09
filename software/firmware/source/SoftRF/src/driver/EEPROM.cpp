@@ -108,11 +108,7 @@ void EEPROM_defaults()
 
   eeprom_block.field.settings.nmea_g     = true;
   eeprom_block.field.settings.nmea_p     = false;
-  #if defined(STRATUX)
-    eeprom_block.field.settings.nmea_l     = false;
-  #else
-    eeprom_block.field.settings.nmea_l     = true;
-  #endif
+  eeprom_block.field.settings.nmea_l     = false;
   eeprom_block.field.settings.nmea_s     = true;
 
 #if (ARDUINO_USB_CDC_ON_BOOT && !defined(USE_USB_HOST)) || \

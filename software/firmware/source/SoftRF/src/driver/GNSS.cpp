@@ -188,7 +188,6 @@ const gnss_chip_ops_t generic_nmea_ops = {
 #if !defined(EXCLUDE_GNSS_UBLOX)
  /* CFG-MSG */
 
-#if defined(STRATUX)
  /*                               Class ID    I2C   UART1 UART2 USB   SPI   Res */
 //const uint8_t setGGA[] PROGMEM = {0xF0, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* GGA is already enabled */
 const uint8_t setGLL[] PROGMEM = {0xF0, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}; /* disable GLL */
@@ -196,14 +195,7 @@ const uint8_t setGSA[] PROGMEM = {0xF0, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01
 const uint8_t setGSV[] PROGMEM = {0xF0, 0x03, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01}; /* enable GSV for Stratux */
 //const uint8_t setRMC[] PROGMEM = {0xF0, 0x04, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* RMC is already enabled */
 const uint8_t setVTG[] PROGMEM = {0xF0, 0x05, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable VTG for Stratux */
-#else
-const uint8_t setGLL[] PROGMEM = {0xF0, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
-const uint8_t setGSV[] PROGMEM = {0xF0, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
-const uint8_t setVTG[] PROGMEM = {0xF0, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
-#if !defined(NMEA_TCP_SERVICE)
-const uint8_t setGSA[] PROGMEM = {0xF0, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
-#endif
-#endif /* STRATUX */
+
  /* CFG-PRT */
 uint8_t setBR[] = {0x01, 0x00, 0x00, 0x00, 0xD0, 0x08, 0x00, 0x00, 0x00, 0x96,
                    0x00, 0x00, 0x07, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -391,8 +383,6 @@ static void setup_UBX()
   SoC->swSer_begin(baudrate);
 #endif
 
-#if defined(STRATUX)
-
   byte version = ublox_version();
 
   //if ((version == GNSS_MODULE_U6) || (version == GNSS_MODULE_U7) || (version == GNSS_MODULE_U8)) {
@@ -434,8 +424,6 @@ static void setup_UBX()
     //sendUBX(GNSSbuf, msglen);
     //gnss_set_sucess = getUBX_ACK(0x06, 0x09);
   }
-
-#endif /* STRATUX */
 
   GNSS_DEBUG_PRINTLN(F("Airborne <2g navigation mode: "));
 
@@ -1081,18 +1069,6 @@ static bool at65_setup()
   delay(250);
 #endif
 
-#if !defined(STRATUX)
-    /* Assume that we deal with fake NEO module (AT6558 based) */
-    Serial_GNSS_Out.write("$PCAS04,5*1C\r\n"); /* GPS + GLONASS */     delay(250);
-  #if defined(NMEA_TCP_SERVICE)
-    /* GGA,RMC and GSA */
-    Serial_GNSS_Out.write("$PCAS03,1,0,1,0,1,0,0,0,0,0,,,0,0*03\r\n"); delay(250);
-  #else
-    /* GGA and RMC */
-    Serial_GNSS_Out.write("$PCAS03,1,0,0,0,1,0,0,0,0,0,,,0,0*02\r\n"); delay(250);
-  #endif
-    Serial_GNSS_Out.write("$PCAS11,6*1B\r\n"); /* Aviation < 2g */     delay(250);
-#else
   //Serial_GNSS_Out.write("$PCAS10,3*1F\r\n"); /* load factory defaults */ delay(250);
   //Serial_GNSS_Out.write("$PCAS01,1*1D\r\n"); /* 9600 baud */ delay(250);
   //Serial_GNSS_Out.write("$PCAS01,3*1F\r\n"); /* 38400 baud */ delay(250);
@@ -1105,7 +1081,6 @@ static bool at65_setup()
   //Serial_GNSS_Out.write("$PCAS04,5*1C\r\n"); /* GPS + GLONASS */ delay(250);
   //Serial_GNSS_Out.write("$PCAS04,3*1A\r\n"); /* GPS + BEIDOU */ delay(250);
   Serial_GNSS_Out.write("$PCAS04,7*1E\r\n"); /* GPS + GLONASS + BEIDOU */ delay(250);
-#endif /* STRATUX */
 
   return true;
 }

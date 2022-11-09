@@ -37,11 +37,7 @@
 #include <Fonts/FreeSerif9pt7b.h>
 
 const char EPD_SoftRF_text1[] = "SoftRF";
-#if defined(STRATUX)
-  const char EPD_SoftRF_text2[] =  "Stratux"  ;
-#else
-  const char EPD_SoftRF_text2[] =  "and"  ;
-#endif
+const char EPD_SoftRF_text2[] = "Stratux"  ;
 const char EPD_SoftRF_text3[] = "LilyGO";
 const char EPD_SoftRF_text4[] = "Author: ";
 const char EPD_SoftRF_text5[] = "Linar Yusupov";
