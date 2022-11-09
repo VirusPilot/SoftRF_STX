@@ -1069,6 +1069,7 @@ static bool at65_setup()
   delay(250);
 #endif
 
+  /* L76K GPS configuration commands according to Quectel_L76K_GNSS_协议规范_V1.0.pdf */
   //Serial_GNSS_Out.write("$PCAS10,3*1F\r\n"); /* load factory defaults */ delay(250);
   //Serial_GNSS_Out.write("$PCAS01,1*1D\r\n"); /* 9600 baud */ delay(250);
   //Serial_GNSS_Out.write("$PCAS01,3*1F\r\n"); /* 38400 baud */ delay(250);
