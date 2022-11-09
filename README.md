@@ -9,8 +9,6 @@
 
 For the T-Beam you need to select the `ESP32 Dev Module` board, for the T-Echo the `Nordic nRF52840 DK` board. For more details please read the related upstream WiKi section.
 
-If you want to compile SoftRF without all those modifications, simply disable the STRATUX define in SoftRF.h
-
 **T-Beam modifications:**
 - u-blox GPS configuration:
   - enable GSA, GSV, VTG
