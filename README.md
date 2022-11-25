@@ -32,7 +32,7 @@ For the T-Beam you need to select the `ESP32 Dev Module` board, for the T-Echo t
 - currently only the T-Echo as a Baro source for Stratux is supported
 
 **Recommendations (be careful as you may render your device unusable):**
-- load OGN database for T-Beam: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
+- load OGN database for T-Echo: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings) by **downloading** the following scripts, **opening** them in a browser to generate the appropriate $PSRFC and $PSKVC sentences and then **sending** these generated sentences to the SoftRF device via a serial USB console (e.g. Arduino IDE comes with a nice built in serial USB console):
   - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/basic.html (e.g. Protocol, Aircraft type, Aircraft ID)
   - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/ui.html (e.g. Units, e-Paper 'ghosts' removal)
