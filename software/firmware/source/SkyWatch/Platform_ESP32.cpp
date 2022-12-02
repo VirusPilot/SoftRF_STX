@@ -105,10 +105,10 @@ portMUX_TYPE BMA_mutex = portMUX_INITIALIZER_UNLOCKED;
 volatile bool PMU_Irq         = false;
 volatile bool BMA_Irq         = false;
 
-static bool has_usb_client    = false;
-
 #if defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3)
 #if defined(USE_USB_HOST)
+
+#include <cdc_acm_host.h>
 
 enum {
     USBSER_TYPE_CDC,
@@ -126,7 +126,7 @@ typedef struct {
     const char *last_name;
 } USB_Device_List_t;
 
-static const USB_Device_List_t supported_devices[] = {
+static const USB_Device_List_t supported_USB_devices[] = {
   { 0x0483, 0x5740, USBSER_TYPE_CDC, SOFTRF_MODEL_DONGLE, "Dongle" /* or Bracelet */, "Edition" },
   { 0x239A, 0x8029, USBSER_TYPE_CDC, SOFTRF_MODEL_BADGE, "Badge", "Edition" },
   { 0x2341, 0x804d, USBSER_TYPE_CDC, SOFTRF_MODEL_ACADEMY, "Academy", "Edition" },
@@ -145,8 +145,19 @@ static const USB_Device_List_t supported_devices[] = {
 
 enum {
   SOFTRF_DEVICE_COUNT =
-      sizeof(supported_devices) / sizeof(supported_devices[0])
+      sizeof(supported_USB_devices) / sizeof(supported_USB_devices[0])
 };
+
+// CDC-ACM driver object
+typedef struct {
+    usb_host_client_handle_t cdc_acm_client_hdl;        /*!< USB Host handle reused for all CDC-ACM devices in the system */
+    SemaphoreHandle_t open_close_mutex;
+    EventGroupHandle_t event_group;
+    cdc_acm_new_dev_callback_t new_dev_cb;
+    SLIST_HEAD(list_dev, cdc_dev_s) cdc_devices_list;   /*!< List of open pseudo devices */
+} cdc_acm_obj_t;
+
+extern cdc_acm_obj_t *p_cdc_acm_obj;
 
 #endif /* USE_USB_HOST */
 #endif /* CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3 */
@@ -363,15 +374,60 @@ static void ESP32_post_init()
 #if defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3)
 #if defined(USE_USB_HOST)
 
-  const char *str1 = "NO";
-  const char *str2 = "DEVICE";
+  const char *str1    = "NO";
+  const char *str2    = "DEVICE";
+  bool has_usb_client = false;
+  int timeout_ms      = 1000;
+
+  TickType_t timeout_ticks = (timeout_ms == 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeout_ms);
+  TimeOut_t connection_timeout;
+  vTaskSetTimeOutState(&connection_timeout);
+
+  do {
+      ESP_LOGD(TAG, "Checking list of connected USB devices");
+      uint8_t dev_addr_list[10];
+      int num_of_devices;
+      ESP_ERROR_CHECK(usb_host_device_addr_list_fill(sizeof(dev_addr_list), dev_addr_list, &num_of_devices));
+
+      // Go through device address list and find the one we are looking for
+      for (int i = 0; i < num_of_devices; i++) {
+          usb_device_handle_t current_device;
+          // Open USB device
+          if (usb_host_device_open(p_cdc_acm_obj->cdc_acm_client_hdl, dev_addr_list[i], &current_device) != ESP_OK) {
+              continue; // In case we failed to open this device, continue with next one in the list
+          }
+          assert(current_device);
+          const usb_device_desc_t *device_desc;
+          ESP_ERROR_CHECK(usb_host_get_device_descriptor(current_device, &device_desc));
+          uint16_t vid = device_desc->idVendor;
+          uint16_t pid = device_desc->idProduct;
+          usb_host_device_close(p_cdc_acm_obj->cdc_acm_client_hdl, current_device);
+          ESP_LOGI(TAG, "USB device VID: %X, PID: %X", vid, pid);
+
+          int j;
+          for (j = 0; j < SOFTRF_DEVICE_COUNT; j++) {
+            if (vid == supported_USB_devices[j].vid &&
+                pid == supported_USB_devices[j].pid) {
+                break;
+            }
+          }
+
+          if (j < SOFTRF_DEVICE_COUNT) {
+            has_usb_client = true;
+            hw_info.slave  = j;
+            break;
+          }
+      }
+      vTaskDelay(pdMS_TO_TICKS(50));
+  } while (has_usb_client == false &&
+           xTaskCheckForTimeOut(&connection_timeout, &timeout_ticks) == pdFALSE);
 
   switch (hw_info.display)
   {
   case DISPLAY_TFT_TTGO_135:
     if (has_usb_client) {
-      str1 = supported_devices[hw_info.slave].first_name;
-      str2 = supported_devices[hw_info.slave].last_name;
+      str1 = supported_USB_devices[hw_info.slave].first_name;
+      str2 = supported_USB_devices[hw_info.slave].last_name;
     }
 
     TFT_Message(str1, str2);
@@ -1255,17 +1311,6 @@ using namespace esp_usb;
 
 cbuf *USB_RX_FIFO, *USB_TX_FIFO;
 
-// CDC-ACM driver object
-typedef struct {
-    usb_host_client_handle_t cdc_acm_client_hdl;        /*!< USB Host handle reused for all CDC-ACM devices in the system */
-    SemaphoreHandle_t open_close_mutex;
-    EventGroupHandle_t event_group;
-    cdc_acm_new_dev_callback_t new_dev_cb;
-    SLIST_HEAD(list_dev, cdc_dev_s) cdc_devices_list;   /*!< List of open pseudo devices */
-} cdc_acm_obj_t;
-
-extern cdc_acm_obj_t *p_cdc_acm_obj;
-
 static SemaphoreHandle_t device_disconnected_sem;
 
 typedef struct {
@@ -1359,47 +1404,6 @@ static void ESP32S2_USB_setup()
     ESP_ERROR_CHECK(cdc_acm_host_install(NULL));
 
     assert(p_cdc_acm_obj);
-    int timeout_ms = 1000;
-
-    TickType_t timeout_ticks = (timeout_ms == 0) ? portMAX_DELAY : pdMS_TO_TICKS(timeout_ms);
-    TimeOut_t connection_timeout;
-    vTaskSetTimeOutState(&connection_timeout);
-
-    do {
-        ESP_LOGD(TAG, "Checking list of connected USB devices");
-        uint8_t dev_addr_list[10];
-        int num_of_devices;
-        ESP_ERROR_CHECK(usb_host_device_addr_list_fill(sizeof(dev_addr_list), dev_addr_list, &num_of_devices));
-
-        // Go through device address list and find the one we are looking for
-        for (int i = 0; i < num_of_devices; i++) {
-            usb_device_handle_t current_device;
-            // Open USB device
-            if (usb_host_device_open(p_cdc_acm_obj->cdc_acm_client_hdl, dev_addr_list[i], &current_device) != ESP_OK) {
-                continue; // In case we failed to open this device, continue with next one in the list
-            }
-            assert(current_device);
-            const usb_device_desc_t *device_desc;
-            ESP_ERROR_CHECK(usb_host_get_device_descriptor(current_device, &device_desc));
-            uint16_t vid = device_desc->idVendor;
-            uint16_t pid = device_desc->idProduct;
-            usb_host_device_close(p_cdc_acm_obj->cdc_acm_client_hdl, current_device);
-            ESP_LOGI(TAG, "USB device VID: %X, PID: %X", vid, pid);
-            int j;
-            for (j = 0; j < SOFTRF_DEVICE_COUNT; j++) {
-              if (vid == supported_devices[j].vid &&
-                  pid == supported_devices[j].pid) {
-                  break;
-              }
-            }
-
-            if (j < SOFTRF_DEVICE_COUNT) {
-              has_usb_client = true;
-              hw_info.slave  = j;
-            }
-        }
-        vTaskDelay(pdMS_TO_TICKS(50));
-    } while (xTaskCheckForTimeOut(&connection_timeout, &timeout_ticks) == pdFALSE);
 }
 
 static void ESP32S2_USB_loop()
@@ -1431,9 +1435,9 @@ static void ESP32S2_USB_loop()
 
             int j;
             for (j = 0; j < SOFTRF_DEVICE_COUNT; j++) {
-              if (vid == supported_devices[j].vid &&
-                  pid == supported_devices[j].pid) {
-                dev_type = supported_devices[j].type;
+              if (vid == supported_USB_devices[j].vid &&
+                  pid == supported_USB_devices[j].pid) {
+                dev_type = supported_USB_devices[j].type;
                 break;
               }
             }
@@ -1555,8 +1559,8 @@ static void ESP32S2_USB_loop()
         ESP_ERROR_CHECK(usb_host_device_addr_list_fill(sizeof(dev_addr_list), dev_addr_list, &num_of_devices));
         if (num_of_devices == 0) {
           ESP_LOGI(TAG, "Closing USB device 0x%04X:0x%04X",
-                   supported_devices[ESP32_USB_Serial.index].vid,
-                   supported_devices[ESP32_USB_Serial.index].pid);
+                   supported_USB_devices[ESP32_USB_Serial.index].vid,
+                   supported_USB_devices[ESP32_USB_Serial.index].pid);
           if (ESP32_USB_Serial.device) {
             ESP32_USB_Serial.device->close();
             ESP32_USB_Serial.device = NULL;
