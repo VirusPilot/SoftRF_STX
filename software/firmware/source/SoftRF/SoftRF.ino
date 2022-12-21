@@ -168,7 +168,14 @@ void setup()
 
   // When the users select 0 for aircraft type we will use the default of the chip
   if (settings->aircraft_id == 0) {
-    ThisAircraft.addr = SoC->getChipId() & 0x00FFFFFF;
+    uint32_t id = SoC->getChipId() & 0x00FFFFFF;
+    /* remap some addresses to avoid conflicts */
+    if (id >= 0x00DD0000 && id <= 0x00DFFFFF) {
+      id += 0x00100000;
+    } else if ((id & 0x00FF0000) == 0x005B0000 || (id & 0x00FF0000) == 0x00110000) {
+      id += 0x00010000;
+    }
+    ThisAircraft.addr = id;
   } else {
     ThisAircraft.addr = settings->aircraft_id & 0x00FFFFFF;
   }
