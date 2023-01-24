@@ -29,7 +29,7 @@ For the T-Beam you need to select the `ESP32 Dev Module` board, for the T-Echo t
 **LIMITATIONS:**
 - GPS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GPS as a pseudo AHRS
 - the L76K only supports the NMEA "strict" protocol version, therefore some extended satellite information (like elevation, azimut and numbering) is not provided for some satellites and therefore the GPS info page in Stratux is incomplete. Furthermore BEIDOU satellites are not displayed at all but are in fact used and counted for "in solution"
-- currently only the T-Echo as a Baro source for Stratux is supported
+- if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux; please note the following limitations when adding a baro module to your T-Beam: https://github.com/lyusupov/SoftRF/issues/32#issuecomment-420242682
 
 **Recommendations (be careful as you may render your device unusable):**
 - load OGN database for T-Echo: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
