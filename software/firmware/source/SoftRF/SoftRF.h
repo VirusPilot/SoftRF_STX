@@ -92,7 +92,7 @@
  *
  * Applicable for Standalone Edition. Inherited by most of other SoftRF platforms.
  */
-#define STD_OUT_BR        38400
+#define STD_OUT_BR        115200
 #define STD_OUT_BITS      SERIAL_8N1
 
 #if !defined(SERIAL_OUT_BR)
