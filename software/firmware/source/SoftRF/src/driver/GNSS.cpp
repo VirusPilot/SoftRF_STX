@@ -443,7 +443,7 @@ static void setup_UBX()
   gnss_set_sucess = getUBX_ACK(0x06, 0x01);
 
   if (!gnss_set_sucess) {
-    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to disable NMEA GLL."));
+    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to turn off NMEA GLL."));
   }
 
   GNSS_DEBUG_PRINTLN(F("Switching off NMEA GSV: "));
@@ -453,7 +453,7 @@ static void setup_UBX()
   gnss_set_sucess = getUBX_ACK(0x06, 0x01);
 
   if (!gnss_set_sucess) {
-    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to disable NMEA GSV."));
+    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to turn off NMEA GSV."));
   }
 
   GNSS_DEBUG_PRINTLN(F("Switching off NMEA VTG: "));
@@ -463,22 +463,23 @@ static void setup_UBX()
   gnss_set_sucess = getUBX_ACK(0x06, 0x01);
 
   if (!gnss_set_sucess) {
-    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to disable NMEA VTG."));
+    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to turn off NMEA VTG."));
   }
 
-#if !defined(NMEA_TCP_SERVICE)
+#if defined(NMEA_TCP_SERVICE)
+  if (settings->nmea_out != NMEA_TCP)
+#endif /* NMEA_TCP_SERVICE */
+  {
+    GNSS_DEBUG_PRINTLN(F("Switching off NMEA GSA: "));
 
-  GNSS_DEBUG_PRINTLN(F("Switching off NMEA GSA: "));
+    msglen = makeUBXCFG(0x06, 0x01, sizeof(setGSA), setGSA);
+    sendUBX(GNSSbuf, msglen);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x01);
 
-  msglen = makeUBXCFG(0x06, 0x01, sizeof(setGSA), setGSA);
-  sendUBX(GNSSbuf, msglen);
-  gnss_set_sucess = getUBX_ACK(0x06, 0x01);
-
-  if (!gnss_set_sucess) {
-    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to disable NMEA GSA."));
+    if (!gnss_set_sucess) {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to turn off NMEA GSA."));
+    }
   }
-
-#endif
 }
 
 /* ------ BEGIN -----------  https://github.com/Black-Thunder/FPV-Tracker */
