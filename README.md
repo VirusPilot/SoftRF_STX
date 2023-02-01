@@ -17,7 +17,6 @@ In case you want to convert a T-Beam based OGN Tracker to run SoftRF, you first 
   - enable GPS, GALILEO, BEIDOU and SBAS
   - enable NMEA extended protocol
 - default connection with Stratux: **USB** (115200 baud)
-- WiFi disabled to avoid conflicts with Stratux WiFi
 - LEGACY traffic messages over serial connection are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
 
 **T-Echo modifications:**
