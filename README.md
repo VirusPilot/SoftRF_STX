@@ -17,6 +17,7 @@ In case you want to convert a T-Beam based OGN Tracker to run SoftRF, you first 
   - enable GPS, GALILEO, BEIDOU and SBAS
   - enable NMEA extended protocol
 - default connection with Stratux: **USB** (115200 baud)
+- the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
 - LEGACY traffic messages over serial connection are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
 
 **T-Echo modifications:**
@@ -25,15 +26,16 @@ In case you want to convert a T-Beam based OGN Tracker to run SoftRF, you first 
   - enable GPS, GLONASS and BEIDOU
   - NMEA output through USB (instead of Bluetooth)
 - default connection with Stratux: **USB** (115200 baud)
+- the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
 - LK8EX1 and LEGACY traffic messages over serial connection are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
 
-**LIMITATIONS:**
+**Limitations:**
 - GPS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GPS as a pseudo AHRS
 - the L76K only supports the NMEA "strict" protocol version, therefore some extended satellite information (like elevation, azimut and numbering) is not provided for some satellites and therefore the GPS info page in Stratux is incomplete. Furthermore BEIDOU satellites are not displayed at all but are in fact used and counted for "in solution"
 - if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux; please note the following limitations when adding a baro module to your T-Beam: https://github.com/lyusupov/SoftRF/issues/32#issuecomment-420242682
 
-**Open Issues:**
-- It appears that on SX1262 based T-Beams the modified GPS configuration sometimes reverts to default, e.g. GLONASS is enabled instead of BEIDOU. It is totally unclear why this happens, therefore SX1276 based T-Beams are recommended for the time being.
+**Issues:**
+- it appears that on SX1262 based T-Beams the modified GPS configuration sometimes reverts to the default GNSS settings, e.g. GLONASS is enabled instead of BEIDOU. It is totally unclear why this happens, therefore SX1276 based T-Beams are recommended for the time being
 
 **Recommendations (be careful as you may render your device unusable):**
 - load OGN database for T-Echo: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
