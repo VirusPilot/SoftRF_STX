@@ -34,6 +34,8 @@
 #include <egm96s.h>
 #endif /* EXCLUDE_EGM96 */
 
+#define DO_GNSS_DEBUG
+
 #if !defined(DO_GNSS_DEBUG)
 #define GNSS_DEBUG_PRINT
 #define GNSS_DEBUG_PRINTLN
@@ -189,11 +191,11 @@ const gnss_chip_ops_t generic_nmea_ops = {
  /* CFG-MSG */
 
  /*                               Class ID    I2C   UART1 UART2 USB   SPI   Res */
-//const uint8_t setGGA[] PROGMEM = {0xF0, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* GGA is already enabled */
+const uint8_t setGGA[] PROGMEM = {0xF0, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable GGA for Stratux */
 const uint8_t setGLL[] PROGMEM = {0xF0, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}; /* disable GLL */
 const uint8_t setGSA[] PROGMEM = {0xF0, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01}; /* enable GSA for Stratux */
 const uint8_t setGSV[] PROGMEM = {0xF0, 0x03, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01}; /* enable GSV for Stratux */
-//const uint8_t setRMC[] PROGMEM = {0xF0, 0x04, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* RMC is already enabled */
+const uint8_t setRMC[] PROGMEM = {0xF0, 0x04, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable RMC for Stratux */
 const uint8_t setVTG[] PROGMEM = {0xF0, 0x05, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable VTG for Stratux */
 
  /* CFG-PRT */
@@ -206,26 +208,19 @@ const uint8_t setNav5[] PROGMEM = {0xFF, 0xFF, 0x07, 0x03, 0x00, 0x00, 0x00, 0x0
                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                    0x00, 0x00, 0x00, 0x00};
 
-const uint8_t CFG_RST[12] PROGMEM = { 0xb5, 0x62, 0x06, 0x04, 0x04, 0x00, 0x00,
+const uint8_t CFG_RST[12] PROGMEM = { 0xB5, 0x62, 0x06, 0x04, 0x04, 0x00, 0x00,
                                       0x00, 0x01, 0x00, 0x0F, 0x66};
 
 const uint8_t CFG_RST_COLD[12] PROGMEM = { 0xB5, 0x62, 0x06, 0x04, 0x04, 0x00,
                                            0xFF, 0xB9, 0x00, 0x00, 0xC6, 0x8B };
 
-const uint8_t RXM_PMREQ_OFF[16] PROGMEM = {0xb5, 0x62, 0x02, 0x41, 0x08, 0x00,
+const uint8_t RXM_PMREQ_OFF[16] PROGMEM = {0xB5, 0x62, 0x02, 0x41, 0x08, 0x00,
                                            0x00, 0x00, 0x00, 0x00, 0x02, 0x00,
-                                           0x00, 0x00, 0x4d, 0x3b};
+                                           0x00, 0x00, 0x4d, 0x3B};
  /* CFG-CFG */
 const uint8_t factoryUBX[] PROGMEM = { 0xB5, 0x62, 0x06, 0x09, 0x0D, 0x00, 0xFF,
                                        0xFB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                        0xFF, 0xFF, 0x00, 0x00, 0x17, 0x2B, 0x7E } ;
-
- /* Stratux Setup: enable GPS & Glonass for u-blox 6 & 7 */
-const uint8_t setGNSS_U67[] PROGMEM = {0x00, 0x00, 0xFF, 0x04,
-                                       0x00, 0x04, 0xFF, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable GPS */
-                                       0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable SBAS */
-                                       0x05, 0x00, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable QZSS */
-                                       0x06, 0x08, 0xFF, 0x00, 0x00, 0x00, 0x01, 0x01}; /* disable Glonass */
 
  /* Stratux Setup: enable GPS & Galileo & Beidou for u-blox 8 */
 const uint8_t setGNSS_U8[] PROGMEM = {0x00, 0x00, 0xFF, 0x07,
@@ -237,11 +232,6 @@ const uint8_t setGNSS_U8[] PROGMEM = {0x00, 0x00, 0xFF, 0x07,
                                       0x05, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable QZSS */
                                       0x06, 0x08, 0x10, 0x00, 0x00, 0x00, 0x01, 0x01}; /* disable Glonass */
 
- /* Stratux Setup: set NMEA protocol version and numbering for u-blox 6 & 7 */
-const uint8_t setNMEA_U67[] PROGMEM = {0x00, 0x23, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,  /* NMEA protocol v2.3 extended */
-                                       0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-                                       0x00, 0x00, 0x00, 0x00};
-
  /* Stratux Setup: set NMEA protocol version and numbering for u-blox 8 */
 const uint8_t setNMEA_U8[] PROGMEM = {0x00, 0x40, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,  /* NMEA protocol v4.0 extended */
                                       0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
@@ -250,16 +240,36 @@ const uint8_t setNMEA_U8[] PROGMEM = {0x00, 0x40, 0x00, 0x02, 0x00, 0x00, 0x00, 
  /* Stratux Setup: configure SBAS */
 const uint8_t setSBAS[] PROGMEM = {0x01, 0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00}; /* disable integrity, enable auto-scan */
 
- /* Stratux Setup: load default configuration */
-const uint8_t defaultCFG[] PROGMEM = {0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03};
+ /* Stratux Setup */
+// load default configuration         |      clearMask     |  |     saveMask       |  |     loadMask       |  deviceMask
+const uint8_t defaultCFG[] PROGMEM = {0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x03};
 
- /* Stratux Setup: save configuration */
+ /* Stratux Setup */
+// save configuration              |      clearMask     |  |     saveMask       |  |     loadMask       |  deviceMask
 const uint8_t saveCFG[] PROGMEM = {0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03};
 
  /* Stratux Setup: set update rate */
 const uint8_t setRATE[] PROGMEM = {0xE8, 0x03, 0x01, 0x00, 0x01, 0x00}; /* set to 1Hz */
 //const uint8_t setRATE[] PROGMEM = {0xF4, 0x01, 0x01, 0x00, 0x01, 0x00}; /* set to 2Hz */
 //const uint8_t setRATE[] PROGMEM = {0xC8, 0x00, 0x01, 0x00, 0x01, 0x00}; /* set to 5Hz */
+
+// UBX-CFG-VALSET for u-blox M10S
+// RAM Layer configuration message
+// NMEA 4.0, NMEA extended svnumbering, dynamic model 7, AssistNow Autonomous, GPS+GAL+BDS+SBAS, 10Hz update rate, disable GLL
+// const uint8_t config_M10_RAM[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x28, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x23, 0x10, 0x01, 0x21, 0x00, 0x11, 0x20, 0x07, 0x01, 0x00, 0x21, 0x30, 0x64, 0x00, 0x22, 0x00, 0x31, 0x10, 0x01, 0xCA, 0x00, 0x91, 0x20, 0x00, 0x01, 0x00, 0x93, 0x20, 0x28, 0x07, 0x00, 0x93, 0x20, 0x01, 0x74, 0xCE};
+// for (int i = 0; i < sizeof(config_M10_RAM); i++)
+// {
+//   Serial_GNSS_Out.write(pgm_read_byte(&config_M10_RAM[i]));
+// }
+
+// UBX-CFG-VALSET for u-blox M10S
+// BBR Layer configuration message
+// NMEA 4.0, NMEA extended svnumbering, dynamic model 7, AssistNow Autonomous, GPS+GAL+BDS+SBAS, 10Hz update rate, disable GLL
+// const uint8_t config_M10_BBR[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x28, 0x00, 0x01, 0x02, 0x00, 0x00, 0x01, 0x00, 0x23, 0x10, 0x01, 0x21, 0x00, 0x11, 0x20, 0x07, 0x01, 0x00, 0x21, 0x30, 0x64, 0x00, 0x22, 0x00, 0x31, 0x10, 0x01, 0xCA, 0x00, 0x91, 0x20, 0x00, 0x01, 0x00, 0x93, 0x20, 0x28, 0x07, 0x00, 0x93, 0x20, 0x01, 0x75, 0xF5};
+// for (int i = 0; i < sizeof(config_M10_BBR); i++)
+// {
+//   Serial_GNSS_Out.write(pgm_read_byte(&config_M10_BBR[i]));
+// }
 
 #if defined(USE_GNSS_PSM)
 static bool gnss_psm_active = false;
@@ -305,8 +315,9 @@ uint8_t makeUBXCFG(uint8_t cl, uint8_t id, uint8_t msglen, const uint8_t *msg)
 static void sendUBX(const uint8_t *MSG, uint8_t len) {
   for (int i = 0; i < len; i++) {
     Serial_GNSS_Out.write( MSG[i]);
-    GNSS_DEBUG_PRINT(MSG[i], HEX);
+    //GNSS_DEBUG_PRINT(MSG[i], HEX);
   }
+  delay(250);
 //  Serial_GNSS_Out.println();
 }
 
@@ -385,101 +396,163 @@ static void setup_UBX()
 
   byte version = ublox_version();
 
-  //if ((version == GNSS_MODULE_U6) || (version == GNSS_MODULE_U7) || (version == GNSS_MODULE_U8)) {
-  // msglen = makeUBXCFG(0x06, 0x09, sizeof(defaultCFG), defaultCFG);
-  // sendUBX(GNSSbuf, msglen);
-  // gnss_set_sucess = getUBX_ACK(0x06, 0x09);
-  //}
-
-  if ((version == GNSS_MODULE_U6) || (version == GNSS_MODULE_U7)) {
-    msglen = makeUBXCFG(0x06, 0x3E, sizeof(setGNSS_U67), setGNSS_U67);
+  if ((version == GNSS_MODULE_U6) || (version == GNSS_MODULE_U7) || (version == GNSS_MODULE_U8))
+  {
+    msglen = makeUBXCFG(0x06, 0x09, sizeof(defaultCFG), defaultCFG);
     sendUBX(GNSSbuf, msglen);
-    gnss_set_sucess = getUBX_ACK(0x06, 0x3E);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x09);
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to load u-blox defaults"));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully loaded u-blox defaults"));
+    }
+  } /* GNSS_MODULE_U678 */
 
-    msglen = makeUBXCFG(0x06, 0x17, sizeof(setNMEA_U67), setNMEA_U67);
-    sendUBX(GNSSbuf, msglen);
-    gnss_set_sucess = getUBX_ACK(0x06, 0x17);
-  }
-
-  if (version == GNSS_MODULE_U8) {
+  if (version == GNSS_MODULE_U8)
+  {
     msglen = makeUBXCFG(0x06, 0x3E, sizeof(setGNSS_U8), setGNSS_U8);
     sendUBX(GNSSbuf, msglen);
     gnss_set_sucess = getUBX_ACK(0x06, 0x3E);
-  
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set GNSS_U8: "));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set GNSS_U8: "));
+    }
+
     msglen = makeUBXCFG(0x06, 0x17, sizeof(setNMEA_U8), setNMEA_U8);
     sendUBX(GNSSbuf, msglen);
     gnss_set_sucess = getUBX_ACK(0x06, 0x17);
-  }
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA_U8"));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA_U8"));
+    }
+  } /* GNSS_MODULE_U8 */
 
-  if ((version == GNSS_MODULE_U6) || (version == GNSS_MODULE_U7) || (version == GNSS_MODULE_U8)) {
+  if ((version == GNSS_MODULE_U6) || (version == GNSS_MODULE_U7) || (version == GNSS_MODULE_U8))
+  {
     msglen = makeUBXCFG(0x06, 0x16, sizeof(setSBAS), setSBAS);
     sendUBX(GNSSbuf, msglen);
     gnss_set_sucess = getUBX_ACK(0x06, 0x16);
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set SBAS"));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set SBAS"));
+    }
 
     msglen = makeUBXCFG(0x06, 0x08, sizeof(setRATE), setRATE);
     sendUBX(GNSSbuf, msglen);
     gnss_set_sucess = getUBX_ACK(0x06, 0x08);
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set RATE"));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set RATE"));
+    }
 
-    //msglen = makeUBXCFG(0x06, 0x09, sizeof(saveCFG), saveCFG);
-    //sendUBX(GNSSbuf, msglen);
-    //gnss_set_sucess = getUBX_ACK(0x06, 0x09);
-  }
+    msglen = makeUBXCFG(0x06, 0x24, sizeof(setNav5), setNav5);
+    sendUBX(GNSSbuf, msglen);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x24);
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set airborne < 2g navigation mode"));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set airborne < 2g navigation mode"));
+    }
 
-  GNSS_DEBUG_PRINTLN(F("Airborne <2g navigation mode: "));
-
-  // Set the navigation mode (Airborne, < 2g)
-  msglen = makeUBXCFG(0x06, 0x24, sizeof(setNav5), setNav5);
-  sendUBX(GNSSbuf, msglen);
-  gnss_set_sucess = getUBX_ACK(0x06, 0x24);
-
-  if (!gnss_set_sucess) {
-    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set airborne <2g navigation mode."));
-  }
-
-  GNSS_DEBUG_PRINTLN(F("Switching off NMEA GLL: "));
-
-  msglen = makeUBXCFG(0x06, 0x01, sizeof(setGLL), setGLL);
-  sendUBX(GNSSbuf, msglen);
-  gnss_set_sucess = getUBX_ACK(0x06, 0x01);
-
-  if (!gnss_set_sucess) {
-    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to turn off NMEA GLL."));
-  }
-
-  GNSS_DEBUG_PRINTLN(F("Switching off NMEA GSV: "));
-
-  msglen = makeUBXCFG(0x06, 0x01, sizeof(setGSV), setGSV);
-  sendUBX(GNSSbuf, msglen);
-  gnss_set_sucess = getUBX_ACK(0x06, 0x01);
-
-  if (!gnss_set_sucess) {
-    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to turn off NMEA GSV."));
-  }
-
-  GNSS_DEBUG_PRINTLN(F("Switching off NMEA VTG: "));
-
-  msglen = makeUBXCFG(0x06, 0x01, sizeof(setVTG), setVTG);
-  sendUBX(GNSSbuf, msglen);
-  gnss_set_sucess = getUBX_ACK(0x06, 0x01);
-
-  if (!gnss_set_sucess) {
-    GNSS_DEBUG_PRINTLN(F("WARNING: Unable to turn off NMEA VTG."));
-  }
-
-#if defined(NMEA_TCP_SERVICE)
-  if (settings->nmea_out != NMEA_TCP)
-#endif /* NMEA_TCP_SERVICE */
-  {
-    GNSS_DEBUG_PRINTLN(F("Switching off NMEA GSA: "));
-
-    msglen = makeUBXCFG(0x06, 0x01, sizeof(setGSA), setGSA);
+    msglen = makeUBXCFG(0x06, 0x01, sizeof(setGGA), setGGA);
     sendUBX(GNSSbuf, msglen);
     gnss_set_sucess = getUBX_ACK(0x06, 0x01);
-
-    if (!gnss_set_sucess) {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to turn off NMEA GSA."));
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA GGA"));
     }
-  }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA GGA"));
+    }
+
+    msglen = makeUBXCFG(0x06, 0x01, sizeof(setGLL), setGLL);
+    sendUBX(GNSSbuf, msglen);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x01);
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA GLL"));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA GLL"));
+    }
+
+    msglen = makeUBXCFG(0x06, 0x01, sizeof(setGSV), setGSV);
+    sendUBX(GNSSbuf, msglen);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x01);
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA GSV"));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA GSV"));
+    }
+
+    msglen = makeUBXCFG(0x06, 0x01, sizeof(setRMC), setRMC);
+    sendUBX(GNSSbuf, msglen);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x01);
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA RMC"));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA RMC"));
+    }
+
+    msglen = makeUBXCFG(0x06, 0x01, sizeof(setVTG), setVTG);
+    sendUBX(GNSSbuf, msglen);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x01);
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA VTG"));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA VTG"));
+    }
+
+#if defined(NMEA_TCP_SERVICE)
+    if (settings->nmea_out != NMEA_TCP)
+#endif /* NMEA_TCP_SERVICE */
+    {
+      msglen = makeUBXCFG(0x06, 0x01, sizeof(setGSA), setGSA);
+      sendUBX(GNSSbuf, msglen);
+      gnss_set_sucess = getUBX_ACK(0x06, 0x01);
+      if (!gnss_set_sucess)
+      {
+        GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA GSA"));
+      }
+      else
+      {
+        GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA GSA"));
+      }
+    }
+  } /* GNSS_MODULE_U678 */
 }
 
 /* ------ BEGIN -----------  https://github.com/Black-Thunder/FPV-Tracker */
@@ -500,7 +573,7 @@ static int ubloxProcessData(unsigned char data) {
 
 	switch (ubloxProcessDataState) {
 	case WAIT_SYNC1:
-		if (data == 0xb5) {
+		if (data == 0xB5) {
 			ubloxProcessDataState = WAIT_SYNC2;
 		}
 		break;
@@ -509,7 +582,7 @@ static int ubloxProcessData(unsigned char data) {
 		if (data == 0x62) {
 			ubloxProcessDataState = GET_CLASS;
 		}
-		else if (data == 0xb5) {
+		else if (data == 0xB5) {
 			// ubloxProcessDataState = GET_SYNC2;
 		}
 		else {
@@ -710,17 +783,17 @@ static void ublox_loop()
 
 static void ublox_fini()
 {
-  // Controlled Software reset
-  for (int i = 0; i < sizeof(CFG_RST); i++) {
-    Serial_GNSS_Out.write(pgm_read_byte(&CFG_RST[i]));
-  }
+  // // Controlled Software reset
+  // for (int i = 0; i < sizeof(CFG_RST); i++) {
+  //   Serial_GNSS_Out.write(pgm_read_byte(&CFG_RST[i]));
+  // }
 
-  delay(hw_info.gnss == GNSS_MODULE_U8 ? 1000 : 600);
+  // delay(hw_info.gnss == GNSS_MODULE_U8 ? 1000 : 600);
 
-  // power off until wakeup call
-  for (int i = 0; i < sizeof(RXM_PMREQ_OFF); i++) {
-    Serial_GNSS_Out.write(pgm_read_byte(&RXM_PMREQ_OFF[i]));
-  }
+  // // power off until wakeup call
+  // for (int i = 0; i < sizeof(RXM_PMREQ_OFF); i++) {
+  //   Serial_GNSS_Out.write(pgm_read_byte(&RXM_PMREQ_OFF[i]));
+  // }
 }
 
 const gnss_chip_ops_t ublox_ops = {
