@@ -193,8 +193,8 @@ const gnss_chip_ops_t generic_nmea_ops = {
  /*                               Class ID    I2C   UART1 UART2 USB   SPI   Res */
 const uint8_t setGGA[] PROGMEM = {0xF0, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable GGA for Stratux */
 const uint8_t setGLL[] PROGMEM = {0xF0, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}; /* disable GLL */
-const uint8_t setGSA[] PROGMEM = {0xF0, 0x02, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01}; /* enable GSA for Stratux */
-const uint8_t setGSV[] PROGMEM = {0xF0, 0x03, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01}; /* enable GSV for Stratux */
+const uint8_t setGSA[] PROGMEM = {0xF0, 0x02, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable GSA for Stratux */
+const uint8_t setGSV[] PROGMEM = {0xF0, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable GSV for Stratux */
 const uint8_t setRMC[] PROGMEM = {0xF0, 0x04, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable RMC for Stratux */
 const uint8_t setVTG[] PROGMEM = {0xF0, 0x05, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable VTG for Stratux */
 
@@ -472,11 +472,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x24);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set airborne < 2g navigation mode"));
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set dynamic platform model 7 (airborne < 2g)"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set airborne < 2g navigation mode"));
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set dynamic platform model 7 (airborne < 2g)"));
     }
 
     msglen = makeUBXCFG(0x06, 0x01, sizeof(setGGA), setGGA);
