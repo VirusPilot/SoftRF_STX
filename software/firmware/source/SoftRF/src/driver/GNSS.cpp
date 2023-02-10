@@ -399,20 +399,20 @@ static void setup_UBX()
 
   byte version = ublox_version();
 
-  if ((version == GNSS_MODULE_U6) || (version == GNSS_MODULE_U7) || (version == GNSS_MODULE_U8))
-  {
-    msglen = makeUBXCFG(0x06, 0x09, sizeof(defaultCFG), defaultCFG);
-    sendUBX(GNSSbuf, msglen);
-    gnss_set_sucess = getUBX_ACK(0x06, 0x09);
-    if (!gnss_set_sucess)
-    {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to load u-blox defaults"));
-    }
-    else
-    {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully loaded u-blox defaults"));
-    }
-  } /* GNSS_MODULE_U678 */
+  // if ((version == GNSS_MODULE_U6) || (version == GNSS_MODULE_U7) || (version == GNSS_MODULE_U8))
+  // {
+  //   msglen = makeUBXCFG(0x06, 0x09, sizeof(defaultCFG), defaultCFG);
+  //   sendUBX(GNSSbuf, msglen);
+  //   gnss_set_sucess = getUBX_ACK(0x06, 0x09);
+  //   if (!gnss_set_sucess)
+  //   {
+  //     GNSS_DEBUG_PRINTLN(F("WARNING: Unable to load u-blox defaults"));
+  //   }
+  //   else
+  //   {
+  //     GNSS_DEBUG_PRINTLN(F("Sucessfully loaded u-blox defaults"));
+  //   }
+  // } /* GNSS_MODULE_U678 */
 
   if (version == GNSS_MODULE_U8)
   {
@@ -421,11 +421,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x3E);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set GNSS_U8: "));
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set GNSS_U8"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set GNSS_U8: "));
+      GNSS_DEBUG_PRINTLN(F("Sucessfully set GNSS_U8"));
     }
 
     msglen = makeUBXCFG(0x06, 0x17, sizeof(setNMEA_U8), setNMEA_U8);
@@ -554,6 +554,18 @@ static void setup_UBX()
       {
         GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA GSA"));
       }
+    }
+
+    msglen = makeUBXCFG(0x06, 0x09, sizeof(saveCFG), saveCFG);
+    sendUBX(GNSSbuf, msglen);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x09);
+    if (!gnss_set_sucess)
+    {
+      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to save u-blox configuration"));
+    }
+    else
+    {
+      GNSS_DEBUG_PRINTLN(F("Sucessfully saved u-blox configuration"));
     }
   } /* GNSS_MODULE_U678 */
 }
