@@ -34,8 +34,6 @@
 #include <egm96s.h>
 #endif /* EXCLUDE_EGM96 */
 
-#define DO_GNSS_DEBUG
-
 #if !defined(DO_GNSS_DEBUG)
 #define GNSS_DEBUG_PRINT
 #define GNSS_DEBUG_PRINTLN
@@ -318,9 +316,8 @@ uint8_t makeUBXCFG(uint8_t cl, uint8_t id, uint8_t msglen, const uint8_t *msg)
 static void sendUBX(const uint8_t *MSG, uint8_t len) {
   for (int i = 0; i < len; i++) {
     Serial_GNSS_Out.write( MSG[i]);
-    //GNSS_DEBUG_PRINT(MSG[i], HEX);
+    GNSS_DEBUG_PRINT(MSG[i], HEX);
   }
-  delay(250);
 //  Serial_GNSS_Out.println();
 }
 
@@ -399,20 +396,20 @@ static void setup_UBX()
 
   byte version = ublox_version();
 
-  // if ((version == GNSS_MODULE_U6) || (version == GNSS_MODULE_U7) || (version == GNSS_MODULE_U8))
-  // {
-  //   msglen = makeUBXCFG(0x06, 0x09, sizeof(defaultCFG), defaultCFG);
-  //   sendUBX(GNSSbuf, msglen);
-  //   gnss_set_sucess = getUBX_ACK(0x06, 0x09);
-  //   if (!gnss_set_sucess)
-  //   {
-  //     GNSS_DEBUG_PRINTLN(F("WARNING: Unable to load u-blox defaults"));
-  //   }
-  //   else
-  //   {
-  //     GNSS_DEBUG_PRINTLN(F("Sucessfully loaded u-blox defaults"));
-  //   }
-  // } /* GNSS_MODULE_U678 */
+  if ((version == GNSS_MODULE_U6) || (version == GNSS_MODULE_U7) || (version == GNSS_MODULE_U8))
+  {
+    msglen = makeUBXCFG(0x06, 0x09, sizeof(defaultCFG), defaultCFG);
+    sendUBX(GNSSbuf, msglen);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x09);
+    if (!gnss_set_sucess)
+    {
+      Serial.println(F("WARNING: Unable to load u-blox defaults"));
+    }
+    else
+    {
+      Serial.println(F("Sucessfully loaded u-blox defaults"));
+    }
+  } /* GNSS_MODULE_U678 */
 
   if (version == GNSS_MODULE_U8)
   {
@@ -421,11 +418,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x3E);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set GNSS_U8"));
+      Serial.println(F("WARNING: Unable to set GNSS_U8"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set GNSS_U8"));
+      Serial.println(F("Sucessfully set GNSS_U8"));
     }
 
     msglen = makeUBXCFG(0x06, 0x17, sizeof(setNMEA_U8), setNMEA_U8);
@@ -433,11 +430,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x17);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA_U8"));
+      Serial.println(F("WARNING: Unable to set NMEA_U8"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA_U8"));
+      Serial.println(F("Sucessfully set NMEA_U8"));
     }
   } /* GNSS_MODULE_U8 */
 
@@ -448,11 +445,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x16);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set SBAS"));
+      Serial.println(F("WARNING: Unable to set SBAS"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set SBAS"));
+      Serial.println(F("Sucessfully set SBAS"));
     }
 
     msglen = makeUBXCFG(0x06, 0x08, sizeof(setRATE), setRATE);
@@ -460,11 +457,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x08);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set RATE"));
+      Serial.println(F("WARNING: Unable to set RATE"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set RATE"));
+      Serial.println(F("Sucessfully set RATE"));
     }
 
     msglen = makeUBXCFG(0x06, 0x24, sizeof(setNav5), setNav5);
@@ -472,11 +469,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x24);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set dynamic platform model 7 (airborne < 2g)"));
+      Serial.println(F("WARNING: Unable to set dynamic platform model 7 (airborne < 2g)"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set dynamic platform model 7 (airborne < 2g)"));
+      Serial.println(F("Sucessfully set dynamic platform model 7 (airborne < 2g)"));
     }
 
     msglen = makeUBXCFG(0x06, 0x01, sizeof(setGGA), setGGA);
@@ -484,11 +481,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x01);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA GGA"));
+      Serial.println(F("WARNING: Unable to set NMEA GGA"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA GGA"));
+      Serial.println(F("Sucessfully set NMEA GGA"));
     }
 
     msglen = makeUBXCFG(0x06, 0x01, sizeof(setGLL), setGLL);
@@ -496,11 +493,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x01);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA GLL"));
+      Serial.println(F("WARNING: Unable to set NMEA GLL"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA GLL"));
+      Serial.println(F("Sucessfully set NMEA GLL"));
     }
 
     msglen = makeUBXCFG(0x06, 0x01, sizeof(setGSV), setGSV);
@@ -508,11 +505,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x01);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA GSV"));
+      Serial.println(F("WARNING: Unable to set NMEA GSV"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA GSV"));
+      Serial.println(F("Sucessfully set NMEA GSV"));
     }
 
     msglen = makeUBXCFG(0x06, 0x01, sizeof(setRMC), setRMC);
@@ -520,11 +517,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x01);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA RMC"));
+      Serial.println(F("WARNING: Unable to set NMEA RMC"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA RMC"));
+      Serial.println(F("Sucessfully set NMEA RMC"));
     }
 
     msglen = makeUBXCFG(0x06, 0x01, sizeof(setVTG), setVTG);
@@ -532,11 +529,11 @@ static void setup_UBX()
     gnss_set_sucess = getUBX_ACK(0x06, 0x01);
     if (!gnss_set_sucess)
     {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA VTG"));
+      Serial.println(F("WARNING: Unable to set NMEA VTG"));
     }
     else
     {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA VTG"));
+      Serial.println(F("Sucessfully set NMEA VTG"));
     }
 
 #if defined(NMEA_TCP_SERVICE)
@@ -548,25 +545,25 @@ static void setup_UBX()
       gnss_set_sucess = getUBX_ACK(0x06, 0x01);
       if (!gnss_set_sucess)
       {
-        GNSS_DEBUG_PRINTLN(F("WARNING: Unable to set NMEA GSA"));
+        Serial.println(F("WARNING: Unable to set NMEA GSA"));
       }
       else
       {
-        GNSS_DEBUG_PRINTLN(F("Sucessfully set NMEA GSA"));
+        Serial.println(F("Sucessfully set NMEA GSA"));
       }
     }
 
-    msglen = makeUBXCFG(0x06, 0x09, sizeof(saveCFG), saveCFG);
-    sendUBX(GNSSbuf, msglen);
-    gnss_set_sucess = getUBX_ACK(0x06, 0x09);
-    if (!gnss_set_sucess)
-    {
-      GNSS_DEBUG_PRINTLN(F("WARNING: Unable to save u-blox configuration"));
-    }
-    else
-    {
-      GNSS_DEBUG_PRINTLN(F("Sucessfully saved u-blox configuration"));
-    }
+    // msglen = makeUBXCFG(0x06, 0x09, sizeof(saveCFG), saveCFG);
+    // sendUBX(GNSSbuf, msglen);
+    // gnss_set_sucess = getUBX_ACK(0x06, 0x09);
+    // if (!gnss_set_sucess)
+    // {
+    //   Serial.println(F("WARNING: Unable to save u-blox configuration"));
+    // }
+    // else
+    // {
+    //   Serial.println(F("Sucessfully saved u-blox configuration"));
+    // }
   } /* GNSS_MODULE_U678 */
 }
 
