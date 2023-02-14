@@ -1,7 +1,7 @@
 # SoftRF DIY - Stratux compatible fork
 
-- enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
-- option to modify Aircraft ID (through serial USB console, see below)
+- enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB or WiFi)
+- option to enter Aircraft ID (instead of SoftRF factory ID)
 
 **IMPORTANT**: All modifications are provided only in the source code so you need to be familiar with Arduino to compile and flash it for your platform. You need to install Arduino IDE (v1.8 or later) and add the following two entries into the Additional Board Manager URLs:
 - T-Beam: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
@@ -16,15 +16,20 @@ In case you want to convert a T-Beam based OGN Tracker to run SoftRF, you first 
   - enable GSA, GSV, VTG
   - enable GPS, GALILEO, BEIDOU and SBAS
   - enable NMEA extended protocol
+- LEGACY NMEA traffic messages are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
 - default connection with Stratux: **USB** (115200 baud)
-- the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
-- LEGACY traffic messages over serial connection are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
+  - the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
+- alternative connection with Stratux: **WiFi**
+  - Stratux needs to be in `AP+Client mode` to connect to the SoftRF WiFi AP (please add your SoftRF's SSID and password to the list of `WiFi Client Networks` in the Stratux WiFi settings)
+  - `NMEA output` needs to be set to `TCP`, using the SoftRF webinterface
+  - tbd: automatic port fowarding in Stratux, for now `socat TCP:192.168.4.1:2000 TCP:localhost:30011` is doing the trick
 
 **T-Echo modifications:**
 - L76K GPS configuration:
   - enable GSA, GSV, VTG
   - enable GPS, GLONASS and BEIDOU
   - NMEA output through USB (instead of Bluetooth)
+- WiFi AP IP changed to 192.168.4.1
 - default connection with Stratux: **USB** (115200 baud)
 - the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
 - LK8EX1 and LEGACY traffic messages over serial connection are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
@@ -37,8 +42,11 @@ In case you want to convert a T-Beam based OGN Tracker to run SoftRF, you first 
 **Issues:**
 - it appears that on SX1262 based T-Beams the modified GPS configuration sometimes reverts to the default GNSS settings, e.g. GLONASS is enabled instead of BEIDOU. It is totally unclear why this happens, therefore SX1276 based T-Beams are recommended for the time being
 
-**Recommendations (be careful as you may render your device unusable):**
-- load OGN database for T-Echo: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
+**Recommendations for T-Beam:**
+- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF webinterface
+
+**Recommendations for T-Echo:**
+- load OGN database: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings) by **downloading** the following scripts, **opening** them in a browser to generate the appropriate $PSRFC and $PSKVC sentences and then **sending** these generated sentences to the SoftRF device via a serial USB console (e.g. Arduino IDE comes with a nice built in serial USB console):
   - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/basic.html (e.g. Protocol, Aircraft type, Aircraft ID)
   - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/ui.html (e.g. Units, e-Paper 'ghosts' removal)
