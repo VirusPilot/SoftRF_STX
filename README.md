@@ -17,8 +17,7 @@ In case you want to convert a T-Beam based OGN Tracker to run SoftRF, you first 
   - enable GPS, GALILEO, BEIDOU and SBAS
   - enable NMEA extended protocol
 - LEGACY NMEA traffic messages are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
-- default connection with Stratux: **USB** (115200 baud)
-  - the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
+- default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
 - WiFi AP IP changed to `192.168.4.1` to avoid conflicts with Stratux WiFi AP IP
 - alternative connection with Stratux (under development): **WiFi**
   - Stratux needs to be in `AP+Client mode` to connect to the SoftRF WiFi AP (please add your SoftRF's SSID and password to the list of `WiFi Client Networks` in the Stratux WiFi settings)
@@ -30,8 +29,7 @@ In case you want to convert a T-Beam based OGN Tracker to run SoftRF, you first 
   - enable GSA, GSV, VTG
   - enable GPS, GLONASS and BEIDOU
   - NMEA output through USB (instead of Bluetooth)
-- default connection with Stratux: **USB** (115200 baud)
-- the USB T-Echo connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
+- default connection with Stratux: **USB** (115200 baud), the USB T-Echo connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
 - LK8EX1 and LEGACY traffic messages over serial connection are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
 
 **Limitations:**
