@@ -1,7 +1,9 @@
 # SoftRF DIY - Stratux compatible fork
 
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB or WiFi)
-- option to enter Aircraft ID (instead of SoftRF factory ID)
+- option to enter Aircraft ID
+  - if an Aircraft ID is added, then ADDR_TYPE_ICAO is set for both Legacy and OGN
+  - if the SoftRF factory ID remains, then ADDR_TYPE is set according to the selected protocol
 
 **IMPORTANT**: All modifications are provided only in the source code so you need to be familiar with Arduino to compile and flash it for your platform. You need to install Arduino IDE (v1.8 or later) and add the following two entries into the Additional Board Manager URLs:
 - T-Beam: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
