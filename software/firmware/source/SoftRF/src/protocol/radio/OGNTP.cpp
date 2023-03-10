@@ -97,16 +97,9 @@ bool ogntp_decode(void *pkt, ufo_t *this_aircraft, ufo_t *fop) {
     return false;
   }
 
-#if !defined(SOFTRF_ADDRESS)
-  uint8_t addr_type = ADDR_TYPE_ANONYMOUS;
-#else
-  uint8_t addr_type = (this_aircraft->addr == SOFTRF_ADDRESS ?
-                        ADDR_TYPE_ICAO : ADDR_TYPE_ANONYMOUS);
-#endif
-
   /* ignore this device own (relayed) packets */
   if ((ogn_rx_pkt.Packet.Header.Address    == this_aircraft->addr) &&
-      (ogn_rx_pkt.Packet.Header.AddrType   == addr_type          ) &&
+      (ogn_rx_pkt.Packet.Header.AddrType   == this_aircraft->addr_type) &&
       (ogn_rx_pkt.Packet.Header.RelayCount > 0 )) {
     return false;
   }
@@ -165,13 +158,12 @@ size_t ogntp_encode(void *pkt, ufo_t *this_aircraft) {
   ogn_tx_pkt.Packet.HeaderWord      = 0;
   ogn_tx_pkt.Packet.Header.Address  = this_aircraft->addr;
 
-#if !defined(SOFTRF_ADDRESS)
-  ogn_tx_pkt.Packet.Header.AddrType = ADDR_TYPE_ANONYMOUS;
-#else
-  ogn_tx_pkt.Packet.Header.AddrType = (this_aircraft->addr == SOFTRF_ADDRESS ?
-                                      ADDR_TYPE_ICAO : ADDR_TYPE_ANONYMOUS);
-#endif
-
+  if (this_aircraft->addr_type != ADDR_TYPE_ICAO) {
+    ogn_tx_pkt.Packet.Header.AddrType = ADDR_TYPE_ANONYMOUS; // OGN
+  } else {
+    ogn_tx_pkt.Packet.Header.AddrType = ADDR_TYPE_ICAO;
+  }
+  
 #if defined(USE_OGN_ENCRYPTION)
   if (key[0] || key[1] || key[2] || key[3])
     ogn_tx_pkt.Packet.Header.Encrypted = 1;

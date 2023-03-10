@@ -176,8 +176,10 @@ void setup()
       id += 0x00010000;
     }
     ThisAircraft.addr = id;
+    ThisAircraft.addr_type = ADDR_TYPE_RANDOM;
   } else {
     ThisAircraft.addr = settings->aircraft_id & 0x00FFFFFF;
+    ThisAircraft.addr_type = ADDR_TYPE_ICAO;
   }
 
   hw_info.rf = RF_setup();
