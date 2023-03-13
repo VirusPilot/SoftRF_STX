@@ -74,6 +74,7 @@ bi_decl(bi_1pin_with_name(SOC_EPD_PIN_DC_WS,   "EPD DC"));
 #if defined(EXCLUDE_WIFI)
 char UDPpacketBuffer[4]; // Dummy definition to satisfy build sequence
 #else
+#define ENABLE_ARDUINO_FEATURES 0
 WebServer server ( 80 );
 #endif /* EXCLUDE_WIFI */
 
@@ -95,8 +96,8 @@ static bool wdt_is_active = false;
 
 static RP2040_board_id RP2040_board    = RP2040_RPIPICO; /* default */
 const char *RP2040_Device_Manufacturer = SOFTRF_IDENT;
-const char *RP2040_Device_Model        = "SkyView Light";
-const uint16_t RP2040_Device_Version   = SOFTRF_USB_FW_VERSION;
+const char *RP2040_Device_Model        = SKYVIEW_IDENT " Light";
+const uint16_t RP2040_Device_Version   = SKYVIEW_USB_FW_VERSION;
 
 #define UniqueIDsize 2
 
@@ -130,6 +131,7 @@ static SPIFlash_Device_t possible_devices[] = {
 static bool RP2040_has_spiflash = false;
 static uint32_t spiflash_id     = 0;
 static bool FATFS_is_mounted    = false;
+static bool ADB_is_open         = false;
 
 #if defined(USE_TINYUSB)
 // USB Mass Storage object
@@ -138,6 +140,15 @@ Adafruit_USBD_MSC usb_msc;
 
 // file system object from SdFat
 FatFileSystem fatfs;
+
+#if ENABLE_ARDUINO_FEATURES
+#include "uCDB.hpp"
+#include <ArduinoJson.h>
+#define RP2040_JSON_BUFFER_SIZE  1024
+
+uCDB<FatFileSystem, File> ucdb(fatfs);
+StaticJsonBuffer<RP2040_JSON_BUFFER_SIZE> RP2040_jsonBuffer;
+#endif
 
 #if !defined(ARDUINO_ARCH_MBED)
 // Callback invoked when received READ10 command.
@@ -263,7 +274,11 @@ static void RP2040_fini()
   sleep_run_from_xosc();
 
 #if SOC_GPIO_PIN_KEY0 != SOC_UNUSED_PIN
-  sleep_goto_dormant_until_edge_high(SOC_GPIO_PIN_KEY0);
+  #if SOC_GPIO_PIN_KEY0 == SOC_GPIO_PIN_BUTTON
+    sleep_goto_dormant_until_pin(SOC_GPIO_PIN_KEY0, 0, HIGH);
+  #else
+    sleep_goto_dormant_until_pin(SOC_GPIO_PIN_KEY0, 0, LOW);
+  #endif
 #else
   datetime_t alarm = {0};
   sleep_goto_sleep_until(&alarm, NULL);
@@ -288,9 +303,150 @@ static uint32_t RP2040_getFreeHeap()
   return &top - reinterpret_cast<char*>(_sbrk(0));
 }
 
+#if ENABLE_ARDUINO_FEATURES
+static void RP2040_parseSettings(JsonObject& root)
+{
+  JsonVariant units = root["units"];
+  if (units.success()) {
+    const char * units_s = units.as<char*>();
+    if (!strcmp(units_s,"METRIC")) {
+      settings->units = UNITS_METRIC;
+    } else if (!strcmp(units_s,"IMPERIAL")) {
+      settings->units = UNITS_IMPERIAL;
+    } else if (!strcmp(units_s,"MIXED")) {
+      settings->units = UNITS_MIXED;
+    }
+  }
+
+  JsonVariant zoom = root["zoom"];
+  if (zoom.success()) {
+    const char * zoom_s = zoom.as<char*>();
+    if (!strcmp(zoom_s,"LOWEST")) {
+      settings->zoom = ZOOM_LOWEST;
+    } else if (!strcmp(zoom_s,"LOW")) {
+      settings->zoom = ZOOM_LOW;
+    } else if (!strcmp(zoom_s,"MEDIUM")) {
+      settings->zoom = ZOOM_MEDIUM;
+    } else if (!strcmp(zoom_s,"HIGH")) {
+      settings->zoom = ZOOM_HIGH;
+    }
+  }
+
+  JsonVariant protocol = root["data"];
+  if (protocol.success()) {
+    const char * protocol_s = protocol.as<char*>();
+    if (!strcmp(protocol_s,"NMEA")) {
+      settings->protocol = PROTOCOL_NMEA;
+    } else if (!strcmp(protocol_s,"GDL90")) {
+      settings->protocol = PROTOCOL_GDL90;
+    } else if (!strcmp(protocol_s,"MAV1")) {
+      settings->protocol = PROTOCOL_MAVLINK_1;
+    } else if (!strcmp(protocol_s,"MAV2")) {
+      settings->protocol = PROTOCOL_MAVLINK_2;
+    } else if (!strcmp(protocol_s,"D1090")) {
+      settings->protocol = PROTOCOL_D1090;
+    }
+  }
+
+#if 0
+  JsonVariant rotate = root["rotate"];
+  if (rotate.success()) {
+    const char * rotate_s = rotate.as<char*>();
+    if (!strcmp(rotate_s,"0")) {
+      settings->rotate = ROTATE_0;
+    } else if (!strcmp(rotate_s,"90")) {
+      settings->rotate = ROTATE_90;
+    } else if (!strcmp(rotate_s,"180")) {
+      settings->rotate = ROTATE_180;
+    } else if (!strcmp(rotate_s,"270")) {
+      settings->rotate = ROTATE_270;
+    }
+  }
+#endif
+
+  JsonVariant orientation = root["orientation"];
+  if (orientation.success()) {
+    const char * orientation_s = orientation.as<char*>();
+    if (!strcmp(orientation_s,"TRACK")) {
+      settings->orientation = DIRECTION_TRACK_UP;
+    } else if (!strcmp(orientation_s,"NORTH")) {
+      settings->orientation = DIRECTION_NORTH_UP;
+    }
+  }
+
+  JsonVariant vmode = root["vmode"];
+  if (vmode.success()) {
+    const char * vmode_s = vmode.as<char*>();
+    if (!strcmp(vmode_s,"RADAR")) {
+      settings->vmode = VIEW_MODE_RADAR;
+    } else if (!strcmp(vmode_s,"TEXT")) {
+      settings->vmode = VIEW_MODE_TEXT;
+    }
+  }
+
+  JsonVariant aghost = root["aghost"];
+  if (aghost.success()) {
+    const char * aghost_s = aghost.as<char*>();
+    if (!strcmp(aghost_s,"OFF")) {
+      settings->aghost = ANTI_GHOSTING_OFF;
+    } else if (!strcmp(aghost_s,"2MIN")) {
+      settings->aghost = ANTI_GHOSTING_2MIN;
+    } else if (!strcmp(aghost_s,"5MIN")) {
+      settings->aghost = ANTI_GHOSTING_5MIN;
+    } else if (!strcmp(aghost_s,"10MIN")) {
+      settings->aghost = ANTI_GHOSTING_10MIN;
+    }
+  }
+
+  JsonVariant filter = root["filter"];
+  if (filter.success()) {
+    const char * filter_s = filter.as<char*>();
+    if (!strcmp(filter_s,"OFF")) {
+      settings->filter = TRAFFIC_FILTER_OFF;
+    } else if (!strcmp(filter_s,"500M")) {
+      settings->filter = TRAFFIC_FILTER_500M;
+    } else if (!strcmp(filter_s,"1500M")) {
+      settings->filter = TRAFFIC_FILTER_1500M;
+    }
+  }
+
+  JsonVariant team = root["team"];
+  if (team.success()) {
+    uint32_t team_32 = team.as<unsigned int>();
+    settings->team = team_32;
+  }
+}
+#endif /* ENABLE_ARDUINO_FEATURES */
+
 static bool RP2040_EEPROM_begin(size_t size)
 {
   EEPROM.begin(size);
+
+  if ( RP2040_has_spiflash && FATFS_is_mounted ) {
+#if ENABLE_ARDUINO_FEATURES
+    File file = fatfs.open("/settings.json", FILE_READ);
+
+    if (file) {
+      // StaticJsonBuffer<RP2040_JSON_BUFFER_SIZE> RP2040_jsonBuffer;
+
+      JsonObject &root = RP2040_jsonBuffer.parseObject(file);
+
+      if (root.success()) {
+        JsonVariant msg_class = root["class"];
+
+        if (msg_class.success()) {
+          const char *msg_class_s = msg_class.as<char*>();
+
+          if (!strcmp(msg_class_s,"SKYVIEW")) {
+            RP2040_parseSettings(root);
+          }
+        }
+      }
+      file.close();
+    }
+#endif /* ENABLE_ARDUINO_FEATURES */
+  }
+
   return true;
 }
 
@@ -341,14 +497,81 @@ static float RP2040_Battery_voltage()
   return analogRead (SOC_GPIO_PIN_BATTERY) / SOC_A0_VOLTAGE_DIVIDER ;
 }
 
+#include <SoftSPI.h>
+SoftSPI swSPI(SOC_EPD_PIN_MOSI_WS,
+              SOC_EPD_PIN_MOSI_WS, /* half duplex */
+              SOC_EPD_PIN_SCK_WS);
+
+static ep_model_id RP2040_EPD_ident()
+{
+  ep_model_id rval = EP_GDEW027W3; /* default */
+
+  digitalWrite(SOC_EPD_PIN_SS_WS, HIGH);
+  pinMode(SOC_EPD_PIN_SS_WS, OUTPUT);
+  digitalWrite(SOC_EPD_PIN_DC_WS, HIGH);
+  pinMode(SOC_EPD_PIN_DC_WS, OUTPUT);
+
+  digitalWrite(SOC_EPD_PIN_RST_WS, LOW);
+  pinMode(SOC_EPD_PIN_RST_WS, OUTPUT);
+  delay(20);
+  pinMode(SOC_EPD_PIN_RST_WS, INPUT_PULLUP);
+  delay(200);
+  pinMode(SOC_EPD_PIN_BUSY_WS, INPUT);
+
+  swSPI.begin();
+
+  digitalWrite(SOC_EPD_PIN_DC_WS,  LOW);
+  digitalWrite(SOC_EPD_PIN_SS_WS, LOW);
+
+  swSPI.transfer_out(0x71);
+
+  pinMode(SOC_EPD_PIN_MOSI_WS, INPUT);
+  digitalWrite(SOC_EPD_PIN_DC_WS, HIGH);
+
+  uint8_t status = swSPI.transfer_in();
+
+  digitalWrite(SOC_EPD_PIN_SCK_WS, LOW);
+  digitalWrite(SOC_EPD_PIN_DC_WS,  LOW);
+  digitalWrite(SOC_EPD_PIN_SS_WS,  HIGH);
+
+  swSPI.end();
+
+#if 0
+  Serial.print("REG 71H: ");
+  Serial.println(status, HEX);
+  Serial.flush();
+#endif
+
+//  if (status != 2) {
+//    rval = EP_GDEY027T91; /* TBD */
+//  }
+
+  return rval;
+}
+
+static ep_model_id RP2040_display = EP_UNKNOWN;
+
 static void RP2040_EPD_setup()
 {
   switch(settings->adapter)
   {
   case ADAPTER_WAVESHARE_PICO:
   default:
-    display = &epd_waveshare_W3;
-//    display = &epd_waveshare_T91;
+    if (RP2040_display == EP_UNKNOWN) {
+      RP2040_display = RP2040_EPD_ident();
+    }
+
+    switch (RP2040_display)
+    {
+    case EP_GDEY027T91:
+      display = &epd_waveshare_T91;
+      break;
+    case EP_GDEW027W3:
+    default:
+      display = &epd_waveshare_W3;
+      break;
+    }
+
     SPI1.setRX(SOC_EPD_PIN_MISO_WS);
     SPI1.setTX(SOC_EPD_PIN_MOSI_WS);
     SPI1.setSCK(SOC_EPD_PIN_SCK_WS);
@@ -414,17 +637,92 @@ static int RP2040_WiFi_clients_count()
 
 static bool RP2040_DB_init()
 {
-  return false;
+#if ENABLE_ARDUINO_FEATURES
+  if (FATFS_is_mounted) {
+    const char fileName[] = "/Aircrafts/ogn.cdb";
+
+    if (ucdb.open(fileName) != CDB_OK) {
+      Serial.print("Invalid CDB: ");
+      Serial.println(fileName);
+    } else {
+      ADB_is_open = true;
+    }
+  }
+#endif /* ENABLE_ARDUINO_FEATURES */
+
+  return ADB_is_open;
 }
 
 static bool RP2040_DB_query(uint8_t type, uint32_t id, char *buf, size_t size)
 {
-  return false;
+  bool rval = false;
+
+#if ENABLE_ARDUINO_FEATURES
+  char key[8];
+  char out[64];
+  uint8_t tokens[3] = { 0 };
+  cdbResult rt;
+  int c, i = 0, token_cnt = 0;
+
+  if (!ADB_is_open) {
+    return rval;
+  }
+
+  snprintf(key, sizeof(key),"%06X", id);
+
+  rt = ucdb.findKey(key, strlen(key));
+
+  switch (rt) {
+    case KEY_FOUND:
+      while ((c = ucdb.readValue()) != -1 && i < (sizeof(out) - 1)) {
+        if (c == '|') {
+          if (token_cnt < (sizeof(tokens) - 1)) {
+            token_cnt++;
+            tokens[token_cnt] = i+1;
+          }
+          c = 0;
+        }
+        out[i++] = (char) c;
+      }
+      out[i] = 0;
+
+      switch (settings->idpref)
+      {
+      case ID_TAIL:
+        snprintf(buf, size, "CN: %s",
+          strlen(out + tokens[2]) ? out + tokens[2] : "N/A");
+        break;
+      case ID_MAM:
+        snprintf(buf, size, "%s",
+          strlen(out + tokens[0]) ? out + tokens[0] : "Unknown");
+        break;
+      case ID_REG:
+      default:
+        snprintf(buf, size, "%s",
+          strlen(out + tokens[1]) ? out + tokens[1] : "REG: N/A");
+        break;
+      }
+
+      rval = true;
+      break;
+
+    case KEY_NOT_FOUND:
+    default:
+      break;
+  }
+#endif /* ENABLE_ARDUINO_FEATURES */
+
+  return rval;
 }
 
 static void RP2040_DB_fini()
 {
-
+#if ENABLE_ARDUINO_FEATURES
+  if (ADB_is_open) {
+    ucdb.close();
+    ADB_is_open = false;
+  }
+#endif /* ENABLE_ARDUINO_FEATURES */
 }
 
 static void RP2040_TTS(char *message)
@@ -467,6 +765,7 @@ void handleEvent(AceButton* button, uint8_t eventType,
   switch (eventType) {
     case AceButton::kEventPressed:
       break;
+    case AceButton::kEventClicked:
     case AceButton::kEventReleased:
       if (button == &button_mode) {
         EPD_Mode();
@@ -502,10 +801,11 @@ static void RP2040_Button_setup()
 {
   int mode_button_pin = SOC_GPIO_PIN_KEY0;
 
-  // Button(s) uses external pull up resistor.
-  pinMode(mode_button_pin, INPUT);
+  pinMode(mode_button_pin,
+          mode_button_pin == SOC_GPIO_PIN_BUTTON ? INPUT : INPUT_PULLUP);
 
-  button_mode.init(mode_button_pin);
+  button_mode.init(mode_button_pin,
+                   mode_button_pin == SOC_GPIO_PIN_BUTTON ? LOW : HIGH);
 
   // Configure the ButtonConfig with the event handler, and enable all higher
   // level events.
@@ -513,36 +813,47 @@ static void RP2040_Button_setup()
   ModeButtonConfig->setEventHandler(handleEvent);
   ModeButtonConfig->setFeature(ButtonConfig::kFeatureClick);
   ModeButtonConfig->setFeature(ButtonConfig::kFeatureLongPress);
-  ModeButtonConfig->setDebounceDelay(15);
+  ModeButtonConfig->setFeature(ButtonConfig::kFeatureSuppressAfterClick);
+//  ModeButtonConfig->setDebounceDelay(15);
   ModeButtonConfig->setClickDelay(100);
-  ModeButtonConfig->setDoubleClickDelay(1000);
-  ModeButtonConfig->setLongPressDelay(6000);
+//  ModeButtonConfig->setDoubleClickDelay(1000);
+  ModeButtonConfig->setLongPressDelay(2000);
 
-  attachInterrupt(digitalPinToInterrupt(mode_button_pin), onModeButtonEvent, CHANGE );
+//  attachInterrupt(digitalPinToInterrupt(mode_button_pin), onModeButtonEvent, CHANGE );
 
-  // Button(s) uses external pull up resistor.
-  pinMode(SOC_GPIO_PIN_KEY1, INPUT);
-  pinMode(SOC_GPIO_PIN_KEY2, INPUT);
+  pinMode(SOC_GPIO_PIN_KEY1, INPUT_PULLUP);
+  pinMode(SOC_GPIO_PIN_KEY2, INPUT_PULLUP);
 
   ButtonConfig* UpButtonConfig = button_up.getButtonConfig();
   UpButtonConfig->setEventHandler(handleEvent);
   UpButtonConfig->setFeature(ButtonConfig::kFeatureClick);
-  UpButtonConfig->setDebounceDelay(15);
+  UpButtonConfig->setFeature(ButtonConfig::kFeatureSuppressAfterClick);
+//  UpButtonConfig->setDebounceDelay(15);
   UpButtonConfig->setClickDelay(100);
-  UpButtonConfig->setDoubleClickDelay(1000);
+//  UpButtonConfig->setDoubleClickDelay(1000);
   UpButtonConfig->setLongPressDelay(2000);
 
   ButtonConfig* DownButtonConfig = button_down.getButtonConfig();
   DownButtonConfig->setEventHandler(handleEvent);
   DownButtonConfig->setFeature(ButtonConfig::kFeatureClick);
-  DownButtonConfig->setDebounceDelay(15);
+  DownButtonConfig->setFeature(ButtonConfig::kFeatureSuppressAfterClick);
+//  DownButtonConfig->setDebounceDelay(15);
   DownButtonConfig->setClickDelay(100);
-  DownButtonConfig->setDoubleClickDelay(1000);
+//  DownButtonConfig->setDoubleClickDelay(1000);
   DownButtonConfig->setLongPressDelay(2000);
 
-  attachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_KEY1), onUpButtonEvent,   CHANGE );
-  attachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_KEY2), onDownButtonEvent, CHANGE );
+//  attachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_KEY1), onUpButtonEvent,   CHANGE );
+//  attachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_KEY2), onDownButtonEvent, CHANGE );
 }
+
+#if defined(USE_BOOTSEL_BUTTON)
+#define BOOTSEL_CLICK_DELAY                200
+#define BOOTSEL_LONGPRESS_DELAY            2000
+
+static unsigned long bootsel_time_marker = 0;
+static bool prev_bootsel_state           = false;
+static bool is_bootsel_click             = false;
+#endif /* USE_BOOTSEL_BUTTON */
 
 static void RP2040_Button_loop()
 {
@@ -555,11 +866,48 @@ static void RP2040_Button_loop()
   button_mode.check();
   button_up.check();
   button_down.check();
+
+#if defined(USE_BOOTSEL_BUTTON)
+  if (BOOTSEL) {
+    if (!prev_bootsel_state) {
+      bootsel_time_marker = millis();
+      prev_bootsel_state = true;
+    } else {
+      if (bootsel_time_marker && !is_bootsel_click &&
+          millis() - bootsel_time_marker > BOOTSEL_CLICK_DELAY) {
+        is_bootsel_click = true;
+      }
+      if (bootsel_time_marker &&
+          millis() - bootsel_time_marker > BOOTSEL_LONGPRESS_DELAY) {
+        shutdown("NORMAL OFF");
+//      Serial.println(F("This will never be printed."));
+      }
+    }
+  } else {
+    if (prev_bootsel_state) {
+      if (is_bootsel_click) {
+        EPD_Mode();
+        is_bootsel_click = false;
+      }
+      bootsel_time_marker = 0;
+      prev_bootsel_state = false;
+    }
+  }
+#endif /* USE_BOOTSEL_BUTTON */
 }
 
 static void RP2040_Button_fini()
 {
+//  detachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_KEY2));
+//  detachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_KEY1));
+//  detachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_KEY0));
 
+  int pin = SOC_GPIO_PIN_KEY0;
+  while (digitalRead(pin) == (pin == SOC_GPIO_PIN_BUTTON ? HIGH : LOW));
+
+#if defined(USE_BOOTSEL_BUTTON)
+  while (BOOTSEL);
+#endif /* USE_BOOTSEL_BUTTON */
 }
 
 static void RP2040_WDT_setup()
