@@ -571,6 +571,8 @@ static void RP2040_EPD_setup()
     SPI1.setTX(SOC_EPD_PIN_MOSI_WS);
     SPI1.setSCK(SOC_EPD_PIN_SCK_WS);
     SPI1.setCS(SOC_EPD_PIN_SS_WS);
+
+    display->epd2.selectSPI(SPI1, SPISettings(4000000, MSBFIRST, SPI_MODE0));
     break;
   }
 }
@@ -585,9 +587,35 @@ static bool RP2040_EPD_is_ready()
   return true;
 }
 
+static void RP2040_EPD_Busy_Callback(const void* p)
+{
+  if (SoC->Bluetooth_ops) {
+    SoC->Bluetooth_ops->loop();
+  }
+
+  if (SoC->USB_ops) {
+    SoC->USB_ops->loop();
+  }
+
+  Input_loop();
+
+  // Traffic_ClearExpired();
+
+  // WiFi_loop();
+
+  // Handle Web
+  // Web_loop();
+
+  SoC->Button_loop();
+
+  yield();
+}
+
 static void RP2040_EPD_update(int val)
 {
+  display->epd2.setBusyCallback(RP2040_EPD_Busy_Callback);
   EPD_Update_Sync(val);
+  display->epd2.setBusyCallback(NULL);
 }
 
 static size_t RP2040_WiFi_Receive_UDP(uint8_t *buf, size_t max_size)
