@@ -98,7 +98,8 @@ void WiFi_setup()
   // Set Hostname.
   host_name += "-";
   host_name += String((SoC->getChipId() & 0xFFFFFF), HEX);
-
+  WiFi.mode(WIFI_STA);
+  delay(10);
   if (SoC->WiFi_hostname(host_name) == false) {
     return;
   }
