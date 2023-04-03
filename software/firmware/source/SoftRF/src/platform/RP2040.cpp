@@ -277,7 +277,7 @@ static void RP2040_setup()
 #if defined(ARDUINO_RASPBERRY_PI_PICO)
   RP2040_board = RP2040_RPIPICO;
 #elif defined(ARDUINO_RASPBERRY_PI_PICO_W)
-  RP2040_board = RP2040_RPIPICO_W;
+  RP2040_board = rp2040.isPicoW() ? RP2040_RPIPICO_W : RP2040_RPIPICO;
 #endif /* ARDUINO_RASPBERRY_PI_PICO */
 
   RP2040_board = (SoC->getChipId() == 0xcf516424) ?
@@ -592,7 +592,7 @@ static void RP2040_WiFi_set_param(int ndx, int value)
     break;
   case WIFI_PARAM_DHCP_LEASE_TIME:
     if (WiFi.getMode() == WIFI_AP) {
-      /* TBD */
+      /* RP2040 Wi-Fi default lease time is 24 hours */
     }
     break;
   default:
@@ -601,46 +601,42 @@ static void RP2040_WiFi_set_param(int ndx, int value)
 #endif /* EXCLUDE_WIFI */
 }
 
-#if !defined(EXCLUDE_WIFI)
-static IPAddress RP2040_WiFi_get_broadcast()
-{
-  return IPAddress(~((uint32_t) WiFi.subnetMask()) | ((uint32_t) WiFi.localIP()));
-}
-#endif /* EXCLUDE_WIFI */
+#include <dhcpserver/dhcpserver.h>
+
+union rp2040_ip {
+  uint32_t addr;
+  uint8_t bytes[4];
+};
 
 static void RP2040_WiFi_transmit_UDP(int port, byte *buf, size_t size)
 {
 #if !defined(EXCLUDE_WIFI)
+  union rp2040_ip ipv4;
   IPAddress ClientIP;
-  struct station_info *stat_info;
+  ipv4.addr       = (uint32_t) WiFi.localIP();
   WiFiMode_t mode = WiFi.getMode();
 
   switch (mode)
   {
   case WIFI_STA:
-    ClientIP = RP2040_WiFi_get_broadcast();
+    ClientIP = IPAddress(ipv4.addr | ~((uint32_t) WiFi.subnetMask()));
 
     Uni_Udp.beginPacket(ClientIP, port);
     Uni_Udp.write(buf, size);
     Uni_Udp.endPacket();
 
     break;
-#if 0 /* TBD */
   case WIFI_AP:
-    stat_info = wifi_softap_get_station_info();
-
-    while (stat_info != NULL) {
-      ClientIP = stat_info->ip.addr;
-
-      Uni_Udp.beginPacket(ClientIP, port);
-      Uni_Udp.write(buf, size);
-      Uni_Udp.endPacket();
-
-      stat_info = STAILQ_NEXT(stat_info, next);
+    if (WiFi.softAPgetStationNum() > 0) {
+      for (int i=0; i<4; i++) {
+        ClientIP = IPAddress(ipv4.bytes[0], ipv4.bytes[1], ipv4.bytes[2],
+                             DHCPS_BASE_IP + i);
+        Uni_Udp.beginPacket(ClientIP, port);
+        Uni_Udp.write(buf, size);
+        Uni_Udp.endPacket();
+      }
     }
-    wifi_softap_free_station_info();
     break;
-#endif
   case WIFI_OFF:
   default:
     break;
@@ -670,8 +666,6 @@ static bool RP2040_WiFi_hostname(String aHostname)
 static int RP2040_WiFi_clients_count()
 {
 #if !defined(EXCLUDE_WIFI)
-  struct station_info *stat_info;
-  int clients = 0;
   WiFiMode_t mode = WiFi.getMode();
 
   switch (mode)
@@ -813,8 +807,14 @@ static void RP2040_Display_fini(int reason)
 
 static void RP2040_Battery_setup()
 {
-
+#if SOC_GPIO_PIN_BATTERY != SOC_UNUSED_PIN
+  analogReadResolution(12);
+  analogRead(SOC_GPIO_PIN_BATTERY);
+#endif
 }
+
+#include "hardware/gpio.h"
+#include "hardware/adc.h"
 
 static float RP2040_Battery_param(uint8_t param)
 {
@@ -823,13 +823,13 @@ static float RP2040_Battery_param(uint8_t param)
   switch (param)
   {
   case BATTERY_PARAM_THRESHOLD:
-    rval = hw_info.model == SOFTRF_MODEL_LEGO ? BATTERY_THRESHOLD_LIPO   :
-                                                BATTERY_THRESHOLD_NIMHX2;
+    rval = RP2040_board == RP2040_RPIPICO || RP2040_board == RP2040_RPIPICO_W ?
+           BATTERY_THRESHOLD_NIMHX2 : BATTERY_THRESHOLD_LIPO;
     break;
 
   case BATTERY_PARAM_CUTOFF:
-    rval = hw_info.model == SOFTRF_MODEL_LEGO ? BATTERY_CUTOFF_LIPO      :
-                                                BATTERY_CUTOFF_NIMHX2;
+    rval = RP2040_board == RP2040_RPIPICO || RP2040_board == RP2040_RPIPICO_W ?
+           BATTERY_CUTOFF_NIMHX2 : BATTERY_CUTOFF_LIPO;
     break;
 
   case BATTERY_PARAM_CHARGE:
@@ -851,11 +851,34 @@ static float RP2040_Battery_param(uint8_t param)
 
   case BATTERY_PARAM_VOLTAGE:
   default:
-
     {
       uint16_t mV = 0;
+
 #if SOC_GPIO_PIN_BATTERY != SOC_UNUSED_PIN
-      mV = analogRead(SOC_GPIO_PIN_BATTERY);
+      enum gpio_function pin25_func;
+      enum gpio_function pin29_func;
+      uint pin25_dir;
+      uint pin29_dir;
+
+      if (RP2040_board == RP2040_RPIPICO_W) {
+        pin29_dir  = gpio_get_dir(SOC_GPIO_PIN_BATTERY);
+        pin29_func = gpio_get_function(SOC_GPIO_PIN_BATTERY);
+        adc_gpio_init(SOC_GPIO_PIN_BATTERY);
+
+        pin25_dir  = gpio_get_dir(SOC_GPIO_PIN_CYW43_EN);
+        pin25_func = gpio_get_function(SOC_GPIO_PIN_CYW43_EN);
+        pinMode(SOC_GPIO_PIN_CYW43_EN, OUTPUT);
+        digitalWrite(SOC_GPIO_PIN_CYW43_EN, HIGH);
+      }
+
+      mV = (analogRead(SOC_GPIO_PIN_BATTERY) * 3300UL) >> 12;
+
+      if (RP2040_board == RP2040_RPIPICO_W) {
+        gpio_set_function(SOC_GPIO_PIN_CYW43_EN, pin25_func);
+        gpio_set_dir(SOC_GPIO_PIN_CYW43_EN, pin25_dir);
+        gpio_set_function(SOC_GPIO_PIN_BATTERY,  pin29_func);
+        gpio_set_dir(SOC_GPIO_PIN_BATTERY,  pin29_dir);
+      }
 #endif
       rval = mV * SOC_ADC_VOLTAGE_DIV / 1000.0;
     }
