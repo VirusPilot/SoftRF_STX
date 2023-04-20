@@ -94,14 +94,11 @@
 #include "src/driver/Baro.h"
 #include "src/TTNHelper.h"
 #include "src/TrafficHelper.h"
+#include "src/system/Recorder.h"
 
 #if defined(ENABLE_AHRS)
 #include "src/driver/AHRS.h"
 #endif /* ENABLE_AHRS */
-
-#if LOGGER_IS_ENABLED
-#include "src/system/Log.h"
-#endif /* LOGGER_IS_ENABLED */
 
 #if !defined(SERIAL_FLUSH)
 #define SERIAL_FLUSH() Serial.flush()
@@ -140,10 +137,6 @@ void setup()
   hw_info.soc = SoC_setup(); // Has to be very first procedure in the execution order
 
   resetInfo = (rst_info *) SoC->getResetInfoPtr();
-
-#if LOGGER_IS_ENABLED
-  Logger_setup();
-#endif /* LOGGER_IS_ENABLED */
 
   Serial.println();
   Serial.print(F(SOFTRF_IDENT "-"));
@@ -258,6 +251,8 @@ void setup()
     break;
   }
 
+  Recorder_setup();
+
   SoC->post_init();
 
   SoC->WDT_setup();
@@ -311,9 +306,7 @@ void loop()
   // Handle OTA update.
   OTA_loop();
 
-#if LOGGER_IS_ENABLED
-  Logger_loop();
-#endif /* LOGGER_IS_ENABLED */
+  Recorder_loop();
 
   SoC->loop();
 
@@ -343,6 +336,8 @@ void shutdown(int reason)
   SoC->WDT_fini();
 
   SoC->swSer_enableRx(false);
+
+  Recorder_fini();
 
   Sound_fini();
 
