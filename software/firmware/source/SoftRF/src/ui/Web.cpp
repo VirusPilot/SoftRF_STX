@@ -1238,6 +1238,8 @@ $('form').submit(function(e){\
     server.send_P ( 200, "image/png", Logo, sizeof(Logo) );
   } );
 
+/* FLASH memory usage optimization */
+#if !defined(ARDUINO_ARCH_RP2040)
   server.on ( "/jquery.min.js", []() {
 
     PGM_P content = jquery_min_js_gz;
@@ -1256,6 +1258,7 @@ $('form').submit(function(e){\
     } while (bytes_left > 0) ;
 
   } );
+#endif /* ARDUINO_ARCH_RP2040 */
 
 #if defined(ENABLE_RECORDER)
   server.on("/flights", HTTP_GET, Handle_Flight_Download);
