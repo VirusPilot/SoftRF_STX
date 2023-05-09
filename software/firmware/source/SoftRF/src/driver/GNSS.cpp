@@ -571,8 +571,9 @@ static void setup_UBX()
         Serial.println(F("Sucessfully set NMEA GSA"));
       }
     }
-
-#if defined(USE_U10_EXT)
+  } /* GNSS_MODULE_U678 */
+  
+  #if defined(USE_U10_EXT)
   /* Disable BeiDou B1I. Enable BeiDou B1C and GLONASS L1OF */
   if (_ulox_version == GNSS_MODULE_U10) {
     for (int i = 0; i < sizeof(CFG_SIGNAL); i++) {
@@ -581,20 +582,7 @@ static void setup_UBX()
 
     delay(600);
   }
-#endif /* USE_U10_EXT */
-
-    // msglen = makeUBXCFG(0x06, 0x09, sizeof(saveCFG), saveCFG);
-    // sendUBX(GNSSbuf, msglen);
-    // gnss_set_sucess = getUBX_ACK(0x06, 0x09);
-    // if (!gnss_set_sucess)
-    // {
-    //   Serial.println(F("WARNING: Unable to save u-blox configuration"));
-    // }
-    // else
-    // {
-    //   Serial.println(F("Sucessfully saved u-blox configuration"));
-    // }
-  } /* GNSS_MODULE_U678 */
+  #endif /* USE_U10_EXT */
 }
 
 /* ------ BEGIN -----------  https://github.com/Black-Thunder/FPV-Tracker */
