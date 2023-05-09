@@ -219,6 +219,26 @@ const uint8_t RXM_PMREQ_OFF[16] PROGMEM = {0xB5, 0x62, 0x02, 0x41, 0x08, 0x00,
 const uint8_t factoryUBX[] PROGMEM = { 0xB5, 0x62, 0x06, 0x09, 0x0D, 0x00, 0xFF,
                                        0xFB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                        0xFF, 0xFF, 0x00, 0x00, 0x17, 0x2B, 0x7E } ;
+#if defined(USE_U10_EXT)
+static byte _ulox_version = GNSS_MODULE_NMEA;
+const uint8_t CFG_SIGNAL[] PROGMEM = { 0xB5, 0x62, 0x06, 0x8A, 0x4A,
+                                       0x00, 0x01, 0x01, 0x00, 0x00,
+                                       0x01, 0x00, 0x31, 0x10, 0x01, /* GPS L1C/A  */
+                                       0x05, 0x00, 0x31, 0x10, 0x01, /* SBAS L1C/A */
+                                       0x07, 0x00, 0x31, 0x10, 0x01, /* Galileo E1 */
+                                       0x0D, 0x00, 0x31, 0x10, 0x00, /* BeiDou B1I */
+                                       0x0F, 0x00, 0x31, 0x10, 0x01, /* BeiDou B1C */
+                                       0x12, 0x00, 0x31, 0x10, 0x01, /* QZSS L1C/A */
+                                       0x14, 0x00, 0x31, 0x10, 0x01, /* QZSS L1S   */
+                                       0x18, 0x00, 0x31, 0x10, 0x01, /* GLONASS L1 */
+                                       0x1F, 0x00, 0x31, 0x10, 0x01, /* GPS     EN */
+                                       0x20, 0x00, 0x31, 0x10, 0x01, /* SBAS    EN */
+                                       0x21, 0x00, 0x31, 0x10, 0x01, /* Galileo EN */
+                                       0x22, 0x00, 0x31, 0x10, 0x01, /* BeiDou  EN */
+                                       0x24, 0x00, 0x31, 0x10, 0x01, /* QZSS    EN */
+                                       0x25, 0x00, 0x31, 0x10, 0x01, /* GLONASS EN */
+                                       0xA9, 0xC3 } ;
+#endif /* USE_U10_EXT */
 
  /* Stratux Setup: enable GPS & Galileo & Beidou for u-blox 8 */
 const uint8_t setGNSS_U8[] PROGMEM = {0x00, 0x00, 0xFF, 0x07,
@@ -271,7 +291,6 @@ const uint8_t setRATE[] PROGMEM = {0xE8, 0x03, 0x01, 0x00, 0x01, 0x00}; /* set t
 // {
 //   Serial_GNSS_Out.write(pgm_read_byte(&config_M10_BBR[i]));
 // }
-
 #if defined(USE_GNSS_PSM)
 static bool gnss_psm_active = false;
 
@@ -553,6 +572,17 @@ static void setup_UBX()
       }
     }
 
+#if defined(USE_U10_EXT)
+  /* Disable BeiDou B1I. Enable BeiDou B1C and GLONASS L1OF */
+  if (_ulox_version == GNSS_MODULE_U10) {
+    for (int i = 0; i < sizeof(CFG_SIGNAL); i++) {
+      Serial_GNSS_Out.write(pgm_read_byte(&CFG_SIGNAL[i]));
+    }
+
+    delay(600);
+  }
+#endif /* USE_U10_EXT */
+
     // msglen = makeUBXCFG(0x06, 0x09, sizeof(saveCFG), saveCFG);
     // sendUBX(GNSSbuf, msglen);
     // gnss_set_sucess = getUBX_ACK(0x06, 0x09);
@@ -718,6 +748,9 @@ static byte ublox_version() {
             else if (GNSSbuf[33] == 'A')
               rval = GNSS_MODULE_U10;
 
+#if defined(USE_U10_EXT)
+            _ulox_version = rval;
+#endif /* USE_U10_EXT */
             break;
           }
         }
