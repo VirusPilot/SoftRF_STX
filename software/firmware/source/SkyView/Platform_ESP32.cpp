@@ -40,8 +40,11 @@
 #include "SkyView.h"
 
 #include <battery.h>
+
+#if defined(CONFIG_IDF_TARGET_ESP32)
 #include <sqlite3.h>
 #include <SD.h>
+#endif /* CONFIG_IDF_TARGET_ESP32 */
 
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  28        /* Time ESP32 will go to sleep (in seconds) */
@@ -139,6 +142,7 @@ static union {
   uint64_t chipmacid;
 };
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
 static sqlite3 *fln_db  = NULL;
 static sqlite3 *ogn_db  = NULL;
 static sqlite3 *icao_db = NULL;
@@ -146,6 +150,7 @@ static sqlite3 *icao_db = NULL;
 static uint8_t sdcard_files_to_open = 0;
 
 SPIClass uSD_SPI(HSPI);
+#endif /* CONFIG_IDF_TARGET_ESP32 */
 
 /* variables hold file, state of process wav file and wav file properties */
 wavProperties_t wavProps;
@@ -172,6 +177,127 @@ i2s_pin_config_t pin_config = {
 
 RTC_DATA_ATTR int bootCount          = 0;
 static size_t ESP32_Min_AppPart_Size = 0;
+
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+//#define SPI_DRIVER_SELECT 3
+#include <Adafruit_SPIFlash.h>
+#include <Adafruit_INA219.h>
+#include "uCDB.hpp"
+
+Adafruit_FlashTransport_ESP32 HWFlashTransport;
+Adafruit_SPIFlash QSPIFlash(&HWFlashTransport);
+
+static Adafruit_SPIFlash *SPIFlash = &QSPIFlash;
+
+/// Flash device list count
+enum {
+  EXTERNAL_FLASH_DEVICE_COUNT
+};
+
+/// List of all possible flash devices used by ESP32 boards
+static SPIFlash_Device_t possible_devices[] = { };
+
+static bool ESP32_has_CPM       = false;
+static bool ESP32_has_spiflash  = false;
+static uint32_t spiflash_id     = 0;
+static bool FATFS_is_mounted    = false;
+static bool ADB_is_open         = false;
+
+#if CONFIG_TINYUSB_MSC_ENABLED
+  #if defined(USE_ADAFRUIT_MSC)
+    #include "Adafruit_TinyUSB.h"
+
+    // USB Mass Storage object
+    Adafruit_USBD_MSC usb_msc;
+  #else
+    #include "USBMSC.h"
+
+    // USB Mass Storage object
+    USBMSC usb_msc;
+  #endif /* USE_ADAFRUIT_MSC */
+#endif /* CONFIG_TINYUSB_MSC_ENABLED */
+
+// file system object from SdFat
+FatVolume fatfs;
+
+uCDB<FatVolume, File32> ucdb(fatfs);
+
+Adafruit_INA219 ina219(INA219_ADDRESS_ALT);
+
+#if CONFIG_TINYUSB_MSC_ENABLED
+#if defined(USE_ADAFRUIT_MSC)
+// Callback invoked when received READ10 command.
+// Copy disk's data to buffer (up to bufsize) and
+// return number of copied bytes (must be multiple of block size)
+static int32_t ESP32_msc_read_cb (uint32_t lba, void* buffer, uint32_t bufsize)
+{
+  // Note: SPIFLash Bock API: readBlocks/writeBlocks/syncBlocks
+  // already include 4K sector caching internally. We don't need to cache it, yahhhh!!
+  return SPIFlash->readBlocks(lba, (uint8_t*) buffer, bufsize/512) ? bufsize : -1;
+}
+
+// Callback invoked when received WRITE10 command.
+// Process data in buffer to disk's storage and
+// return number of written bytes (must be multiple of block size)
+static int32_t ESP32_msc_write_cb (uint32_t lba, uint8_t* buffer, uint32_t bufsize)
+{
+  // Note: SPIFLash Bock API: readBlocks/writeBlocks/syncBlocks
+  // already include 4K sector caching internally. We don't need to cache it, yahhhh!!
+  return SPIFlash->writeBlocks(lba, buffer, bufsize/512) ? bufsize : -1;
+}
+
+// Callback invoked when WRITE10 command is completed (status received and accepted by host).
+// used to flush any pending cache.
+static void ESP32_msc_flush_cb (void)
+{
+  // sync with flash
+  SPIFlash->syncBlocks();
+
+  // clear file system's cache to force refresh
+  fatfs.cacheClear();
+}
+
+#else
+
+// Callback invoked when received READ10 command.
+// Copy disk's data to buffer (up to bufsize) and
+// return number of copied bytes (must be multiple of block size)
+static int32_t ESP32_msc_read_cb (uint32_t lba, uint32_t offset, void* buffer, uint32_t bufsize)
+{
+  // Note: SPIFLash Bock API: readBlocks/writeBlocks/syncBlocks
+  // already include 4K sector caching internally. We don't need to cache it, yahhhh!!
+  return SPIFlash->readBlocks(lba, offset, (uint8_t*) buffer, bufsize/512) ?
+         bufsize : -1;
+}
+
+// Callback invoked when received WRITE10 command.
+// Process data in buffer to disk's storage and
+// return number of written bytes (must be multiple of block size)
+static int32_t ESP32_msc_write_cb (uint32_t lba, uint32_t offset, uint8_t* buffer, uint32_t bufsize)
+{
+  // Note: SPIFLash Bock API: readBlocks/writeBlocks/syncBlocks
+  // already include 4K sector caching internally. We don't need to cache it, yahhhh!!
+  int32_t rval = SPIFlash->writeBlocks(lba, offset, buffer, bufsize/512) ?
+                 bufsize : -1;
+
+#if 1
+  // sync with flash
+  SPIFlash->syncBlocks();
+
+  // clear file system's cache to force refresh
+  fatfs.cacheClear();
+#endif
+
+  return rval;
+}
+#endif /* USE_ADAFRUIT_MSC */
+#endif /* CONFIG_TINYUSB_MSC_ENABLED */
+
+const char *ESP32SX_Device_Manufacturer = SOFTRF_IDENT;
+const char *ESP32SX_Device_Model = SKYVIEW_IDENT " Pico"; /* 303a:8133 */
+const uint16_t ESP32SX_Device_Version = SKYVIEW_USB_FW_VERSION;
+
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
 
 static uint32_t ESP32_getFlashId()
 {
@@ -267,10 +393,12 @@ static void ESP32_setup()
       /* custom ESP32-WROVER-E module with 16 MB flash */
       hw_info.revision = HW_REV_T5_1;
       break;
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
     case MakeFlashId(WINBOND_NEX_ID, WINBOND_NEX_W25Q64_V):
     case MakeFlashId(WINBOND_NEX_ID, WINBOND_NEX_W25Q64_W):
       hw_info.revision = HW_REV_BPI;
       break;
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
     default:
       hw_info.revision = HW_REV_UNKNOWN;
       break;
@@ -292,6 +420,103 @@ static void ESP32_setup()
       break;
     }
   }
+
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+  Wire.setPins(SOC_GPIO_PIN_SDA, SOC_GPIO_PIN_SCL);
+  Wire.begin();
+  Wire.beginTransmission(INA219_ADDRESS_ALT);
+  ESP32_has_CPM = (Wire.endTransmission() == 0);
+  Wire.end();
+
+  if (ESP32_has_CPM) {
+    ina219.begin(&Wire);
+//  ina219.setCalibration_16V_400mA();
+  }
+
+  ESP32_has_spiflash = SPIFlash->begin(possible_devices,
+                                       EXTERNAL_FLASH_DEVICE_COUNT);
+  if (ESP32_has_spiflash) {
+    spiflash_id = SPIFlash->getJEDECID();
+
+    uint32_t capacity = spiflash_id & 0xFF;
+    if (capacity >= 0x17) { /* equal or greater than 1UL << 23 (8 MiB) */
+#if CONFIG_TINYUSB_MSC_ENABLED
+  #if defined(USE_ADAFRUIT_MSC)
+      // Set disk vendor id, product id and revision
+      // with string up to 8, 16, 4 characters respectively
+      usb_msc.setID(ESP32SX_Device_Manufacturer, "Internal Flash", "1.0");
+
+      // Set callback
+      usb_msc.setReadWriteCallback(ESP32_msc_read_cb,
+                                   ESP32_msc_write_cb,
+                                   ESP32_msc_flush_cb);
+
+      // Set disk size, block size should be 512 regardless of spi flash page size
+      usb_msc.setCapacity(SPIFlash->size()/512, 512);
+
+      // MSC is ready for read/write
+      usb_msc.setUnitReady(true);
+
+      usb_msc.begin();
+
+  #else
+
+      // Set disk vendor id, product id and revision
+      // with string up to 8, 16, 4 characters respectively
+      usb_msc.vendorID(ESP32SX_Device_Manufacturer);
+      usb_msc.productID("Internal Flash");
+      usb_msc.productRevision("1.0");
+
+      // Set callback
+      usb_msc.onRead(ESP32_msc_read_cb);
+      usb_msc.onWrite(ESP32_msc_write_cb);
+
+      // MSC is ready for read/write
+      usb_msc.mediaPresent(true);
+
+      // Set disk size, block size should be 512 regardless of spi flash page size
+      usb_msc.begin(SPIFlash->size()/512, 512);
+  #endif /* USE_ADAFRUIT_MSC */
+#endif /* CONFIG_TINYUSB_MSC_ENABLED */
+
+      FATFS_is_mounted = fatfs.begin(SPIFlash);
+      hw_info.storage  = FATFS_is_mounted ? STORAGE_FLASH : STORAGE_NONE;
+    }
+  }
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
+
+#if ARDUINO_USB_CDC_ON_BOOT && \
+    (defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3))
+  if (USB.manufacturerName(ESP32SX_Device_Manufacturer)) {
+    char usb_serial_number[16];
+    uint16_t pid = 0x812BD ; /* Banana Pi BPI-PicoW-S3 - Arduino */
+
+    snprintf(usb_serial_number, sizeof(usb_serial_number),
+             "%02X%02X%02X%02X%02X%02X",
+             efuse_mac[0], efuse_mac[1], efuse_mac[2],
+             efuse_mac[3], efuse_mac[4], efuse_mac[5]);
+
+    USB.VID(USB_VID); // USB_ESPRESSIF_VID = 0x303A
+    USB.PID(pid);
+    USB.productName(ESP32SX_Device_Model);
+    USB.firmwareVersion(ESP32SX_Device_Version);
+    USB.serialNumber(usb_serial_number);
+    USB.begin();
+  }
+
+  Serial.begin(SERIAL_OUT_BR);
+
+  for (int i=0; i < 20; i++) {if (Serial) break; else delay(100);}
+
+#if 0 /* TBD */
+  if (Serial.rebootEnabled()) {
+    Serial.enableReboot(false);
+  }
+#endif /* TBD */
+
+#else
+  Serial.begin(SERIAL_OUT_BR, SERIAL_OUT_BITS);
+#endif /* ARDUINO_USB_CDC_ON_BOOT && (CONFIG_IDF_TARGET_ESP32S2 || S3) */
 }
 
 static void ESP32_post_init()
@@ -306,13 +531,34 @@ static void ESP32_loop()
 
 static void ESP32_fini()
 {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+  if (ESP32_has_spiflash) {
+#if CONFIG_TINYUSB_MSC_ENABLED
+  #if defined(USE_ADAFRUIT_MSC)
+    usb_msc.setUnitReady(false);
+//  usb_msc.end(); /* N/A */
+  #else
+    usb_msc.mediaPresent(false);
+    usb_msc.end();
+  #endif /* USE_ADAFRUIT_MSC */
+#endif /* CONFIG_TINYUSB_MSC_ENABLED */
+  }
+
+  if (SPIFlash != NULL) SPIFlash->end();
+
+  if (ESP32_has_CPM) {
+//  ina219.powerSave(true);
+  }
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
+
   int mode_button_pin = SOC_BUTTON_MODE_DEF;
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
   if (settings && (settings->adapter == ADAPTER_TTGO_T5S)) {
     uSD_SPI.end();
-
     mode_button_pin = SOC_BUTTON_MODE_T5S;
   }
+#endif /* CONFIG_IDF_TARGET_ESP32 */
 
   esp_wifi_stop();
 
@@ -435,7 +681,7 @@ static void ESP32_Battery_setup()
 #elif defined(CONFIG_IDF_TARGET_ESP32S2)
   calibrate_voltage(ADC1_GPIO9_CHANNEL); /* TBD */
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
-  calibrate_voltage(ADC1_GPIO2_CHANNEL); /* TBD */
+  calibrate_voltage(ADC1_GPIO3_CHANNEL);
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
   calibrate_voltage(ADC1_GPIO1_CHANNEL); /* TBD */
 #else
@@ -445,6 +691,15 @@ static void ESP32_Battery_setup()
 
 static float ESP32_Battery_voltage()
 {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+  if (ESP32_has_CPM) {
+    float shuntvoltage = ina219.getShuntVoltage_mV();
+    float busvoltage   = ina219.getBusVoltage_V();
+
+    return (busvoltage + (shuntvoltage / 1000));
+  }
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
+
   float voltage = ((float) read_voltage()) * 0.001 ;
 
   /* T5 has voltage divider 100k/100k on board */
@@ -624,11 +879,13 @@ static void ESP32_EPD_setup()
               SOC_GPIO_PIN_MOSI_T5S,
               SOC_GPIO_PIN_SS_T5S);
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
     /* SD-SPI init */
     uSD_SPI.begin(SOC_SD_PIN_SCK_T5S,
                   SOC_SD_PIN_MISO_T5S,
                   SOC_SD_PIN_MOSI_T5S,
                   SOC_SD_PIN_SS_T5S);
+#endif /* CONFIG_IDF_TARGET_ESP32 */
     break;
   }
 
@@ -685,180 +942,300 @@ static bool ESP32_DB_init()
 {
   bool rval = false;
 
-  if (settings->adapter != ADAPTER_TTGO_T5S) {
-    return rval;
-  }
-
+  switch (settings->adapter)
+  {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+  case ADAPTER_WAVESHARE_PICO_2_7:
+  case ADAPTER_WAVESHARE_PICO_2_7_V2:
 #if !defined(BUILD_SKYVIEW_HD)
+    if (FATFS_is_mounted) {
+      const char *fileName;
 
-  sdcard_files_to_open += (settings->adb   == DB_FLN    ? 1 : 0);
-  sdcard_files_to_open += (settings->adb   == DB_OGN    ? 1 : 0);
-  sdcard_files_to_open += (settings->adb   == DB_ICAO   ? 1 : 0);
-  sdcard_files_to_open += (settings->voice != VOICE_OFF ? 1 : 0);
+      if (settings->adb == DB_OGN) {
+        fileName = "/Aircrafts/ogn.cdb";
 
-  if (!SD.begin(SOC_SD_PIN_SS_T5S, uSD_SPI, 4000000, "/sd", sdcard_files_to_open)) {
-    Serial.println(F("ERROR: Failed to mount microSD card."));
-    return rval;
-  }
+        if (ucdb.open(fileName) != CDB_OK) {
+          Serial.print("Invalid CDB: ");
+          Serial.println(fileName);
+        } else {
+          ADB_is_open = true;
+        }
+      }
+      if (settings->adb == DB_FLN) {
+        fileName = "/Aircrafts/fln.cdb";
 
-  if (settings->adb == DB_NONE) {
-    return rval;
-  }
-
-  sqlite3_initialize();
-
-  if (settings->adb == DB_FLN) {
-    sqlite3_open("/sd/Aircrafts/fln.db", &fln_db);
-
-    if (fln_db == NULL)
-    {
-      Serial.println(F("Failed to open FlarmNet DB\n"));
-    }  else {
-      rval = true;
+        if (ucdb.open(fileName) != CDB_OK) {
+          Serial.print("Invalid CDB: ");
+          Serial.println(fileName);
+        } else {
+          ADB_is_open = true;
+        }
+      }
     }
-  }
 
-  if (settings->adb == DB_OGN) {
-    sqlite3_open("/sd/Aircrafts/ogn.db", &ogn_db);
-
-    if (ogn_db == NULL)
-    {
-      Serial.println(F("Failed to open OGN DB\n"));
-    }  else {
-      rval = true;
-    }
-  }
-
-  if (settings->adb == DB_ICAO) {
-    sqlite3_open("/sd/Aircrafts/icao.db", &icao_db);
-
-    if (icao_db == NULL)
-    {
-      Serial.println(F("Failed to open ICAO DB\n"));
-    }  else {
-      rval = true;
-    }
-  }
+    rval = ADB_is_open;
 #endif /* BUILD_SKYVIEW_HD */
+    break;
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
+#if defined(CONFIG_IDF_TARGET_ESP32)
+  case ADAPTER_TTGO_T5S:
+#if !defined(BUILD_SKYVIEW_HD)
+    {
+      sdcard_files_to_open += (settings->adb   == DB_FLN    ? 1 : 0);
+      sdcard_files_to_open += (settings->adb   == DB_OGN    ? 1 : 0);
+      sdcard_files_to_open += (settings->adb   == DB_ICAO   ? 1 : 0);
+      sdcard_files_to_open += (settings->voice != VOICE_OFF ? 1 : 0);
+
+      if (!SD.begin(SOC_SD_PIN_SS_T5S, uSD_SPI, 4000000, "/sd", sdcard_files_to_open)) {
+        Serial.println(F("ERROR: Failed to mount microSD card."));
+        return rval;
+      }
+
+      if (settings->adb == DB_NONE) {
+        return rval;
+      }
+
+      sqlite3_initialize();
+
+      if (settings->adb == DB_FLN) {
+        sqlite3_open("/sd/Aircrafts/fln.db", &fln_db);
+
+        if (fln_db == NULL)
+        {
+          Serial.println(F("Failed to open FlarmNet DB\n"));
+        }  else {
+          rval = true;
+        }
+      }
+
+      if (settings->adb == DB_OGN) {
+        sqlite3_open("/sd/Aircrafts/ogn.db", &ogn_db);
+
+        if (ogn_db == NULL)
+        {
+          Serial.println(F("Failed to open OGN DB\n"));
+        }  else {
+          rval = true;
+        }
+      }
+
+      if (settings->adb == DB_ICAO) {
+        sqlite3_open("/sd/Aircrafts/icao.db", &icao_db);
+
+        if (icao_db == NULL)
+        {
+          Serial.println(F("Failed to open ICAO DB\n"));
+        }  else {
+          rval = true;
+        }
+      }
+    }
+#endif /* BUILD_SKYVIEW_HD */
+    break;
+#endif /* CONFIG_IDF_TARGET_ESP32 */
+  default:
+    break;
+  }
 
   return rval;
 }
 
 static bool ESP32_DB_query(uint8_t type, uint32_t id, char *buf, size_t size)
 {
-  sqlite3_stmt *stmt;
-  char *query = NULL;
-  int error;
   bool rval = false;
-  const char *reg_key, *db_key;
-  sqlite3 *db;
 
-  if (settings->adapter != ADAPTER_TTGO_T5S) {
-    return false;
-  }
-
-#if !defined(BUILD_SKYVIEW_HD)
-
-  switch (type)
+  switch (settings->adapter)
   {
-  case DB_OGN:
-    switch (settings->idpref)
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+  case ADAPTER_WAVESHARE_PICO_2_7:
+  case ADAPTER_WAVESHARE_PICO_2_7_V2:
+#if !defined(BUILD_SKYVIEW_HD)
     {
-    case ID_TAIL:
-      reg_key = "accn";
-      break;
-    case ID_MAM:
-      reg_key = "acmodel";
-      break;
-    case ID_REG:
-    default:
-      reg_key = "acreg";
-      break;
-    }
-    db_key  = "devices";
-    db      = ogn_db;
-    break;
-  case DB_ICAO:
-    switch (settings->idpref)
-    {
-    case ID_TAIL:
-      reg_key = "owner";
-      break;
-    case ID_MAM:
-      reg_key = "type";
-      break;
-    case ID_REG:
-    default:
-      reg_key = "registration";
-      break;
-    }
-    db_key  = "aircrafts";
-    db      = icao_db;
-    break;
-  case DB_FLN:
-  default:
-    switch (settings->idpref)
-    {
-    case ID_TAIL:
-      reg_key = "tail";
-      break;
-    case ID_MAM:
-      reg_key = "type";
-      break;
-    case ID_REG:
-    default:
-      reg_key = "registration";
-      break;
-    }
-    db_key  = "aircrafts";
-    db      = fln_db;
-    break;
-  }
+      char key[8];
+      char out[64];
+      uint8_t tokens[3] = { 0 };
+      cdbResult rt;
+      int c, i = 0, token_cnt = 0;
+      int tok_num = 1;
 
-  if (db == NULL) {
-    return false;
-  }
+      if (!ADB_is_open) {
+        return rval;
+      }
 
-  error = asprintf(&query, "select %s from %s where id = %d",reg_key, db_key, id);
+      snprintf(key, sizeof(key),"%06X", id);
 
-  if (error == -1) {
-    return false;
-  }
+      rt = ucdb.findKey(key, strlen(key));
 
-  sqlite3_prepare_v2(db, query, strlen(query), &stmt, NULL);
+      switch (rt) {
+        case KEY_FOUND:
+          while ((c = ucdb.readValue()) != -1 && i < (sizeof(out) - 1)) {
+            if (c == '|') {
+              if (token_cnt < (sizeof(tokens) - 1)) {
+                token_cnt++;
+                tokens[token_cnt] = i+1;
+              }
+              c = 0;
+            }
+            out[i++] = (char) c;
+          }
+          out[i] = 0;
 
-  while (sqlite3_step(stmt) != SQLITE_DONE) {
-    if (sqlite3_column_type(stmt, 0) == SQLITE3_TEXT) {
+          switch (settings->idpref)
+          {
+          case ID_TAIL:
+            tok_num = 2;
+            break;
+          case ID_MAM:
+            tok_num = 0;
+            break;
+          case ID_REG:
+          default:
+            tok_num = 1;
+            break;
+          }
 
-      size_t len = strlen((char *) sqlite3_column_text(stmt, 0));
+          if (strlen(out + tokens[tok_num]) > 0) {
+            snprintf(buf, size, "%s", out + tokens[tok_num]);
+            rval = true;
+          }
+          break;
 
-      if (len > 0) {
-        len = len > size ? size : len;
-        strncpy(buf, (char *) sqlite3_column_text(stmt, 0), len);
-        if (len < size) {
-          buf[len] = 0;
-        } else if (len == size) {
-          buf[len-1] = 0;
-        }
-        rval = true;
+        case KEY_NOT_FOUND:
+        default:
+          break;
       }
     }
-  }
-
-  sqlite3_finalize(stmt);
-
-  free(query);
-
 #endif /* BUILD_SKYVIEW_HD */
+    break;
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
+#if defined(CONFIG_IDF_TARGET_ESP32)
+  case ADAPTER_TTGO_T5S:
+#if !defined(BUILD_SKYVIEW_HD)
+    {
+      sqlite3_stmt *stmt;
+      char *query = NULL;
+      int error;
+      const char *reg_key, *db_key;
+      sqlite3 *db;
+
+      switch (type)
+      {
+      case DB_OGN:
+        switch (settings->idpref)
+        {
+        case ID_TAIL:
+          reg_key = "accn";
+          break;
+        case ID_MAM:
+          reg_key = "acmodel";
+          break;
+        case ID_REG:
+        default:
+          reg_key = "acreg";
+          break;
+        }
+        db_key  = "devices";
+        db      = ogn_db;
+        break;
+      case DB_ICAO:
+        switch (settings->idpref)
+        {
+        case ID_TAIL:
+          reg_key = "owner";
+          break;
+        case ID_MAM:
+          reg_key = "type";
+          break;
+        case ID_REG:
+        default:
+          reg_key = "registration";
+          break;
+        }
+        db_key  = "aircrafts";
+        db      = icao_db;
+        break;
+      case DB_FLN:
+      default:
+        switch (settings->idpref)
+        {
+        case ID_TAIL:
+          reg_key = "tail";
+          break;
+        case ID_MAM:
+          reg_key = "type";
+          break;
+        case ID_REG:
+        default:
+          reg_key = "registration";
+          break;
+        }
+        db_key  = "aircrafts";
+        db      = fln_db;
+        break;
+      }
+
+      if (db == NULL) {
+        return false;
+      }
+
+      error = asprintf(&query, "select %s from %s where id = %d",reg_key, db_key, id);
+
+      if (error == -1) {
+        return false;
+      }
+
+      sqlite3_prepare_v2(db, query, strlen(query), &stmt, NULL);
+
+      while (sqlite3_step(stmt) != SQLITE_DONE) {
+        if (sqlite3_column_type(stmt, 0) == SQLITE3_TEXT) {
+
+          size_t len = strlen((char *) sqlite3_column_text(stmt, 0));
+
+          if (len > 0) {
+            len = len > size ? size : len;
+            strncpy(buf, (char *) sqlite3_column_text(stmt, 0), len);
+            if (len < size) {
+              buf[len] = 0;
+            } else if (len == size) {
+              buf[len-1] = 0;
+            }
+            rval = true;
+          }
+        }
+      }
+
+      sqlite3_finalize(stmt);
+
+      free(query);
+    }
+#endif /* BUILD_SKYVIEW_HD */
+    break;
+#endif /* CONFIG_IDF_TARGET_ESP32 */
+  default:
+    break;
+  }
 
   return rval;
 }
 
 static void ESP32_DB_fini()
 {
+  switch (settings->adapter)
+  {
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+  case ADAPTER_WAVESHARE_PICO_2_7:
+  case ADAPTER_WAVESHARE_PICO_2_7_V2:
 #if !defined(BUILD_SKYVIEW_HD)
-  if (settings->adapter == ADAPTER_TTGO_T5S) {
-
+    if (ADB_is_open) {
+      ucdb.close();
+      ADB_is_open = false;
+    }
+#endif /* BUILD_SKYVIEW_HD */
+    break;
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
+#if defined(CONFIG_IDF_TARGET_ESP32)
+  case ADAPTER_TTGO_T5S:
+#if !defined(BUILD_SKYVIEW_HD)
     if (settings->adb != DB_NONE) {
       if (fln_db != NULL) {
         sqlite3_close(fln_db);
@@ -876,8 +1253,12 @@ static void ESP32_DB_fini()
     }
 
     SD.end();
-  }
 #endif /* BUILD_SKYVIEW_HD */
+    break;
+#endif /* CONFIG_IDF_TARGET_ESP32 */
+  default:
+    break;
+  }
 }
 
 /* write sample data to I2S */
@@ -893,6 +1274,7 @@ int i2s_write_sample_nb(uint32_t sample)
 #endif
 }
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
 /* read 4 bytes of data from wav file */
 int read4bytes(File file, uint32_t *chunkId)
 {
@@ -911,11 +1293,13 @@ int readProps(File file, wavProperties_t *wavProps)
   int n = file.read((uint8_t *)wavProps, sizeof(wavProperties_t));
   return n;
 }
+#endif /* CONFIG_IDF_TARGET_ESP32 */
 
 static bool play_file(char *filename)
 {
   bool rval = false;
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
 #if !defined(EXCLUDE_AUDIO)
   headerState_t state = HEADER_RIFF;
 
@@ -988,12 +1372,14 @@ static bool play_file(char *filename)
     i2s_driver_uninstall((i2s_port_t)i2s_num); //stop & destroy i2s driver
   }
 #endif /* EXCLUDE_AUDIO */
+#endif /* CONFIG_IDF_TARGET_ESP32 */
 
   return rval;
 }
 
 static void ESP32_TTS(char *message)
 {
+#if defined(CONFIG_IDF_TARGET_ESP32)
   char filename[MAX_FILENAME_LEN];
 
   if (strcmp(message, "POST")) {
@@ -1055,6 +1441,7 @@ static void ESP32_TTS(char *message)
       }
     }
   }
+#endif /* CONFIG_IDF_TARGET_ESP32 */
 }
 
 #include <AceButton.h>
@@ -1126,11 +1513,25 @@ void onDownButtonEvent() {
 
 static void ESP32_Button_setup()
 {
-  int mode_button_pin = settings->adapter == ADAPTER_TTGO_T5S ?
-                        SOC_BUTTON_MODE_T5S : SOC_BUTTON_MODE_DEF;
+  int mode_button_pin = SOC_BUTTON_MODE_DEF;
 
-  // Button(s) uses external pull up resistor.
-  pinMode(mode_button_pin, INPUT);
+#if defined(CONFIG_IDF_TARGET_ESP32)
+  if (settings->adapter == ADAPTER_TTGO_T5S) {
+    mode_button_pin = SOC_BUTTON_MODE_T5S;
+  }
+#endif /* CONFIG_IDF_TARGET_ESP32 */
+
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+  if (settings->adapter == ADAPTER_WAVESHARE_PICO_2_7 ||
+      settings->adapter == ADAPTER_WAVESHARE_PICO_2_7_V2) {
+    mode_button_pin = settings->rotate == ROTATE_180 ?
+                      SOC_GPIO_PIN_KEY0 : SOC_GPIO_PIN_KEY2;
+  }
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
+
+  pinMode(mode_button_pin, settings->adapter == ADAPTER_WAVESHARE_PICO_2_7 ||
+                           settings->adapter == ADAPTER_WAVESHARE_PICO_2_7_V2 ?
+                           INPUT_PULLUP : INPUT);
 
   button_mode.init(mode_button_pin);
 
@@ -1147,6 +1548,7 @@ static void ESP32_Button_setup()
 
 //  attachInterrupt(digitalPinToInterrupt(mode_button_pin), onModeButtonEvent, CHANGE );
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
   if (settings->adapter == ADAPTER_TTGO_T5S) {
 
     // Button(s) uses external pull up resistor.
@@ -1185,13 +1587,43 @@ static void ESP32_Button_setup()
 //      attachInterrupt(digitalPinToInterrupt(SOC_BUTTON_DOWN_T5S), onDownButtonEvent, CHANGE);
     }
   }
+#endif /* CONFIG_IDF_TARGET_ESP32 */
+
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+  if (settings->adapter == ADAPTER_WAVESHARE_PICO_2_7 ||
+      settings->adapter == ADAPTER_WAVESHARE_PICO_2_7_V2) {
+    pinMode(SOC_GPIO_PIN_KEY1, INPUT_PULLUP);
+    button_up.init(SOC_GPIO_PIN_KEY1, HIGH);
+
+    int down_button_pin = settings->rotate == ROTATE_180 ?
+                          SOC_GPIO_PIN_KEY2 : SOC_GPIO_PIN_KEY0;
+    pinMode(down_button_pin, INPUT_PULLUP);
+    button_down.init(down_button_pin, HIGH);
+
+    ButtonConfig* UpButtonConfig = button_up.getButtonConfig();
+    UpButtonConfig->setEventHandler(handleEvent);
+    UpButtonConfig->setFeature(ButtonConfig::kFeatureClick);
+    UpButtonConfig->setFeature(ButtonConfig::kFeatureSuppressAfterClick);
+    UpButtonConfig->setClickDelay(100);
+    UpButtonConfig->setLongPressDelay(2000);
+
+    ButtonConfig* DownButtonConfig = button_down.getButtonConfig();
+    DownButtonConfig->setEventHandler(handleEvent);
+    DownButtonConfig->setFeature(ButtonConfig::kFeatureClick);
+    DownButtonConfig->setFeature(ButtonConfig::kFeatureSuppressAfterClick);
+    DownButtonConfig->setClickDelay(100);
+    DownButtonConfig->setLongPressDelay(2000);
+  }
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
 }
 
 static void ESP32_Button_loop()
 {
   button_mode.check();
 
-  if (settings->adapter == ADAPTER_TTGO_T5S) {
+  if (settings->adapter == ADAPTER_TTGO_T5S           ||
+      settings->adapter == ADAPTER_WAVESHARE_PICO_2_7 ||
+      settings->adapter == ADAPTER_WAVESHARE_PICO_2_7_V2) {
     button_up.check();
     button_down.check();
   }
@@ -1199,18 +1631,26 @@ static void ESP32_Button_loop()
 
 static void ESP32_Button_fini()
 {
+  int mode_button_pin = SOC_BUTTON_MODE_DEF;
 
+#if defined(CONFIG_IDF_TARGET_ESP32)
   if (settings->adapter == ADAPTER_TTGO_T5S) {
-//    detachInterrupt(digitalPinToInterrupt(SOC_BUTTON_MODE_T5S));
+    mode_button_pin = SOC_BUTTON_MODE_T5S;
 //    detachInterrupt(digitalPinToInterrupt(SOC_BUTTON_UP_T5S));
 //    detachInterrupt(digitalPinToInterrupt(SOC_BUTTON_DOWN_T5S));
-
-    while (digitalRead(SOC_BUTTON_MODE_T5S) == LOW);
-  } else {
-//    detachInterrupt(digitalPinToInterrupt(SOC_BUTTON_MODE_DEF));
-
-    while (digitalRead(SOC_BUTTON_MODE_DEF) == LOW);
   }
+#endif /* CONFIG_IDF_TARGET_ESP32 */
+
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+  if (settings->adapter == ADAPTER_WAVESHARE_PICO_2_7 ||
+      settings->adapter == ADAPTER_WAVESHARE_PICO_2_7_V2) {
+    mode_button_pin = settings->rotate == ROTATE_180 ?
+                      SOC_GPIO_PIN_KEY0 : SOC_GPIO_PIN_KEY2;
+  }
+#endif /* CONFIG_IDF_TARGET_ESP32S3 */
+
+//  detachInterrupt(digitalPinToInterrupt(mode_button_pin));
+  while (digitalRead(mode_button_pin) == LOW);
 }
 
 static void ESP32_WDT_setup()
