@@ -9,7 +9,7 @@
 - **T-Beam**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
 - **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
-For the T-Beam you need to select the `ESP32 Dev Module` board, for the T-Echo the `Nordic nRF52840 DK` board. For more details please read the following related upstream WiKi sections: https://github.com/lyusupov/SoftRF/tree/master/software/firmware/source#esp32 and https://github.com/lyusupov/SoftRF/tree/master/software/firmware/source#nrf52840
+For the T-Beam you need to select the `ESP32 Dev Module` board (`ESP32S3 Dev Module` for the T-Beam S3 Supreme), for the T-Echo the `Nordic nRF52840 DK` board. For more details please read the following related upstream WiKi sections: https://github.com/lyusupov/SoftRF/tree/master/software/firmware/source#esp32 and https://github.com/lyusupov/SoftRF/tree/master/software/firmware/source#nrf52840
 
 In case you want to convert a T-Beam based OGN Tracker to run SoftRF, you first need to apply the following reset: https://github.com/VirusPilot/LilyGo-T-Beam-GPS-Reset, otherwise the GPS chipset won't work with SoftRF (OGN Tracker uses 57600 baud vs. SoftRF using 9600 baud for the GPS-CPU connection).
 
