@@ -9,9 +9,40 @@
 - **T-Beam**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
 - **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
-For the T-Beam you need to select the `ESP32 Dev Module` board (`ESP32S3 Dev Module` for the T-Beam S3 Supreme), for the T-Echo the `Nordic nRF52840 DK` board. For more details please read the following related upstream WiKi sections: https://github.com/lyusupov/SoftRF/tree/master/software/firmware/source#esp32 and https://github.com/lyusupov/SoftRF/tree/master/software/firmware/source#nrf52840
+**Arduino IDE** settings for **T-Beam v0.7/v1.0/v1.1**
+- Select Tools -> Board -> ESP32 Dev Module
+- Select Tools -> CPU Frequency -> 80MHz
+- Select Tools -> Flash Frequency -> 80MHz
+- Select Tools -> Flash Mode -> DIO
+- Select Tools -> Flash Size -> 4MB
+- Select Tools -> Partition Scheme -> Minimal SPIFFS
+- Select Tools -> PSRAM -> Enabled
+- Select Tools -> Upload Speed -> 921600
+- Select Tools -> open serial monitor @ 115200 baud
+- connect your T-Beam
+- Select Tools -> Port -> (select accodingly)
 
-In case you want to convert a T-Beam based OGN Tracker to run SoftRF, you first need to apply the following reset: https://github.com/VirusPilot/LilyGo-T-Beam-GPS-Reset, otherwise the GPS chipset won't work with SoftRF (OGN Tracker uses 57600 baud vs. SoftRF using 9600 baud for the GPS-CPU connection).
+**Arduino IDE** settings for **T-Beam Supreme** (under construction)
+- Select Tools -> Board -> ESP32S3 Dev Module
+- Select Tools -> CPU Frequency -> 80MHz
+- Select Tools -> Flash Frequency -> 80MHz
+- Select Tools -> Flash Mode -> DIO
+- Select Tools -> Flash Size -> 8MB
+- Select Tools -> Partition Scheme -> 8MB with spiffs
+- Select Tools -> PSRAM -> ???
+- Select Tools -> Upload Speed -> 921600
+- Select Tools -> Upload Mode -> ???
+- Select Tools -> USB Mode -> ???
+- Select Tools -> USB Firmware MSC on Boot -> ???
+- Select Tools -> USB CDC on Boot -> ???
+- ...
+
+**Arduino IDE** settings for **T-Echo**
+- Select Tools -> Board -> Nordic nRF52840 DK
+- connect your T-Echo
+- Select Tools -> Port -> (select accodingly)
+
+In case you want to convert a **T-Beam based OGN Tracker to run SoftRF**, you first need to apply the following reset: https://github.com/VirusPilot/LilyGo-T-Beam-GPS-Reset, otherwise the GPS chipset won't work with SoftRF (OGN Tracker uses 57600 baud vs. SoftRF using 9600 baud for the GPS-CPU connection).
 
 **T-Beam modifications:**
 - u-blox GPS configuration:
@@ -43,7 +74,7 @@ In case you want to convert a T-Beam based OGN Tracker to run SoftRF, you first 
 - it appears that on SX1262 based T-Beams the modified GPS configuration sometimes reverts to the default GNSS settings, e.g. GLONASS is enabled instead of BEIDOU. It is totally unclear why this happens, therefore SX1276 based T-Beams are recommended for the time being
 
 **Recommendations for T-Beam:**
-- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF webinterface
+- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF webinterface (192.168.4.1)
 
 **Recommendations for T-Echo:**
 - load OGN database: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
