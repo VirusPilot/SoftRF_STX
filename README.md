@@ -1,4 +1,4 @@
-# SoftRF DIY - Stratux compatible fork
+# SoftRF DIY - Stratux compatible fork for T-Beam and T-Echo
 
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB or WiFi)
 - option to enter Aircraft ID
@@ -6,8 +6,8 @@
   - if the SoftRF factory ID remains, then ADDR_TYPE is set according to the selected protocol
 
 **IMPORTANT**: All modifications are provided only in the source code so you need to be familiar with Arduino to compile and flash it for your platform. You need to install Arduino IDE (v1.8 or later) and add the following two entries into the Additional Board Manager URLs:
-- T-Beam: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
-- T-Echo: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
+- **T-Beam**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+- **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
 For the T-Beam you need to select the `ESP32 Dev Module` board, for the T-Echo the `Nordic nRF52840 DK` board. For more details please read the following related upstream WiKi sections: https://github.com/lyusupov/SoftRF/tree/master/software/firmware/source#esp32 and https://github.com/lyusupov/SoftRF/tree/master/software/firmware/source#nrf52840
 
