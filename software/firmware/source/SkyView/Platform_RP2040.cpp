@@ -583,10 +583,12 @@ static ep_model_id RP2040_EPD_ident()
  *  0x2D:
  *  FF FF FF FF FF FF FF FF FF FF FF - W3
  *  00 00 00 FF 00 00 40 01 00 00 00
+ *  00 00 00 00 00 00 00 00 00 00 00 - T91
  *
  *  0x2E:
  *  FF FF FF FF FF FF FF FF FF FF    - W3
  *  FF FF FF FF FF FF FF FF FF FF
+ *  00 00 00 00 00 00 00 00 00 00    - T91
  */
 #endif
 
@@ -603,7 +605,7 @@ static ep_model_id RP2040_EPD_ident()
   if (is_ff) {
     rval = EP_GDEW027W3;
   } else {
-    rval = EP_GDEY027T91; /* TBD */
+    rval = EP_GDEY027T91;
   }
 
   return rval;
@@ -733,13 +735,27 @@ static int RP2040_WiFi_clients_count()
 static bool RP2040_DB_init()
 {
   if (FATFS_is_mounted) {
-    const char fileName[] = "/Aircrafts/ogn.cdb";
+    const char *fileName;
 
-    if (ucdb.open(fileName) != CDB_OK) {
-      Serial.print("Invalid CDB: ");
-      Serial.println(fileName);
-    } else {
-      ADB_is_open = true;
+    if (settings->adb == DB_OGN) {
+      fileName = "/Aircrafts/ogn.cdb";
+
+      if (ucdb.open(fileName) != CDB_OK) {
+        Serial.print("Invalid CDB: ");
+        Serial.println(fileName);
+      } else {
+        ADB_is_open = true;
+      }
+    }
+    if (settings->adb == DB_FLN) {
+      fileName = "/Aircrafts/fln.cdb";
+
+      if (ucdb.open(fileName) != CDB_OK) {
+        Serial.print("Invalid CDB: ");
+        Serial.println(fileName);
+      } else {
+        ADB_is_open = true;
+      }
     }
   }
 
@@ -847,23 +863,23 @@ static void RP2040_TTS(char *message)
       if (!FATFS_is_mounted)
         return;
 
+      if (wdt_is_active) {
+        Watchdog.reset();
+      }
+
       while (!SoC->EPD_is_ready()) {yield();}
       EPD_Message("VOICE", "ALERT");
       SoC->EPD_update(EPD_UPDATE_FAST);
       while (!SoC->EPD_is_ready()) {yield();}
 
-#if 0 /* TBD */
-      bool wdt_status = loopTaskWDTEnabled;
-
-      if (wdt_status) {
-        disableLoopWDT();
-      }
-#endif
-
       char *word = strtok (message, " ");
 
       while (word != NULL)
       {
+          if (wdt_is_active) {
+            Watchdog.reset();
+          }
+
           strcpy(filename, WAV_FILE_PREFIX);
           strcat(filename,  settings->voice == VOICE_1 ? VOICE1_SUBDIR :
                            (settings->voice == VOICE_2 ? VOICE2_SUBDIR :
@@ -879,12 +895,6 @@ static void RP2040_TTS(char *message)
           /* Poll input source(s) */
           Input_loop();
       }
-
-#if 0 /* TBD */
-      if (wdt_status) {
-        enableLoopWDT();
-      }
-#endif
     }
   } else {
     if ( settings->voice   != VOICE_OFF                  &&
