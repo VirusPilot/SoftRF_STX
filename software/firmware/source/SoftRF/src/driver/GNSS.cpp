@@ -568,7 +568,7 @@ static void setup_UBX()
     for (int i = 0; i < sizeof(CFG_SIGNAL); i++) {
       Serial_GNSS_Out.write(pgm_read_byte(&CFG_SIGNAL[i]));
     }
-
+    Serial.println(F("Sucessfully configured u-blox M10S"));
     delay(600);
   }
   #endif /* USE_U10_EXT */
