@@ -115,7 +115,7 @@ const char *ISO3166_CC[] = {
 };
 
 const char SoftRF_text1[]  = "SoftRF";
-const char SoftRF_text2[]  = "and";
+const char SoftRF_text2[]  = "Stratux";
 const char SoftRF_text3[]  = "LilyGO";
 const char ID_text[]       = "ID";
 const char PROTOCOL_text[] = "PROTOCOL";
