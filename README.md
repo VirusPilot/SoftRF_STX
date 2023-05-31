@@ -39,9 +39,9 @@
 - Select Tools -> USB CDC on Boot -> enabled
 - do **NOT** compile/upload but:
   - select **Export Compiled Binary**
-  - convert `SoftRF.ino.bin` to UF2 using `uf2conv.py` from https://github.com/adafruit/tinyuf2
+  - convert `SoftRF.ino.bin` to UF2 using `uf2conv.py SoftRF.ino.bin -c -b 0x00 -f ESP32S3` (from https://github.com/microsoft/uf2/tree/master/utils)
   - connect your T-Beam Supreme and put it in UF2 upload mode (press RESET and shortly thereafter BOOT)
-  - upload the UF2 file to the TBEAMBOOT drive (https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3)
+  - upload the UF2 file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 
 **Arduino IDE** settings for **T-Echo**
 - Select Tools -> Board -> Nordic nRF52840 DK
