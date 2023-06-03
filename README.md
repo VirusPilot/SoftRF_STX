@@ -23,20 +23,26 @@
 - Select Tools -> Port -> (select accodingly)
 - compile/upload
 
-**Arduino IDE** settings for **T-Beam Supreme** (under construction)
+**Arduino IDE** settings for **T-Beam Supreme** (**Caution:** the UF2 firmware upload option will no longer work after the following steps)
 - Select Tools -> Board -> ESP32S3 Dev Module
 - Select Tools -> CPU Frequency -> 80MHz
 - Select Tools -> Flash Frequency -> 80MHz
 - Select Tools -> Flash Mode -> QIO
 - Select Tools -> Flash Size -> 8MB
-- Select Tools -> Partition Scheme -> 8MB with spiffs
+- Select Tools -> Partition Scheme -> 8MB with spiffs (tbd.)
 - Select Tools -> PSRAM -> QSPI PSRAM
 - Select Tools -> Upload Speed -> 921600
-- Select Tools -> Upload Mode -> USB-OTG CDC (TinyUSB)
+- Select Tools -> Upload Mode -> UART0 / Hardware CDC
 - Select Tools -> USB Mode -> USB-OTG CDC (TinyUSB)
 - Select Tools -> USB Firmware MSC on Boot -> disabled
 - Select Tools -> USB DFU on Boot -> disabled
 - Select Tools -> USB CDC on Boot -> enabled
+- connect your T-Beam
+- put your T-Beam in Espressif Service Mode (press and keep holding RESET, press and keep holding BOOT, release RESET first, thereafter release BOOT)
+- compile/upload
+- press RESET
+
+As an alternative (if you want to maintain the UF2 firmware upload option):
 - do **NOT** compile/upload but:
   - select **Export Compiled Binary**
   - convert `SoftRF.ino.bin` to UF2 using `uf2conv.py SoftRF.ino.bin -c -b 0x00 -f ESP32S3` (from https://github.com/microsoft/uf2/tree/master/utils)
