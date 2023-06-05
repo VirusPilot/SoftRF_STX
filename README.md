@@ -1,6 +1,6 @@
 # SoftRF DIY - Stratux compatible fork for T-Beam, T-Beam Supreme and T-Echo
 
-- enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB or WiFi)
+- enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
 - option to enter Aircraft ID
   - if an Aircraft ID is added, then ADDR_TYPE_ICAO is set for both Legacy and OGN
   - if the SoftRF factory ID remains, then ADDR_TYPE is set according to the selected protocol
@@ -42,12 +42,19 @@
 - compile/upload
 - press RESET
 
-As an alternative (if you want to maintain the UF2 firmware upload option):
+1st alternative (and if you want to maintain the UF2 firmware upload option):
 - do **NOT** compile/upload but:
-  - select **Export Compiled Binary**
+  - select **Export Compiled Binary** and then locate `SoftRF.ino.bin`
   - convert `SoftRF.ino.bin` to UF2 using `uf2conv.py SoftRF.ino.bin -c -b 0x00 -f ESP32S3` (from https://github.com/microsoft/uf2/tree/master/utils)
   - connect your T-Beam Supreme and put it in UF2 upload mode (press RESET and shortly thereafter BOOT)
   - upload the UF2 file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
+
+2nd alternative (and if you want to maintain the UF2 firmware upload option):
+- do **NOT** compile/upload but:
+  - select **Export Compiled Binary** and then locate `SoftRF.ino.bin`
+  - connect you PC with the SoftRF WiFi
+  - select `Firmware Update``
+  - upload `SoftRF.ino.bin`
 
 **Arduino IDE** settings for **T-Echo**
 - Select Tools -> Board -> Nordic nRF52840 DK
