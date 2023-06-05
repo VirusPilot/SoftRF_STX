@@ -29,12 +29,12 @@
 - Select Tools -> Flash Frequency -> 80MHz
 - Select Tools -> Flash Mode -> QIO
 - Select Tools -> Flash Size -> 8MB
-- Select Tools -> Partition Scheme -> 8MB with spiffs (tbd.)
+- Select Tools -> Partition Scheme -> 8MB with spiffs (copy https://github.com/lyusupov/tinyuf2/blob/master/ports/espressif/partitions-8MB-SPIFFS.csv to your local Arduino partitionss path, e.g. `/packages/esp32/hardware/esp32/2.0.9/tools/partitions` and replace `default_8MB.csv`)
 - Select Tools -> PSRAM -> QSPI PSRAM
 - Select Tools -> Upload Speed -> 921600
 - Select Tools -> Upload Mode -> UART0 / Hardware CDC
 - Select Tools -> USB Mode -> USB-OTG CDC (TinyUSB)
-- Select Tools -> USB Firmware MSC on Boot -> disabled
+- Select Tools -> USB Firmware MSC on Boot -> enabled
 - Select Tools -> USB DFU on Boot -> disabled
 - Select Tools -> USB CDC on Boot -> enabled
 - connect your T-Beam
