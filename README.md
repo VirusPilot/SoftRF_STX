@@ -1,12 +1,12 @@
-# SoftRF DIY - Stratux compatible fork for T-Beam and T-Echo
+# SoftRF DIY - Stratux compatible fork for T-Beam, T-Beam Supreme and T-Echo
 
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB or WiFi)
 - option to enter Aircraft ID
   - if an Aircraft ID is added, then ADDR_TYPE_ICAO is set for both Legacy and OGN
   - if the SoftRF factory ID remains, then ADDR_TYPE is set according to the selected protocol
 
-**IMPORTANT**: All modifications are provided only in the source code so you need to be familiar with Arduino to compile and flash it for your platform. You need to install **Arduino IDE** (v1.8 or later) and add the following two entries into the Additional Board Manager URLs:
-- **T-Beam**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+**IMPORTANT**: All modifications are provided only in the source code so you need to be familiar with Arduino to compile and flash it for your platform. You need to install the latest version of **Arduino IDE** and add the following two entries into the Additional Board Manager URLs:
+- **T-Beam and T-Beam Supreme**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
 - **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
 **Arduino IDE** settings for **T-Beam v0.7/v1.0/v1.1**
@@ -29,7 +29,7 @@
 - Select Tools -> Flash Frequency -> 80MHz
 - Select Tools -> Flash Mode -> QIO
 - Select Tools -> Flash Size -> 8MB
-- Select Tools -> Partition Scheme -> 8MB with spiffs (copy https://github.com/lyusupov/tinyuf2/blob/master/ports/espressif/partitions-8MB-SPIFFS.csv to your local Arduino partitionss path, e.g. `/packages/esp32/hardware/esp32/2.0.9/tools/partitions` and replace `default_8MB.csv`)
+- Select Tools -> Partition Scheme -> 8MB with spiffs (copy https://github.com/lyusupov/tinyuf2/blob/master/ports/espressif/partitions-8MB-SPIFFS.csv to your local Arduino partitionss path, e.g. `..packages/esp32/hardware/esp32/2.0.9/tools/partitions` and replace `default_8MB.csv`)
 - Select Tools -> PSRAM -> QSPI PSRAM
 - Select Tools -> Upload Speed -> 921600
 - Select Tools -> Upload Mode -> UART0 / Hardware CDC
@@ -65,10 +65,6 @@ In case you want to convert a **T-Beam based OGN Tracker to run SoftRF**, you fi
 - LEGACY NMEA traffic messages are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
 - default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
 - WiFi AP IP changed to `192.168.4.1` to avoid conflicts with Stratux WiFi AP IP
-- alternative connection with Stratux (under development): **WiFi**
-  - Stratux needs to be in `AP+Client mode` to connect to the SoftRF WiFi AP (please add your SoftRF's SSID and password to the list of `WiFi Client Networks` in the Stratux WiFi settings)
-  - T-Beam `NMEA output` needs to be set to `TCP`, using the SoftRF webinterface
-  - to be implemented on Stratux: automatic port fowarding in Stratux, for now `socat TCP:192.168.4.1:2000 TCP:localhost:30011` is doing the trick but not reliable yet
 
 **T-Echo modifications:**
 - L76K GPS configuration:
@@ -84,7 +80,7 @@ In case you want to convert a **T-Beam based OGN Tracker to run SoftRF**, you fi
 - if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux; please note the following limitations when adding a baro module to your T-Beam: https://github.com/lyusupov/SoftRF/issues/32#issuecomment-420242682
 
 **Issues:**
-- it appears that on SX1262 based T-Beams the modified GPS configuration sometimes reverts to the default GNSS settings, e.g. GLONASS is enabled instead of BEIDOU. It is totally unclear why this happens, therefore SX1276 based T-Beams are recommended for the time being
+- it appears that on some SX1262 based T-Beams (not the T-Beam Supreme) the modified GPS configuration sometimes reverts to the default GNSS settings, e.g. GLONASS is enabled instead of BEIDOU.
 
 **Recommendations for T-Beam:**
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF webinterface (192.168.4.1)
