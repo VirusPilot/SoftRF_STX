@@ -34,7 +34,7 @@
 - Select Tools -> Upload Speed -> 921600
 - Select Tools -> Upload Mode -> UART0 / Hardware CDC
 - Select Tools -> USB Mode -> USB-OTG CDC (TinyUSB)
-- Select Tools -> USB Firmware MSC on Boot -> enabled
+- Select Tools -> USB Firmware MSC on Boot -> disabled
 - Select Tools -> USB DFU on Boot -> disabled
 - Select Tools -> USB CDC on Boot -> enabled
 - connect your T-Beam
