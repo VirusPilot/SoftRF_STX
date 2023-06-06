@@ -1,4 +1,4 @@
-# SoftRF DIY - Stratux compatible fork for T-Beam, T-Beam Supreme and T-Echo
+# SoftRF DIY - Stratux compatible fork for T-Beam, T-Beam S3 Supreme and T-Echo
 
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
 - option to enter Aircraft ID
@@ -6,10 +6,10 @@
   - if the SoftRF factory ID remains, then ADDR_TYPE is set according to the selected protocol
 
 **IMPORTANT**: All modifications are provided only in the source code so you need to be familiar with Arduino to compile and flash it for your platform. You need to install the latest version of **Arduino IDE** and add the following two entries into the Additional Board Manager URLs:
-- **T-Beam and T-Beam Supreme**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
+- **T-Beam and T-Beam S3 Supreme**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
 - **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
-**Arduino IDE** settings for **T-Beam v0.7/v1.0/v1.1**
+**Arduino IDE** settings for **T-Beam v0.7, T-Beam v1.0, T-Beam v1.1**
 - Select Tools -> Board -> ESP32 Dev Module
 - Select Tools -> CPU Frequency -> 80MHz
 - Select Tools -> Flash Frequency -> 80MHz
@@ -23,7 +23,7 @@
 - Select Tools -> Port -> (select accodingly)
 - compile/upload
 
-**Arduino IDE** settings for **T-Beam Supreme** (**Caution:** the UF2 firmware upload option will no longer work after the following steps)
+**Arduino IDE** settings for **T-Beam S3 Supreme** (**Caution:** the UF2 firmware upload option will no longer work after the following steps)
 - Select Tools -> Board -> ESP32S3 Dev Module
 - Select Tools -> CPU Frequency -> 80MHz
 - Select Tools -> Flash Frequency -> 80MHz
@@ -37,20 +37,20 @@
 - Select Tools -> USB Firmware MSC on Boot -> disabled
 - Select Tools -> USB DFU on Boot -> disabled
 - Select Tools -> USB CDC on Boot -> enabled
-- connect your T-Beam
+- connect your T-Beam S3 Supreme
 - put your T-Beam in Espressif Service Mode (press and keep holding RESET, press and keep holding BOOT, release RESET first, thereafter release BOOT)
 - compile/upload
 - press RESET
 
-1st alternative (and if you want to maintain the UF2 firmware upload option):
-- do **NOT** compile/upload but:
+1st alternative for **T-Beam S3 Supreme** (and if you want to maintain the UF2 firmware upload option):
+- follow all steps above but do **NOT** compile/upload:
   - select **Export Compiled Binary** and then locate `SoftRF.ino.bin`
-  - convert `SoftRF.ino.bin` to UF2 using `uf2conv.py SoftRF.ino.bin -c -b 0x00 -f ESP32S3` (from https://github.com/microsoft/uf2/tree/master/utils)
-  - connect your T-Beam Supreme and put it in UF2 upload mode (press RESET and shortly thereafter BOOT)
-  - upload the UF2 file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
+  - convert `SoftRF.ino.bin` to UF2 using `uf2conv.py SoftRF.ino.bin -c -b 0x00 -f ESP32S3 -o SoftRF.ino.uf2` (from https://github.com/microsoft/uf2/tree/master/utils)
+  - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press RESET and shortly thereafter BOOT)
+  - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 
-2nd alternative (and if you want to maintain the UF2 firmware upload option):
-- do **NOT** compile/upload but:
+2nd alternative for **T-Beam S3 Supreme** (and if you want to maintain the UF2 firmware upload option):
+- follow all steps above but do **NOT** compile/upload:
   - select **Export Compiled Binary** and then locate `SoftRF.ino.bin`
   - connect you PC with the SoftRF WiFi
   - select `Firmware Update``
@@ -64,7 +64,7 @@
 
 In case you want to convert a **T-Beam based OGN Tracker to run SoftRF**, you first need to apply the following reset: https://github.com/VirusPilot/LilyGo-T-Beam-GPS-Reset, otherwise the GPS chipset won't work with SoftRF (OGN Tracker uses 57600 baud vs. SoftRF using 9600 baud for the GPS-CPU connection).
 
-**T-Beam modifications:**
+**T-Beam and T-Beam S3 Supreme modifications:**
 - u-blox GPS configuration:
   - enable GSA, GSV, VTG
   - enable GPS, GALILEO, BEIDOU and SBAS
@@ -87,9 +87,9 @@ In case you want to convert a **T-Beam based OGN Tracker to run SoftRF**, you fi
 - if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux; please note the following limitations when adding a baro module to your T-Beam: https://github.com/lyusupov/SoftRF/issues/32#issuecomment-420242682
 
 **Issues:**
-- it appears that on some SX1262 based T-Beams (not the T-Beam Supreme) the modified GPS configuration sometimes reverts to the default GNSS settings, e.g. GLONASS is enabled instead of BEIDOU.
+- it appears that on some SX1262 based T-Beams (not the T-Beam S3 Supreme) the modified GPS configuration sometimes reverts to the default GNSS settings, e.g. GLONASS is enabled instead of BEIDOU.
 
-**Recommendations for T-Beam:**
+**Recommendations for T-Beam and T-Beam S3 Supreme:**
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF webinterface (192.168.4.1)
 
 **Recommendations for T-Echo:**
