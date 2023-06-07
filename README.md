@@ -38,15 +38,15 @@
 - Select Tools -> USB DFU on Boot -> disabled
 - Select Tools -> USB CDC on Boot -> enabled
 - connect your T-Beam S3 Supreme
-- put your T-Beam in Espressif Service Mode (press and keep holding RESET, press and keep holding BOOT, release RESET first, thereafter release BOOT)
+- put your T-Beam in Espressif Service Mode (press and keep holding **BOOT**, press and release **RESET**, thereafter release **BOOT**)
 - compile/upload
-- press RESET
+- press **RESET**
 
 1st alternative for **T-Beam S3 Supreme** (and if you want to maintain the UF2 firmware upload option):
 - follow all steps above but do **NOT** compile/upload:
   - select **Export Compiled Binary** and then locate `SoftRF.ino.bin`
   - convert `SoftRF.ino.bin` to UF2 using `uf2conv.py SoftRF.ino.bin -c -b 0x00 -f ESP32S3 -o SoftRF.ino.uf2` (from https://github.com/microsoft/uf2/tree/master/utils)
-  - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press RESET and shortly thereafter BOOT)
+  - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
   - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 
 2nd alternative for **T-Beam S3 Supreme** (and if you want to maintain the UF2 firmware upload option):
