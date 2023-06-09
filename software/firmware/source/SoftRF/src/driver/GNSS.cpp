@@ -219,35 +219,22 @@ const uint8_t RXM_PMREQ_OFF[16] PROGMEM = {0xB5, 0x62, 0x02, 0x41, 0x08, 0x00,
 const uint8_t factoryUBX[] PROGMEM = { 0xB5, 0x62, 0x06, 0x09, 0x0D, 0x00, 0xFF,
                                        0xFB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                        0xFF, 0xFF, 0x00, 0x00, 0x17, 0x2B, 0x7E } ;
-#if defined(USE_U10_EXT)
-static byte _ulox_version_cache = GNSS_MODULE_NMEA;
-// const uint8_t CFG_SIGNAL[] PROGMEM = { 0xB5, 0x62, 0x06, 0x8A, 0x4A,
-//                                        0x00, 0x01, 0x01, 0x00, 0x00,
-//                       /* GPS  L1C/A */ 0x01, 0x00, 0x31, 0x10, 0x01,
-//                       /* SBAS L1C/A */ 0x05, 0x00, 0x31, 0x10, 0x01,
-//                       /* Galileo E1 */ 0x07, 0x00, 0x31, 0x10, 0x01,
-//                       /* BeiDou B1I */ 0x0D, 0x00, 0x31, 0x10, 0x00,
-//                       /* BeiDou B1C */ 0x0F, 0x00, 0x31, 0x10, 0x01,
-//                       /* QZSS L1C/A */ 0x12, 0x00, 0x31, 0x10, 0x01,
-//                       /* QZSS   L1S */ 0x14, 0x00, 0x31, 0x10, 0x01,
-//                       /* GLONASS L1 */ 0x18, 0x00, 0x31, 0x10, 0x01,
-//                       /* GPS     EN */ 0x1F, 0x00, 0x31, 0x10, 0x01,
-//                       /* SBAS    EN */ 0x20, 0x00, 0x31, 0x10, 0x01,
-//                       /* Galileo EN */ 0x21, 0x00, 0x31, 0x10, 0x01,
-//                       /* BeiDou  EN */ 0x22, 0x00, 0x31, 0x10, 0x01,
-//                       /* QZSS    EN */ 0x24, 0x00, 0x31, 0x10, 0x01,
-//                       /* GLONASS EN */ 0x25, 0x00, 0x31, 0x10, 0x01,
-//                                        0xA9, 0xC3 } ;
-//
+
 // UBX-CFG-VALSET Stratux settings for u-blox M10S
 // -----------------------------------------------
-// CFG-MSGOUT-NMEA_ID_GLL_UART1 = 0
-// CFG-NAVSPG-DYNMODEL = 7 (airborne < 2g)
-// CFG-NMEA-PROTVER = 40
-// CFG-NMEA-SVNUMBERING = 1
+// CFG_MSGOUT_NMEA_ID_GLL_UART1 = 0
+const uint8_t CFG_MSGOUT_NMEA_ID_GLL_UART1[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x09, 0x00, 0x01, 0x01, 0x00, 0x00, 0xCA, 0x00, 0x91, 0x20, 0x00, 0x16, 0x1F};
+
+// CFG_NAVSPG_DYNMODEL = 7 (airborne < 2g)
+const uint8_t CFG_NAVSPG_DYNMODEL[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x09, 0x00, 0x01, 0x01, 0x00, 0x00, 0x21, 0x00, 0x11, 0x20, 0x07, 0xF4, 0x59};
+
+// CFG_NMEA_PROTVER = 4.0
+const uint8_t CFG_NMEA_PROTVER[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x09, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x93, 0x20, 0x28, 0x77, 0x60};
+
+// CFG_NMEA_SVNUMBERING = 1 (extended)
+const uint8_t CFG_NMEA_SVNUMBERING[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x09, 0x00, 0x01, 0x01, 0x00, 0x00, 0x07, 0x00, 0x93, 0x20, 0x01, 0x56, 0x57};
+
 // CFG-SIGNAL-..._ENA = default (The default configuration is concurrent reception of GPS, Galileo and BeiDou B1I with QZSS and SBAS enabled)
-const uint8_t CFG_SIGNAL[] PROGMEM = { 0xB5, 0x62, 0x06, 0x8A, 0x18, 0x00, 0x01, 0x01, 0x00, 0x00, 0xCA, 0x00, 0x91, 0x20, 0x00, 0x21, 0x00, 0x11, 0x20, 0x07, 0x01, 0x00, 0x93, 0x20, 0x28, 0x07, 0x00, 0x93, 0x20, 0x01, 0x15, 0x17 } ;
-#endif /* USE_U10_EXT */
 
  /* Stratux Setup: enable GPS & Galileo & Beidou for u-blox 8 */
 const uint8_t setGNSS_U8[] PROGMEM = {0x00, 0x00, 0xFF, 0x07,
@@ -544,34 +531,49 @@ static void setup_UBX()
       Serial.println(F("Sucessfully set NMEA VTG"));
     }
 
-#if defined(NMEA_TCP_SERVICE)
-    if (settings->nmea_out != NMEA_TCP)
-#endif /* NMEA_TCP_SERVICE */
+    msglen = makeUBXCFG(0x06, 0x01, sizeof(setGSA), setGSA);
+    sendUBX(GNSSbuf, msglen);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x01);
+    if (!gnss_set_sucess)
     {
-      msglen = makeUBXCFG(0x06, 0x01, sizeof(setGSA), setGSA);
-      sendUBX(GNSSbuf, msglen);
-      gnss_set_sucess = getUBX_ACK(0x06, 0x01);
-      if (!gnss_set_sucess)
-      {
-        Serial.println(F("WARNING: Unable to set NMEA GSA"));
-      }
-      else
-      {
-        Serial.println(F("Sucessfully set NMEA GSA"));
-      }
+      Serial.println(F("WARNING: Unable to set NMEA GSA"));
+    }
+    else
+    {
+      Serial.println(F("Sucessfully set NMEA GSA"));
     }
   } /* GNSS_MODULE_U678 */
-  
-  #if defined(USE_U10_EXT)
-  /* Disable BeiDou B1I. Enable BeiDou B1C and GLONASS L1OF */
-  if (_ulox_version_cache == GNSS_MODULE_U10) {
-    for (int i = 0; i < sizeof(CFG_SIGNAL); i++) {
-      Serial_GNSS_Out.write(pgm_read_byte(&CFG_SIGNAL[i]));
+
+  if (version == GNSS_MODULE_U10)
+  {
+    for (int i = 0; i < sizeof(CFG_MSGOUT_NMEA_ID_GLL_UART1); i++)
+    {
+      Serial_GNSS_Out.write(pgm_read_byte(&CFG_MSGOUT_NMEA_ID_GLL_UART1[i]));
     }
-    Serial.println(F("Sucessfully configured u-blox M10S"));
-    delay(600);
+    Serial.println(F("Sucessfully configured u-blox M10S (disable GLL)"));
+    delay(1000);
+
+    for (int i = 0; i < sizeof(CFG_NAVSPG_DYNMODEL); i++)
+    {
+      Serial_GNSS_Out.write(pgm_read_byte(&CFG_NAVSPG_DYNMODEL[i]));
+    }
+    Serial.println(F("Sucessfully configured u-blox M10S (set dynmodel = 7, airborne < 2g)"));
+    delay(1000);
+
+    for (int i = 0; i < sizeof(CFG_NMEA_PROTVER); i++)
+    {
+      Serial_GNSS_Out.write(pgm_read_byte(&CFG_NMEA_PROTVER[i]));
+    }
+    Serial.println(F("Sucessfully configured u-blox M10S (NMEA protocol version = 4.0)"));
+    delay(1000);
+
+    for (int i = 0; i < sizeof(CFG_NMEA_SVNUMBERING); i++)
+    {
+      Serial_GNSS_Out.write(pgm_read_byte(&CFG_NMEA_SVNUMBERING[i]));
+    }
+    Serial.println(F("Sucessfully configured u-blox M10S (NMEA protocol extended numbering)"));
+    delay(1000);
   }
-  #endif /* USE_U10_EXT */
 }
 
 /* ------ BEGIN -----------  https://github.com/Black-Thunder/FPV-Tracker */
@@ -724,10 +726,6 @@ static byte ublox_version() {
               rval = GNSS_MODULE_U9;
             else if (GNSSbuf[33] == 'A')
               rval = GNSS_MODULE_U10;
-
-#if defined(USE_U10_EXT)
-            _ulox_version_cache = rval;
-#endif /* USE_U10_EXT */
             break;
           }
         }
