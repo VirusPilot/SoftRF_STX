@@ -234,6 +234,12 @@ const uint8_t CFG_NMEA_PROTVER[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x09, 0x00, 
 // CFG_NMEA_SVNUMBERING = 1 (extended)
 const uint8_t CFG_NMEA_SVNUMBERING[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x09, 0x00, 0x01, 0x01, 0x00, 0x00, 0x07, 0x00, 0x93, 0x20, 0x01, 0x56, 0x57};
 
+// CFG_RATE_MEAS = 100ms (measurement rate = 10Hz)
+const uint8_t CFG_RATE_MEAS[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x0A, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x21, 0x30, 0x64, 0x00, 0x52, 0xC3};
+
+// CFG_RATE_NAV = 10 (number of measurements per navigation solution)
+const uint8_t CFG_RATE_NAV[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x0A, 0x00, 0x01, 0x01, 0x00, 0x00, 0x02, 0x00, 0x21, 0x30, 0x0A, 0x00, 0xF9, 0x15};
+
 // CFG-SIGNAL-..._ENA = default (The default configuration is concurrent reception of GPS, Galileo and BeiDou B1I with QZSS and SBAS enabled)
 
  /* Stratux Setup: enable GPS & Galileo & Beidou for u-blox 8 */
@@ -550,29 +556,61 @@ static void setup_UBX()
     {
       Serial_GNSS_Out.write(pgm_read_byte(&CFG_MSGOUT_NMEA_ID_GLL_UART1[i]));
     }
-    Serial.println(F("Sucessfully configured u-blox M10S (disable GLL)"));
-    delay(1000);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x8A);
+    if (gnss_set_sucess)
+    {
+      Serial.println(F("Sucessfully configured u-blox M10S (disable GLL)"));
+    }
 
     for (int i = 0; i < sizeof(CFG_NAVSPG_DYNMODEL); i++)
     {
       Serial_GNSS_Out.write(pgm_read_byte(&CFG_NAVSPG_DYNMODEL[i]));
     }
-    Serial.println(F("Sucessfully configured u-blox M10S (set dynmodel = 7, airborne < 2g)"));
-    delay(1000);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x8A);
+    if (gnss_set_sucess)
+    {
+      Serial.println(F("Sucessfully configured u-blox M10S (set dynmodel = 7, airborne < 2g)"));
+    }
 
     for (int i = 0; i < sizeof(CFG_NMEA_PROTVER); i++)
     {
       Serial_GNSS_Out.write(pgm_read_byte(&CFG_NMEA_PROTVER[i]));
     }
-    Serial.println(F("Sucessfully configured u-blox M10S (NMEA protocol version = 4.0)"));
-    delay(1000);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x8A);
+    if (gnss_set_sucess)
+    {
+      Serial.println(F("Sucessfully configured u-blox M10S (NMEA protocol version = 4.0)"));
+    }
 
     for (int i = 0; i < sizeof(CFG_NMEA_SVNUMBERING); i++)
     {
       Serial_GNSS_Out.write(pgm_read_byte(&CFG_NMEA_SVNUMBERING[i]));
     }
-    Serial.println(F("Sucessfully configured u-blox M10S (NMEA protocol extended numbering)"));
-    delay(1000);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x8A);
+    if (gnss_set_sucess)
+    {
+      Serial.println(F("Sucessfully configured u-blox M10S (NMEA protocol extended numbering)"));
+    }
+
+    for (int i = 0; i < sizeof(CFG_RATE_MEAS); i++)
+    {
+      Serial_GNSS_Out.write(pgm_read_byte(&CFG_RATE_MEAS[i]));
+    }
+    gnss_set_sucess = getUBX_ACK(0x06, 0x8A);
+    if (gnss_set_sucess)
+    {
+      Serial.println(F("Sucessfully configured u-blox M10S (100ms measurement rate)"));
+    }
+
+    for (int i = 0; i < sizeof(CFG_RATE_NAV); i++)
+    {
+      Serial_GNSS_Out.write(pgm_read_byte(&CFG_RATE_NAV[i]));
+    }
+    gnss_set_sucess = getUBX_ACK(0x06, 0x8A);
+    if (gnss_set_sucess)
+    {
+      Serial.println(F("Sucessfully configured u-blox M10S (10 measurements per navigation solution)"));
+    }
   }
 }
 
