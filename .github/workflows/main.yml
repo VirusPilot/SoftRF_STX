@@ -30,7 +30,7 @@ jobs:
           ]
 
     env:
-      ARDUINO_IDE_VERSION: 1.8.13
+      ARDUINO_IDE_VERSION: 1.8.19
       BOARD: ${{ matrix.board }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
