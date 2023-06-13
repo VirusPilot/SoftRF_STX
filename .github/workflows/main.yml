@@ -141,3 +141,14 @@ jobs:
           if [[ "$BOARD" =~ "adafruit:nrf52:"     ]]; then
             arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    needs: build
+    steps: 
+      - name: download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: static site
+      - name: test artifact download
+        run: ls -R
