@@ -730,7 +730,7 @@ void NMEA_Process_SRF_SKV_Sentences()
           char psrfc_buf[MAX_PSRFC_LEN];
 
           snprintf_P(psrfc_buf, sizeof(psrfc_buf),
-              PSTR("$PSRFC,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%X*"),
+              PSTR("$PSRFC,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%6X*"),
               PSRFC_VERSION,        settings->mode,     settings->rf_protocol,
               settings->band,       settings->aircraft_type, settings->alarm,
               settings->txpower,    settings->volume,   settings->pointer,
