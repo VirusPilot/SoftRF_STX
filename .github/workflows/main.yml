@@ -8,16 +8,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        board:
-          [
-            'esp32:esp32:esp32',
-            'esp32:esp32:esp32s3',
-            'adafruit:nrf52:pca10056',
-          ]
+        include:
+          - board: 'adafruit:nrf52:pca10056'
+            artifact: 'SoftRF-nrf52'
+            path: 'adafruit.nrf52.pca10056'
+          - board: 'esp32:esp32:esp32s3'
+            artifact: 'SoftRF-esp32s3'
+            path: 'esp32.esp32.esp32s3'
     env:
 #     ARDUINO_IDE_VERSION: 1.8.13
       ARDUINO_IDE_VERSION: 1.8.19
       BOARD: ${{ matrix.board }}
+      ARTIFACT: ${{ matrix.artifact }}
     steps:
       - uses: actions/checkout@v3
       - name: Run before_install
