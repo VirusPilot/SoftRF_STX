@@ -37,14 +37,19 @@ jobs:
           echo 'Building board ${{ matrix.board }}'
           cd $GITHUB_WORKSPACE
           arduino-cli compile -e -b "${{ matrix.board }}" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-      - name: Running uf2
+      - name: Running uf2 for nrf52
         if: startsWith(matrix.board, 'adafruit:nrf52:')
         run: |
           shopt -s extglob
           cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/${{ matrix.path }}"
           ~/uf2/utils/uf2conv.py SoftRF.ino.hex -c -f 0xADA52840 -o SoftRF.uf2
-          # mv flash.uf2 SoftRF.uf2
-          # Remove files that we do not need for uf2 targets
+          rm -v !("SoftRF.uf2")
+      - name: Running uf2 for esp32
+        if: startsWith(matrix.board, 'esp32:esp32:esp32s3')
+        run: |
+          shopt -s extglob
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/${{ matrix.path }}"
+          ~/uf2/utils/uf2conv.py SoftRF.ino.hex -c -f 0xc47e5767 -o SoftRF.uf2
           rm -v !("SoftRF.uf2")
       - name: Rename before artifact upload
         run: |
