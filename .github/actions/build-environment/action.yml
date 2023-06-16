@@ -20,7 +20,7 @@ runs:
       shell: bash
       run: |
         echo "Install Arduino for ${{ inputs.board }}"
-        # mkdir -p ~/.local/bin
+        mkdir -p ~/.local/bin
         # wget http://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
         # tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
         # rm arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
