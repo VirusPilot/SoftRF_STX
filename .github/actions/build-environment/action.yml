@@ -26,7 +26,7 @@ runs:
         # rm arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
         # sudo mv arduino-$ARDUINO_IDE_VERSION /usr/local/share/arduino ;
         # sudo ln -s /usr/local/share/arduino/arduino ~/.local/bin/arduino ;
-        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin
+        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh
     - name: Install platform python nrfutil
       if: startsWith(inputs.board, 'adafruit:nrf52:')
       shell: bash
