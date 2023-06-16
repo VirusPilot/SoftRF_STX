@@ -22,7 +22,6 @@ jobs:
             artifact: 'SoftRF-esp32s3'
             path: 'esp32.esp32.esp32s3'
     env:
-      ARDUINO_IDE_VERSION: 1.8.13
       BOARD: ${{ matrix.board }}
       ARTIFACT: ${{ matrix.artifact }}
     steps:
@@ -36,8 +35,7 @@ jobs:
         run: |
           echo 'Building board ${{ matrix.board }}'
           cd $GITHUB_WORKSPACE
-          arduino compile -e -b "${{ matrix.board }}" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-#          arduino-cli compile -e -b "${{ matrix.board }}" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          arduino-cli compile -e -b "${{ matrix.board }}" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
       - name: Running uf2 for nrf52
         if: startsWith(matrix.board, 'adafruit:nrf52:')
         run: |
