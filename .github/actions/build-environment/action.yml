@@ -46,13 +46,15 @@ runs:
       if: startsWith(inputs.board, 'esp32:esp32:')
       shell: bash
       run: |
-        arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+        arduino core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+#        arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 
     - name: Install platform libraries nrf52
       if: startsWith(inputs.board, 'adafruit:nrf52:')
       shell: bash
       run: |
-        arduino-cli core install adafruit:nrf52 --additional-urls https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
+        arduino core install adafruit:nrf52 --additional-urls https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
+#        arduino-cli core install adafruit:nrf52 --additional-urls https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
         if [[ ! -f ~/.local/bin/adafruit-nrfutil ]]; then
           ln -s /bin/true ~/.local/bin/adafruit-nrfutil
         fi
