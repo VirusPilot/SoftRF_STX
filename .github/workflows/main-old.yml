@@ -1,4 +1,4 @@
-name: build-new-style
+name: build-old-style
 
 on:
   workflow_dispatch:
