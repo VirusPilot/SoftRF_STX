@@ -19,12 +19,12 @@ runs:
       shell: bash
       run: |
         echo "Install Arduino for ${{ inputs.board }}"
+        mkdir -p ~/.local/bin
         wget http://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
         tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
         rm arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
         sudo mv arduino-$ARDUINO_IDE_VERSION /usr/local/share/arduino ;
-        sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino ;
-#        mkdir -p ~/.local/bin
+        sudo ln -s /usr/local/share/arduino/arduino ~/.local/bin/arduino ;
 #        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh -s 0.27.1
     - name: Install platform python nrfutil
       if: startsWith(inputs.board, 'adafruit:nrf52:')
