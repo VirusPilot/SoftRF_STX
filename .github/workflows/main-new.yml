@@ -49,7 +49,7 @@ jobs:
         run: |
           shopt -s extglob
           cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/${{ matrix.path }}"
-          ~/uf2/utils/uf2conv.py SoftRF.ino.hex -c -f 0xc47e5767 -o SoftRF.uf2
+          ~/uf2/utils/uf2conv.py SoftRF.ino.bin -b 0x00 -c -f 0xc47e5767 -o SoftRF.uf2
           rm -v !("SoftRF.uf2")
       - name: Rename before artifact upload
         run: |
