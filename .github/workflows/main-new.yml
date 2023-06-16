@@ -9,71 +9,69 @@ jobs:
     strategy:
       matrix:
         include:
+          - board: 'esp32:esp32:esp32:PartitionScheme=min_spiffs,CPUFreq=80,PSRAM=enabled,FlashFreq=80,FlashMode=dio,FlashSize=4M,DebugLevel=none'
+            artifact: 'SoftRF-esp32'
+            path: 'esp32.esp32.esp32'
           - board: 'adafruit:nrf52:pca10056'
             artifact: 'SoftRF-nrf52'
             path: 'adafruit.nrf52.pca10056'
-          - board: 'esp32:esp32:esp32s3'
+          - board: 'esp32:esp32:esp32s2:PartitionScheme=min_spiffs,CPUFreq=80,PSRAM=enabled,FlashMode=dio,FlashSize=4M,DebugLevel=none'
+            artifact: 'SoftRF-esp32s'
+            path: 'esp32.esp32.esp32s2'
+          - board: 'esp32:esp32:esp32s3:PartitionScheme=min_spiffs,CPUFreq=80,PSRAM=enabled,FlashMode=dio,FlashSize=4M,DebugLevel=none'
             artifact: 'SoftRF-esp32s3'
             path: 'esp32.esp32.esp32s3'
     env:
-#     ARDUINO_IDE_VERSION: 1.8.13
-      ARDUINO_IDE_VERSION: 1.8.19
+      ARDUINO_IDE_VERSION: 1.8.13
       BOARD: ${{ matrix.board }}
       ARTIFACT: ${{ matrix.artifact }}
     steps:
+      - name: Install rename
+        run: sudo apt-get install -y rename
       - uses: actions/checkout@v3
-      - name: Run before_install
+      - uses: ./.github/actions/build-environment
+        with:
+          board: ${{ matrix.board }}
+      - name: Build SoftRF for platform ${{ matrix.board }}
         run: |
-          /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
-          sleep 3
-          export DISPLAY=:1.0
-            wget http://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
-            tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
-            rm arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
-            sudo mv arduino-$ARDUINO_IDE_VERSION /usr/local/share/arduino ;
-            sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino ;
-            if [[ "$BOARD" =~ "adafruit:nrf52:" ]]; then
-              sudo apt-get install python3-pip ;
-              pip3 install setuptools --user ;
-              pip3 install adafruit-nrfutil --user ;
-              pip3 install intelhex --user ;
-            fi
-      - name: Run install
+          echo 'Building board ${{ matrix.board }}'
+          cd $GITHUB_WORKSPACE
+          arduino-cli compile -e -b "${{ matrix.board }}" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+      - name: Running uf2
+        if: startsWith(matrix.board, 'adafruit:nrf52:')
         run: |
-          mkdir $HOME/Arduino ;
-          ln -s $PWD/software/firmware/source/libraries $HOME/Arduino/libraries ;
-          if [[ "$BOARD" =~ "esp32:esp32:esp32s3" ]]; then
-            arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json" --save-prefs ;
-            arduino --install-boards esp32:esp32:2.0.9 ;
-            arduino --board $BOARD --save-prefs ;
-            arduino --pref "custom_CPUFreq=esp32s3_80"                 --save-prefs ;
-            arduino --pref "custom_DebugLevel=esp32s3_none"            --save-prefs ;
-            arduino --pref "custom_FlashFreq=esp32s3_80"               --save-prefs ;
-            arduino --pref "custom_FlashMode=esp32s3_dio"              --save-prefs ;
-            arduino --pref "custom_FlashSize=esp32s3_8M"               --save-prefs ;
-            arduino --pref "custom_USBMode=esp32s3_default"            --save-prefs ;
-            arduino --pref "custom_CDCOnBoot=esp32s3_cdc"              --save-prefs ;
-            arduino --pref "custom_PSRAM=esp32s3_enabled"              --save-prefs ;
-            arduino --pref "custom_PartitionScheme=esp32s3_default_8MB" --save-prefs ;
-            arduino --pref "custom_UploadSpeed=esp32s3_921600"         --save-prefs ;
-            cd $GITHUB_WORKSPACE ;
-          fi
-          if [[ "$BOARD" =~ "adafruit:nrf52:" ]]; then
-            arduino --pref "boardsmanager.additional.urls=https://adafruit.github.io/arduino-board-index/package_adafruit_index.json" --save-prefs ;
-            arduino --install-boards adafruit:nrf52:1.4.0 ;
-            arduino --board $BOARD --save-prefs ;
-            arduino --pref "custom_debug=pca10056_l0"                 --save-prefs ;
-            arduino --pref "custom_softdevice=pca10056_s140v6"        --save-prefs ;
-            if [[ ! -f ~/.local/bin/adafruit-nrfutil ]]; then
-              ln -s /bin/true ~/.local/bin/adafruit-nrfutil;
-            fi ;
-            cd $GITHUB_WORKSPACE ;
-          fi
-      - name: Run script
+          shopt -s extglob
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/${{ matrix.path }}"
+          ~/uf2/utils/uf2conv.py SoftRF.ino.hex -c -f 0xADA52840 -o SoftRF.uf2
+          # mv flash.uf2 SoftRF.uf2
+          # Remove files that we do not need for uf2 targets
+          rm -v !("SoftRF.uf2")
+      - name: Rename before artifact upload
         run: |
-          if [[ "$BOARD" =~ "esp32:esp32:esp32s3:" ]]; then
-            arduino compile --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
-          fi ;
-          if [[ "$BOARD" =~ "adafruit:nrf52:" ]]; then
-            arduino compile --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
-          fi ;
+          shopt -s extglob
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/${{ matrix.path }}"
+          # Rename to the right file type, we do this for clarity of the files
+          rename -v 's/SoftRF/${{ matrix.artifact }}/' SoftRF*
+          # Create a zip with the contents so that the download artifact just get zipfiles
+          zip -r ${{ matrix.artifact }}.zip .
+          rm -v !("${{ matrix.artifact }}.zip")
+      - uses: actions/upload-artifact@v3
+        with:
+          name: SoftRF
+          path: |
+            software/firmware/source/SoftRF/build/${{ matrix.path }}/
+          if-no-files-found: error
+
+  additional:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: additional
+          path: |
+            STRATUX.md
+            README.md
+          if-no-files-found: error

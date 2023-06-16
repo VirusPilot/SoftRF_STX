@@ -1,0 +1,53 @@
+inputs:
+  board:
+    description: "Board to install"
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install uf2
+      shell: bash
+      run: |
+        echo "Install uf2"
+        git clone https://github.com/microsoft/uf2 ~/uf2
+
+    - name: Install Arduino for ${{ inputs.board }}
+      shell: bash
+      run: |
+        echo "Install Arduino for ${{ inputs.board }}"
+        mkdir -p ~/.local/bin
+        # version 0.28.0 gave me issues so fixed fot 0.27.1 for now
+        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh -s 0.27.1
+
+    - name: Install platform python nrfutil
+      if: startsWith(inputs.board, 'adafruit:nrf52:')
+      shell: bash
+      run: |
+        echo "Install board nrfutil"
+        sudo apt-get install python3-pip
+        pip3 install setuptools --user
+        pip3 install adafruit-nrfutil --user
+        pip3 install intelhex --user
+
+    - name: Install platform libraries esp32
+      shell: bash
+      run: |
+        mkdir $HOME/Arduino
+        ln -s $GITHUB_WORKSPACE/software/firmware/source/libraries $HOME/Arduino/libraries
+
+    - name: Install platform libraries esp32
+      if: startsWith(inputs.board, 'esp32:esp32:')
+      shell: bash
+      run: |
+        arduino-cli core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+
+    - name: Install platform libraries nrf52
+      if: startsWith(inputs.board, 'adafruit:nrf52:')
+      shell: bash
+      run: |
+        arduino-cli core install adafruit:nrf52 --additional-urls https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
+        if [[ ! -f ~/.local/bin/adafruit-nrfutil ]]; then
+          ln -s /bin/true ~/.local/bin/adafruit-nrfutil
+        fi
