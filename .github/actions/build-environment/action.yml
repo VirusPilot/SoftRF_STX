@@ -4,6 +4,8 @@ inputs:
     required: true
     type: string
 
+env: 
+  ARDUINO_IDE_VERSION: 1.8.13
 runs:
   using: "composite"
   steps:
@@ -17,10 +19,13 @@ runs:
       shell: bash
       run: |
         echo "Install Arduino for ${{ inputs.board }}"
-        mkdir -p ~/.local/bin
-        # version 0.28.0 gave me issues so fixed fot 0.27.1 for now
-        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh -s 0.27.1
-
+        wget http://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
+        tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
+        rm arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
+        sudo mv arduino-$ARDUINO_IDE_VERSION /usr/local/share/arduino ;
+        sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino ;
+#        mkdir -p ~/.local/bin
+#        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh -s 0.27.1
     - name: Install platform python nrfutil
       if: startsWith(inputs.board, 'adafruit:nrf52:')
       shell: bash
