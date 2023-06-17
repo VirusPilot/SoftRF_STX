@@ -19,7 +19,7 @@ jobs:
             'adafruit:nrf52:pca10056',
           ]
     env:
-      ARDUINO_IDE_VERSION: 1.8.19
+      ARDUINO_IDE_VERSION: 1.8.13
       BOARD: ${{ matrix.board }}
     steps:
       - uses: actions/checkout@v3
