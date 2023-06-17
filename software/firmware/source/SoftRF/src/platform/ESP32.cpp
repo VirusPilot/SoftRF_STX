@@ -1188,8 +1188,8 @@ static void ESP32_setup()
   //   pid = (esp32_board == ESP32_TTGO_T_BEAM_SUPREME) ? SOFTRF_USB_PID_PRIME_MK3  :
   //         (esp32_board == ESP32_S2_T8_V1_1         ) ? SOFTRF_USB_PID_WEBTOP     :
   //         (esp32_board == ESP32_S3_DEVKIT          ) ? SOFTRF_USB_PID_STANDALONE :
-  //        (esp32_board == ESP32_LILYGO_T_TWR_V1_3  ) ? SOFTRF_USB_PID_HAM        :
-  //        (esp32_board == ESP32_LILYGO_T_TWR_V2_0  ) ? SOFTRF_USB_PID_HAM        :
+  //         (esp32_board == ESP32_LILYGO_T_TWR_V1_3  ) ? SOFTRF_USB_PID_HAM        :
+  //         (esp32_board == ESP32_LILYGO_T_TWR_V2_0  ) ? SOFTRF_USB_PID_HAM        :
   //         USB_PID /* 0x1001 */ ;
 
   //   snprintf(usb_serial_number, sizeof(usb_serial_number),
@@ -1202,7 +1202,7 @@ static void ESP32_setup()
   //   USB.productName(esp32_board == ESP32_TTGO_T_BEAM_SUPREME ? ESP32S3_Model_Prime3 :
   //                  esp32_board == ESP32_LILYGO_T_TWR_V1_3   ? ESP32S3_Model_Ham    :
   //                  esp32_board == ESP32_LILYGO_T_TWR_V2_0   ? ESP32S3_Model_Ham    :
-  //                   ESP32SX_Model_Stand);
+  //                  ESP32SX_Model_Stand);
   //   USB.firmwareVersion(ESP32SX_Device_Version);
   //   USB.serialNumber(usb_serial_number);
   //   USB.begin();
