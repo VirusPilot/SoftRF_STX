@@ -11,9 +11,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - board: 'esp32:esp32:esp32:PartitionScheme=min_spiffs,CPUFreq=80,PSRAM=enabled,FlashFreq=80,FlashMode=dio,FlashSize=4M,DebugLevel=none'
-            artifact: 'SoftRF-esp32'
-            path: 'esp32.esp32.esp32'
           - board: 'adafruit:nrf52:pca10056'
             artifact: 'SoftRF-nrf52'
             path: 'adafruit.nrf52.pca10056'
