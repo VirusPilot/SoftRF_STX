@@ -31,7 +31,7 @@ jobs:
         run: |
           echo 'Building board ${{ matrix.board }}'
           cd $GITHUB_WORKSPACE
-          arduino-cli compile -e -b "${{ matrix.board }}" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          arduino-cli compile -fqbn "${{ matrix.board }}" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
       - name: Running uf2 for nrf52
         if: startsWith(matrix.board, 'adafruit:nrf52:')
         run: |
