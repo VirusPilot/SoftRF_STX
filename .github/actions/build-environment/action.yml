@@ -21,7 +21,7 @@ runs:
         mkdir $HOME/Arduino
         ln -s $GITHUB_WORKSPACE/software/firmware/source/libraries $HOME/Arduino/libraries
 
-        sudo apt install python3-pip
+        sudo apt-get install python3-pip
         pip3 install setuptools --user
         pip3 install adafruit-nrfutil --user
         pip3 install intelhex --user
