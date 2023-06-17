@@ -25,7 +25,7 @@ runs:
         pip3 install setuptools --user
         pip3 install adafruit-nrfutil --user
         pip3 install intelhex --user
-        pip3 install pyserial --break-system-packages --user
+        pip3 install pyserial --user
 
     - name: Install nrf52 boards
       if: startsWith(inputs.board, 'adafruit:nrf52:')
