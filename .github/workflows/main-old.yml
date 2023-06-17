@@ -1,6 +1,8 @@
 name: build-old-style
 
 on:
+  push:
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
@@ -10,11 +12,13 @@ jobs:
       matrix:
         board:
           [
+            'esp32:esp32:esp32:PartitionScheme=min_spiffs',
+            'esp32:esp32:esp32s2',
+            'esp32:esp32:esp32s3',
+            'esp32:esp32:esp32c3',
             'adafruit:nrf52:pca10056',
-            'esp32:esp32:esp32s3'
           ]
     env:
-      # ARDUINO_IDE_VERSION: 1.8.13
       ARDUINO_IDE_VERSION: 1.8.19
       BOARD: ${{ matrix.board }}
     steps:
@@ -39,6 +43,35 @@ jobs:
         run: |
           mkdir $HOME/Arduino ;
           ln -s $PWD/software/firmware/source/libraries $HOME/Arduino/libraries ;
+
+          if [[ "$BOARD" =~ "esp32:esp32:esp32:" ]]; then
+            arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json" --save-prefs ;
+            arduino --install-boards esp32:esp32:2.0.9 ;
+            arduino --board $BOARD --save-prefs ;
+            arduino --pref "custom_CPUFreq=esp32_80"                   --save-prefs ;
+            arduino --pref "custom_DebugLevel=esp32_none"              --save-prefs ;
+            arduino --pref "custom_FlashFreq=esp32_80"                 --save-prefs ;
+            arduino --pref "custom_FlashMode=esp32_dio"                --save-prefs ;
+            arduino --pref "custom_FlashSize=esp32_4M"                 --save-prefs ;
+            arduino --pref "custom_PSRAM=esp32_enabled"                --save-prefs ;
+            arduino --pref "custom_PartitionScheme=esp32_min_spiffs"   --save-prefs ;
+            arduino --pref "custom_UploadSpeed=esp32_921600"           --save-prefs ;
+            cd $GITHUB_WORKSPACE ;
+          fi
+          if [[ "$BOARD" =~ "esp32:esp32:esp32s2" ]]; then
+            arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json" --save-prefs ;
+            arduino --install-boards esp32:esp32:2.0.9 ;
+            arduino --board $BOARD --save-prefs ;
+            arduino --pref "custom_CPUFreq=esp32s2_80"                 --save-prefs ;
+            arduino --pref "custom_DebugLevel=esp32s2_none"            --save-prefs ;
+            arduino --pref "custom_FlashFreq=esp32s2_80"               --save-prefs ;
+            arduino --pref "custom_FlashMode=esp32s2_dio"              --save-prefs ;
+            arduino --pref "custom_FlashSize=esp32s2_4M"               --save-prefs ;
+            arduino --pref "custom_PSRAM=esp32s2_enabled"              --save-prefs ;
+            arduino --pref "custom_PartitionScheme=esp32s2_min_spiffs" --save-prefs ;
+            arduino --pref "custom_UploadSpeed=esp32s2_921600"         --save-prefs ;
+            cd $GITHUB_WORKSPACE ;
+          fi
           if [[ "$BOARD" =~ "esp32:esp32:esp32s3" ]]; then
             arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json" --save-prefs ;
             arduino --install-boards esp32:esp32:2.0.9 ;
@@ -55,6 +88,20 @@ jobs:
             arduino --pref "custom_UploadSpeed=esp32s3_921600"         --save-prefs ;
             cd $GITHUB_WORKSPACE ;
           fi
+          if [[ "$BOARD" =~ "esp32:esp32:esp32c3" ]]; then
+            arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json" --save-prefs ;
+            arduino --install-boards esp32:esp32:2.0.9 ;
+            arduino --board $BOARD --save-prefs ;
+            arduino --pref "custom_CPUFreq=esp32c3_80"                 --save-prefs ;
+            arduino --pref "custom_DebugLevel=esp32c3_none"            --save-prefs ;
+            arduino --pref "custom_FlashFreq=esp32c3_80"               --save-prefs ;
+            arduino --pref "custom_FlashMode=esp32c3_dio"              --save-prefs ;
+            arduino --pref "custom_FlashSize=esp32c3_4M"               --save-prefs ;
+            arduino --pref "custom_PSRAM=esp32c3_enabled"              --save-prefs ;
+            arduino --pref "custom_PartitionScheme=esp32c3_min_spiffs" --save-prefs ;
+            arduino --pref "custom_UploadSpeed=esp32c3_921600"         --save-prefs ;
+            cd $GITHUB_WORKSPACE ;
+          fi
           if [[ "$BOARD" =~ "adafruit:nrf52:" ]]; then
             arduino --pref "boardsmanager.additional.urls=https://adafruit.github.io/arduino-board-index/package_adafruit_index.json" --save-prefs ;
             arduino --install-boards adafruit:nrf52:1.4.0 ;
@@ -68,9 +115,9 @@ jobs:
           fi
       - name: Run script
         run: |
-          if [[ "$BOARD" =~ "esp32:esp32:esp32s3:" ]]; then
-            arduino --verify --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+          if [[ "$BOARD" =~ "esp32:esp32:"        ]]; then
+            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
-          if [[ "$BOARD" =~ "adafruit:nrf52:" ]]; then
-            arduino --verify --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+          if [[ "$BOARD" =~ "adafruit:nrf52:"     ]]; then
+            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
