@@ -16,10 +16,10 @@ jobs:
             artifact: 'SoftRF-esp32s3'
             path: 'esp32.esp32.esp32s3'
     env:
-#     ARDUINO_IDE_VERSION: 1.8.13
+      # ARDUINO_IDE_VERSION: 1.8.13
       ARDUINO_IDE_VERSION: 1.8.19
       BOARD: ${{ matrix.board }}
-      ARTIFACT: ${{ matrix.artifact }}
+      # ARTIFACT: ${{ matrix.artifact }}
     steps:
       - uses: actions/checkout@v3
       - name: Run before_install
@@ -72,8 +72,8 @@ jobs:
       - name: Run script
         run: |
           if [[ "$BOARD" =~ "esp32:esp32:esp32s3:" ]]; then
-            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+            arduino --verify --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
           if [[ "$BOARD" =~ "adafruit:nrf52:" ]]; then
-            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+            arduino --verify --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
