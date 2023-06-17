@@ -116,8 +116,8 @@ jobs:
       - name: Run script
         run: |
           if [[ "$BOARD" =~ "esp32:esp32:"        ]]; then
-            arduino --verify --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
           if [[ "$BOARD" =~ "adafruit:nrf52:"     ]]; then
-            arduino --verify --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
