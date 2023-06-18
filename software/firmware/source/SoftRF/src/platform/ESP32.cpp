@@ -1181,7 +1181,6 @@ static void ESP32_setup()
 
 #if ARDUINO_USB_CDC_ON_BOOT && \
     (defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3))
-#if 1
   if (USB.manufacturerName(ESP32SX_Device_Manufacturer)) {
     char usb_serial_number[16];
     uint16_t pid;
@@ -1201,14 +1200,13 @@ static void ESP32_setup()
     USB.VID(USB_VID); // USB_ESPRESSIF_VID = 0x303A
     USB.PID(pid);
     USB.productName(esp32_board == ESP32_TTGO_T_BEAM_SUPREME ? ESP32S3_Model_Prime3 :
-                   esp32_board == ESP32_LILYGO_T_TWR_V1_3   ? ESP32S3_Model_Ham    :
-                   esp32_board == ESP32_LILYGO_T_TWR_V2_0   ? ESP32S3_Model_Ham    :
-                   ESP32SX_Model_Stand);
+                    esp32_board == ESP32_LILYGO_T_TWR_V1_3   ? ESP32S3_Model_Ham    :
+                    esp32_board == ESP32_LILYGO_T_TWR_V2_0   ? ESP32S3_Model_Ham    :
+                    ESP32SX_Model_Stand);
     USB.firmwareVersion(ESP32SX_Device_Version);
     USB.serialNumber(usb_serial_number);
     USB.begin();
   }
-#endif
   Serial.begin(SERIAL_OUT_BR);
 
   for (int i=0; i < 20; i++) {if (Serial) break; else delay(100);}
