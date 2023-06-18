@@ -1207,6 +1207,7 @@ static void ESP32_setup()
     USB.serialNumber(usb_serial_number);
     USB.begin();
   }
+  
   Serial.begin(SERIAL_OUT_BR);
 
   for (int i=0; i < 20; i++) {if (Serial) break; else delay(100);}
