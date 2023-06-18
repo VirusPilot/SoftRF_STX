@@ -16,7 +16,7 @@ runs:
       shell: bash
       run: |
         mkdir -p ~/.local/bin
-        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh -s 0.27.1
+        curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh
 
         mkdir $HOME/Arduino
         ln -s $GITHUB_WORKSPACE/software/firmware/source/libraries $HOME/Arduino/libraries
@@ -42,4 +42,5 @@ runs:
       run: |
         arduino-cli config init
         arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+        arduino-cli core update-index
         arduino-cli core install esp32:esp32
