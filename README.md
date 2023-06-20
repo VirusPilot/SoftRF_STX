@@ -9,6 +9,13 @@
 - **T-Beam and T-Beam S3 Supreme**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
 - **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
+**Alternative**: I have activated Github Actions on this fork so that binary packages for testing are provided `SoftRF.zip` which include the following platforms
+- T-Beam, update only via WiFi `SoftRF-esp32.ino.bin`
+- T-Beam S3 Supreme, update via WiFi `SoftRF-esp32s3.ino.bin` or UF2 method `SoftRF-esp32s3.uf2`
+- T-Echo, update only via UF2 method `SoftRF-nrf52.uf2`
+
+These so-called Artifacts `SoftRF.zip` can be downloaded under each workflow here: https://github.com/VirusPilot/SoftRF/actions. Please be aware that flashing such binaries on your SoftRF device may render it unusable!
+
 **Arduino IDE** settings for **T-Beam v0.7, T-Beam v1.0, T-Beam v1.1**
 - Select Tools -> Board -> ESP32 Dev Module
 - Select Tools -> CPU Frequency -> 80MHz
