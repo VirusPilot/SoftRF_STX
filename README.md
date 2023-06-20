@@ -89,7 +89,7 @@ In case you want to convert a **T-Beam based OGN Tracker to run SoftRF**, you fi
 - if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux; please note the following limitations when adding a baro module to your T-Beam: https://github.com/lyusupov/SoftRF/issues/32#issuecomment-420242682
 
 **Issues:**
-- on the **T-Beam S3 Supreme the USB CDC mode** still seems to be unstable, therefore e dirty patch is applied so that SoftRF will compile for this target; the only limitation is that SoftRF will only boot if the serial connection is opened up by an external device (which is the case when connected to Stratux)
+- on the **T-Beam S3 Supreme the USB CDC mode** still seems to be unstable, therefore a dirty patch is applied so that SoftRF will compile for this target; the only limitation is that SoftRF will only boot if the serial connection is opened up by an external device (which is the case when connected to Stratux)
 - it appears that on some SX1262 based T-Beams (not the T-Beam S3 Supreme) the modified GPS configuration sometimes reverts to the default GNSS settings, e.g. GLONASS is enabled instead of BEIDOU.
 
 **Recommendations for T-Beam and T-Beam S3 Supreme:**
