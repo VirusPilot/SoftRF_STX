@@ -1184,6 +1184,7 @@ static void ESP32_setup()
 
 #if ARDUINO_USB_CDC_ON_BOOT && \
     (defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3))
+#if 0
   if (USB.manufacturerName(ESP32SX_Device_Manufacturer)) {
     char usb_serial_number[16];
     uint16_t pid;
@@ -1210,6 +1211,7 @@ static void ESP32_setup()
     USB.serialNumber(usb_serial_number);
     USB.begin();
   }
+#endif
 
   Serial.begin(SERIAL_OUT_BR);
 
