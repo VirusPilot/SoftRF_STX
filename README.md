@@ -11,7 +11,7 @@ https://github.com/VirusPilot/SoftRF/actions: binary packages are provided for t
 - T-Beam S3 Supreme, update via WiFi `SoftRF-esp32s3.ino.bin` or UF2 method `SoftRF-esp32s3.uf2`
 - T-Echo, update only via UF2 method `SoftRF-nrf52.uf2`
 
-These so-called Artifacts `SoftRF.zip` can be downloaded under each workflow here: https://github.com/VirusPilot/SoftRF/actions. Please be aware that flashing such binaries on your SoftRF device may render it unusable!
+These so-called Artifacts `SoftRF.zip` can be downloaded under each workflow here: https://github.com/VirusPilot/SoftRF/actions. Please be aware that flashing these binaries on your SoftRF device may render it unusable!
 
 ## Comiling/Flashing the Source Code
 You need to be familiar with Arduino to compile and flash it for your platform. You need to install the latest version of **Arduino IDE** and add the following two entries into the Additional Board Manager URLs:
