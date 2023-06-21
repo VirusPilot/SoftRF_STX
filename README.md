@@ -81,7 +81,7 @@ alternative for **T-Echo**:
 - upload the `SoftRF.ino.uf2` file to the NRF52BOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
 
 ## In case you want to convert a T-Beam based OGN Tracker to run SoftRF
-- you first need to apply the following GPS reset:
+you first need to apply the following GPS reset:
 - https://github.com/VirusPilot/LilyGo-T-Beam-GPS-Reset, otherwise the GPS chipset won't work with SoftRF (OGN Tracker uses 57600 baud vs. SoftRF using 9600 baud for the GPS-CPU connection)
 - as a alternative you may consider using: https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series/tree/master/examples/GPS/UBlox_Recovery, please uncomment the `utility.h` file according to your board model, otherwise compilation will report an error
 
