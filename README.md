@@ -6,12 +6,12 @@
   - if the SoftRF factory ID remains, then ADDR_TYPE is set according to the selected protocol
 
 ## Binaries available for testing
-https://github.com/VirusPilot/SoftRF/actions: binary packages are provided for the following platforms
+Binary packages are provided for the following platforms:
 - T-Beam, update only via WiFi `SoftRF-esp32.ino.bin`
 - T-Beam S3 Supreme, update via WiFi `SoftRF-esp32s3.ino.bin` or UF2 method `SoftRF-esp32s3.uf2`
 - T-Echo, update only via UF2 method `SoftRF-nrf52.uf2`
 
-These so-called Artifacts `SoftRF.zip` can be downloaded under each workflow here: https://github.com/VirusPilot/SoftRF/actions. Please be aware that flashing these binaries on your SoftRF device may render it unusable!
+These binaries can be downloaded as part of so-called Artifacts `SoftRF.zip` @ https://github.com/VirusPilot/SoftRF/actions under each workflow. Please be aware that flashing these beta binaries on your SoftRF device may render it unusable!
 
 ## Comiling/Flashing the Source Code
 You need to be familiar with Arduino to compile and flash it for your platform. You need to install the latest version of **Arduino IDE** and add the following two entries into the Additional Board Manager URLs:
