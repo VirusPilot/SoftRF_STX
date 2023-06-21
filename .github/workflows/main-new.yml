@@ -66,17 +66,3 @@ jobs:
           path: |
             software/firmware/source/SoftRF/build/${{ matrix.path }}/
           if-no-files-found: error
-
-  additional:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: additional
-          path: |
-            STRATUX.md
-            README.md
-          if-no-files-found: error
