@@ -21,11 +21,11 @@ runs:
         mkdir $HOME/Arduino
         ln -s $GITHUB_WORKSPACE/software/firmware/source/libraries $HOME/Arduino/libraries
 
-        sudo apt-get install python3-pip
-        pip3 install setuptools --user
+        # sudo apt-get install python3-pip
+        # pip3 install setuptools --user
         pip3 install adafruit-nrfutil --user
         pip3 install intelhex --user
-        pip3 install pyserial --user
+        # pip3 install pyserial --user
 
     - name: Install nrf52 boards
       if: startsWith(inputs.board, 'adafruit:nrf52:')
