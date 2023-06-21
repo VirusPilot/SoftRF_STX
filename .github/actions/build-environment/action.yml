@@ -21,17 +21,18 @@ runs:
         mkdir $HOME/Arduino
         ln -s $GITHUB_WORKSPACE/software/firmware/source/libraries $HOME/Arduino/libraries
 
-        # sudo apt-get install python3-pip
-        # pip3 install setuptools --user
         pip3 install adafruit-nrfutil --user
         pip3 install intelhex --user
-        # pip3 install pyserial --user
 
     - name: Install nrf52 boards
       if: startsWith(inputs.board, 'adafruit:nrf52:')
       shell: bash
       run: |
-        arduino-cli core install adafruit:nrf52 --additional-urls https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
+        arduino-cli config init
+        arduino-cli config add board_manager.additional_urls https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
+        arduino-cli core update-index
+        arduino-cli core install adafruit:nrf52
+
         if [[ ! -f ~/.local/bin/adafruit-nrfutil ]]; then
           ln -s /bin/true ~/.local/bin/adafruit-nrfutil
         fi
