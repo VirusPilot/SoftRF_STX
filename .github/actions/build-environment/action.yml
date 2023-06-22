@@ -22,8 +22,8 @@ runs:
         ln -s $GITHUB_WORKSPACE/software/firmware/source/libraries $HOME/Arduino/libraries
 
         sudo apt-get install python3-full
+
         pip3 install adafruit-nrfutil --user
-        pip3 install intelhex --user
 
     - name: Install nrf52 boards
       if: startsWith(inputs.board, 'adafruit:nrf52:')
