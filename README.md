@@ -78,7 +78,7 @@ alternative for **T-Echo**:
 - select **Export Compiled Binary** and then locate `SoftRF.ino.bin`
 - convert `SoftRF.ino.bin` to UF2 using `uf2conv.py SoftRF.ino.bin -c -b 0x00 -f 0xADA52840 -o SoftRF.ino.uf2` (from https://github.com/microsoft/uf2/tree/master/utils)
 - connect your T-Echo and put it in UF2 upload mode (double-click **RESET**)
-- upload the `SoftRF.ino.uf2` file to the NRF52BOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
+- upload the `SoftRF.ino.uf2` file to the NRF52BOOT or TECHBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
 
 ## In case you want to convert a T-Beam based OGN Tracker to run SoftRF
 you first need to apply the following GPS reset:
