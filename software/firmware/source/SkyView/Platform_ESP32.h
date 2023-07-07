@@ -123,7 +123,7 @@
 
 /* Waveshare Pico & Banana PicoW keys mapping */
 #define SOC_GPIO_PIN_KEY0     42
-#define SOC_GPIO_PIN_KEY1     2
+#define SOC_GPIO_PIN_KEY1     2  // RTC GPIO
 #define SOC_GPIO_PIN_KEY2     47
 
 /* misc. Banana PicoW pins */
@@ -137,6 +137,8 @@
 #define SOC_GPIO_PIN_USB_DP   20
 #define SOC_GPIO_PIN_USB_DN   19
 
+//#define USE_ADAFRUIT_MSC
+
 // Audio
 #define EXCLUDE_AUDIO            // pending
 #if !defined(EXCLUDE_AUDIO)
@@ -146,16 +148,16 @@
 #define SOC_GPIO_PIN_PDM_OUT  17
 
 /* Waveshare Pico-Audio, PCM5101A I2S DAC */
-#define SOC_GPIO_PIN_DATA     8
-#define SOC_GPIO_PIN_BCK      9
-#define SOC_GPIO_PIN_LRCK     10
-#define SOC_GPIO_PIN_MCK      I2S_PIN_NO_CHANGE
+//#define SOC_GPIO_PIN_DATA     8
+//#define SOC_GPIO_PIN_BCK      9
+//#define SOC_GPIO_PIN_LRCK     10
+//#define SOC_GPIO_PIN_MCK      I2S_PIN_NO_CHANGE
 
 /* Waveshare Pico-Audio Rev2.1, CS4344 I2S DAC */
-//#define SOC_GPIO_PIN_DATA     7
-//#define SOC_GPIO_PIN_BCK      10
-//#define SOC_GPIO_PIN_LRCK     9
-//#define SOC_GPIO_PIN_MCK      8
+#define SOC_GPIO_PIN_DATA     7
+#define SOC_GPIO_PIN_BCK      10
+#define SOC_GPIO_PIN_LRCK     9
+#define SOC_GPIO_PIN_MCK      8
 
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
 #define SOC_GPIO_PIN_GNSS_RX  10  /* D4 */
