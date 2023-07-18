@@ -3084,11 +3084,10 @@ static void ESP32_Display_fini(int reason)
         if (reason == SOFTRF_SHUTDOWN_LOWBAT) {
           tft->setTextSize(1);
         } else
-#else
+#endif
         {
           tft->setTextSize(2);
         }
-#endif
         tft->setTextColor(TFT_WHITE, TFT_NAVY);
 
         uint16_t tbw = tft->textWidth(msg);
