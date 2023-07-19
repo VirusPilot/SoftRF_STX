@@ -154,7 +154,7 @@ const char *ESP32SX_Device_Manufacturer = SOFTRF_IDENT;
 const char *ESP32SX_Model_Stand  = "Standalone Edition"; /* 303a:8132 */
 const char *ESP32S3_Model_Prime3 = "Prime Edition Mk.3"; /* 303a:8133 */
 const char *ESP32S3_Model_Ham    = "Ham Edition";        /* 303a:818F */
-const char *ESP32S3_Model_Midi   = "Midi Edition";
+const char *ESP32S3_Model_Midi   = "Midi Edition";       /* 303a:81A0 */
 const uint16_t ESP32SX_Device_Version = SOFTRF_USB_FW_VERSION;
 
 #if defined(EXCLUDE_WIFI)
@@ -1226,6 +1226,7 @@ static void ESP32_setup()
           (esp32_board == ESP32_S3_DEVKIT          ) ? SOFTRF_USB_PID_STANDALONE :
           (esp32_board == ESP32_LILYGO_T_TWR_V1_3  ) ? SOFTRF_USB_PID_HAM        :
           (esp32_board == ESP32_LILYGO_T_TWR_V2_0  ) ? SOFTRF_USB_PID_HAM        :
+          (esp32_board == ESP32_HELTEC_TRACKER     ) ? SOFTRF_USB_PID_MIDI       :
           USB_PID /* 0x1001 */ ;
 
     snprintf(usb_serial_number, sizeof(usb_serial_number),
@@ -1340,7 +1341,11 @@ static void ESP32_setup()
 
     pinMode(SOC_GPIO_PIN_HELTRK_TFT_EN,   INPUT_PULLDOWN);
     pinMode(SOC_GPIO_PIN_HELTRK_ADC_EN,   INPUT_PULLUP);
+
 //    pinMode(SOC_GPIO_PIN_HELTRK_VEXT_EN,  INPUT_PULLDOWN); /* TBD */
+
+    digitalWrite(SOC_GPIO_PIN_HELTRK_LED, LOW);
+    pinMode(SOC_GPIO_PIN_HELTRK_LED,  OUTPUT);
 
   } else {
 #if !defined(EXCLUDE_IMU)
@@ -1763,6 +1768,11 @@ static void ESP32_loop()
     MAG_Time_Marker = millis();
   }
   #endif /* !EXCLUDE_MAG */
+
+  if (esp32_board == ESP32_HELTEC_TRACKER) {
+    digitalWrite(SOC_GPIO_PIN_HELTRK_LED,
+                 digitalRead(SOC_GPIO_PIN_HELTRK_GNSS_PPS));
+  }
 #endif /* CONFIG_IDF_TARGET_ESP32S3 */
 }
 
@@ -1984,6 +1994,13 @@ static void ESP32_fini(int reason)
       break;
     }
   } else if (esp32_board == ESP32_HELTEC_TRACKER) {
+    pinMode(SOC_GPIO_PIN_HELTRK_GNSS_EN,  INPUT);
+    pinMode(SOC_GPIO_PIN_HELTRK_GNSS_RST, INPUT);
+    pinMode(SOC_GPIO_PIN_HELTRK_TFT_EN,   INPUT);
+    pinMode(SOC_GPIO_PIN_HELTRK_ADC_EN,   INPUT);
+//    pinMode(SOC_GPIO_PIN_HELTRK_VEXT_EN,  INPUT); /* TBD */
+    pinMode(SOC_GPIO_PIN_HELTRK_LED,      INPUT);
+
 #if !defined(CONFIG_IDF_TARGET_ESP32C3)
     esp_sleep_enable_ext1_wakeup(1ULL << SOC_GPIO_PIN_S3_BUTTON,
                                  ESP_EXT1_WAKEUP_ALL_LOW);
@@ -3026,6 +3043,116 @@ static void ESP32_Display_loop()
     break;
 
 #endif /* LV_HOR_RES == 135 */
+
+#if LV_HOR_RES == 80
+  case DISPLAY_TFT_HELTEC_80:
+    if (tft) {
+      if (!TFT_display_frontpage) {
+        tft->fillScreen(TFT_NAVY);
+
+        tft->setTextFont(2);
+        tft->setTextSize(1);
+        tft->setTextColor(TFT_WHITE, TFT_NAVY);
+
+        tbw = tft->textWidth(ID_text);
+        tbh = tft->fontHeight();
+
+        tft->setCursor(tft->textWidth(" "), tft->height()/4 - tbh - 6);
+        tft->print(ID_text);
+
+        tbw = tft->textWidth(PROTOCOL_text);
+
+        tft->setCursor(tft->width() - tbw - tft->textWidth(" "),
+                       tft->height()/4 - tbh - 6);
+        tft->print(PROTOCOL_text);
+
+        tbw = tft->textWidth(RX_text);
+        tbh = tft->fontHeight();
+
+        tft->setCursor(tft->textWidth("   "), 3*tft->height()/4 - tbh - 4);
+        tft->print(RX_text);
+
+        tbw = tft->textWidth(TX_text);
+
+        tft->setCursor(tft->width()/2 + tft->textWidth("   "),
+                       3*tft->height()/4 - tbh - 4);
+        tft->print(TX_text);
+
+        tft->setTextFont(2);
+        tft->setTextSize(2);
+
+        snprintf (buf, sizeof(buf), "%06X", ThisAircraft.addr);
+
+        tbw = tft->textWidth(buf);
+        tbh = tft->fontHeight();
+
+        tft->setCursor(tft->textWidth(" "), tft->height()/4 - 9);
+        tft->print(buf);
+
+        tbw = tft->textWidth("O");
+
+        tft->setCursor(tft->width() - tbw - tft->textWidth(" "),
+                       tft->height()/4 - 9);
+        tft->print(Protocol_ID[ThisAircraft.protocol][0]);
+
+        itoa(rx_packets_counter % 1000, buf, 10);
+        tft->setCursor(tft->textWidth(" "), 3*tft->height()/4 - 7);
+        tft->print(buf);
+
+        itoa(tx_packets_counter % 1000, buf, 10);
+        tft->setCursor(tft->width()/2 + tft->textWidth(" "), 3*tft->height()/4 - 7);
+        tft->print(buf);
+
+        TFT_display_frontpage = true;
+
+      } else { /* TFT_display_frontpage */
+
+        if (rx_packets_counter > prev_rx_packets_counter) {
+          disp_value = rx_packets_counter % 1000;
+          itoa(disp_value, buf, 10);
+
+          if (disp_value < 10) {
+            strcat_P(buf,PSTR("  "));
+          } else {
+            if (disp_value < 100) {
+              strcat_P(buf,PSTR(" "));
+            };
+          }
+
+          tft->setTextFont(2);
+          tft->setTextSize(2);
+
+          tft->setCursor(tft->textWidth(" "), 3*tft->height()/4 - 7);
+          tft->print(buf);
+
+          prev_rx_packets_counter = rx_packets_counter;
+        }
+        if (tx_packets_counter > prev_tx_packets_counter) {
+          disp_value = tx_packets_counter % 1000;
+          itoa(disp_value, buf, 10);
+
+          if (disp_value < 10) {
+            strcat_P(buf,PSTR("  "));
+          } else {
+            if (disp_value < 100) {
+              strcat_P(buf,PSTR(" "));
+            };
+          }
+
+          tft->setTextFont(2);
+          tft->setTextSize(2);
+
+          tft->setCursor(tft->width()/2 + tft->textWidth(" "), 3*tft->height()/4 - 7);
+          tft->print(buf);
+
+          prev_tx_packets_counter = tx_packets_counter;
+        }
+      }
+    }
+
+    break;
+
+#endif /* LV_HOR_RES == 80 */
 #endif /* USE_TFT */
 
 #if defined(USE_OLED)
