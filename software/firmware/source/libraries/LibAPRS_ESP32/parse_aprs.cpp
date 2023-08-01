@@ -2228,6 +2228,7 @@ int ParseAPRS::parse_aprs_comment(struct pbuf_t* pb, char const* input, unsigned
 		DEBUG_LOG("Comment: ");
 		DEBUG_LOG(rest);
 	}
+	return 1;
 }
 
 uint8_t ParseAPRS::pkgType(const char* raw) {
