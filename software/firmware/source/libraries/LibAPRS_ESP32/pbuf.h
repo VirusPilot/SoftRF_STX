@@ -93,6 +93,7 @@
 #define F_EQNS		(1 << 9)
 #define F_BITS		(1 << 10)
 #define F_TLM		(1 << 11)
+#define F_OGNID		(1 << 12)
 
 #define W_WD	(1 << 0)
 #define W_WS	(1 << 1)
@@ -282,6 +283,8 @@ struct pbuf_t {
 	unsigned short course;
 	/// Land speed in km/h.
 	double speed;
+
+	uint32_t ogn_id;
 
 	/// Weather report.
 	fap_wx_report_t wx_report;
