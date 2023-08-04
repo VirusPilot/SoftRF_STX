@@ -568,7 +568,29 @@ void handleSettings() {
 <select name='power_save'>\
 <option %s value='%d'>Disabled</option>\
 <option %s value='%d'>WiFi OFF (10 min.)</option>\
-<option %s value='%d'>GNSS</option>\
+<option %s value='%d'>GNSS</option>"),
+  (settings->power_save == POWER_SAVE_NONE ? "selected" : ""), POWER_SAVE_NONE,
+  (settings->power_save == POWER_SAVE_WIFI ? "selected" : ""), POWER_SAVE_WIFI,
+  (settings->power_save == POWER_SAVE_GNSS ? "selected" : ""), POWER_SAVE_GNSS
+  );
+
+  len = strlen(offset);
+  offset += len;
+  size -= len;
+
+  /* Radio specific part 2 */
+  if (rf_chip && rf_chip->type == RF_IC_SA8X8) {
+    snprintf_P(offset, size, PSTR("<option %s value='%d'>No receive</option>"),
+    (settings->power_save == POWER_SAVE_NORECEIVE ? "selected" : ""), POWER_SAVE_NORECEIVE);
+
+    len = strlen(offset);
+    offset += len;
+    size -= len;
+  }
+
+  /* Common part 7 */
+  snprintf_P ( offset, size,
+    PSTR("\
 </select>\
 </td>\
 </tr>\
@@ -586,9 +608,6 @@ void handleSettings() {
 <input type='radio' name='no_track' value='1' %s>On\
 </td>\
 </tr>"),
-  (settings->power_save == POWER_SAVE_NONE ? "selected" : ""), POWER_SAVE_NONE,
-  (settings->power_save == POWER_SAVE_WIFI ? "selected" : ""), POWER_SAVE_WIFI,
-  (settings->power_save == POWER_SAVE_GNSS ? "selected" : ""), POWER_SAVE_GNSS,
   (!settings->stealth  ? "checked" : "") , (settings->stealth  ? "checked" : ""),
   (!settings->no_track ? "checked" : "") , (settings->no_track ? "checked" : "")
   );
@@ -597,7 +616,7 @@ void handleSettings() {
   offset += len;
   size -= len;
 
-  /* Radio specific part 2 */
+  /* Radio specific part 3 */
   if (rf_chip && rf_chip->type == RF_IC_SX1276) {
     snprintf_P ( offset, size,
       PSTR("\
@@ -630,7 +649,7 @@ void handleSettings() {
   size -= len;
 #endif
 
-  /* Common part 7 */
+  /* Common part 8 */
   snprintf_P ( offset, size,
     PSTR("\
 </table>\
