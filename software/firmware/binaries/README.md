@@ -36,7 +36,7 @@ Model|Instructions|Firmware folder
 Model|Instructions|Firmware folder
 ---|:---:|:---:
 [SkyView EZ](https://github.com/lyusupov/SoftRF/wiki/SkyView-EZ)|[ESP32](https://github.com/lyusupov/SoftRF/wiki/SkyView.-Quick-start)|[ESP32](https://github.com/lyusupov/SoftRF/tree/master/software/firmware/binaries/ESP32/SkyView)
-[SkyView Pico](https://github.com/lyusupov/SoftRF/wiki/SkyView-Pico)|[RP2040](https://github.com/lyusupov/SoftRF/wiki/SkyView-Pico.-Quick-start#raspberry-pico-w)<br>[ESP32-S3](https://github.com/lyusupov/SoftRF/wiki/SkyView-Pico.-Quick-start#banana-bpi-picow-s3)|RP2040<!-- ](https://github.com/lyusupov/SoftRF/tree/master/software/firmware/binaries/RP2040/SkyView) --><br>ESP32S3<!-- ](https://github.com/lyusupov/SoftRF/tree/master/software/firmware/binaries/ESP32S3/SkyView) -->
+[SkyView Pico](https://github.com/lyusupov/SoftRF/wiki/SkyView-Pico)|[RP2040](https://github.com/lyusupov/SoftRF/wiki/SkyView-Pico.-Quick-start#raspberry-pico-w)<br>[ESP32-S3](https://github.com/lyusupov/SoftRF/wiki/SkyView-Pico.-Quick-start#banana-bpi-picow-s3)|[RP2040](https://github.com/lyusupov/SoftRF/tree/master/software/firmware/binaries/RP2040/SkyView)<br>[ESP32S3](https://github.com/lyusupov/SoftRF/tree/master/software/firmware/binaries/ESP32S3/SkyView)
 [WebTop Serial](https://github.com/lyusupov/SoftRF/wiki/WebTop-Serial-adapter)|[NodeMCU](https://github.com/lyusupov/SoftRF/tree/master/software/firmware/binaries#nodemcu)|[NodeMCU](https://github.com/lyusupov/SoftRF/tree/master/software/firmware/binaries/NodeMCU/WebTop)
 [WebTop USB](https://github.com/lyusupov/SoftRF/wiki/WebTop-USB)|[ESP32-S2](https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s2)|[ESP32S2](https://github.com/lyusupov/SoftRF/tree/master/software/firmware/binaries/ESP32S2/WebTop)
 [USB to Bluetooth](https://github.com/lyusupov/SoftRF/wiki/USB-to-Bluetooth-adapter)|[XIAO](https://github.com/lyusupov/SoftRF/wiki/USB-to-Bluetooth-adapter#quick-start)|[SAMD21](https://github.com/lyusupov/SoftRF/tree/master/software/firmware/binaries/SAMD21/USB_Bluetooth)
@@ -279,17 +279,31 @@ The Bootloader is capable to self-program an application firmware into the devic
 
 1. Download an appropriate version of SoftRF firmware from [this location](https://github.com/lyusupov/SoftRF/tree/master/software/firmware/binaries/ESP32S3/SoftRF/MassStorage) and extract the archive ;
 
-2. Connect the SoftRF Prime Edition Mk.3 device to your PC by means of a USB cable (Type-A <-> Type-C) ;
+2. Connect the SoftRF device to your PC by means of a USB cable (Type-A <-> Type-C) ;
 
 3. Press and release RESET button of the SoftRF device. Immediately (within 1 second) press and release the BOOT button. One should see this message on the OLED display.
 
+&nbsp;&nbsp;&nbsp;&nbsp; For **T-Beam Supreme**:
+
 ![](https://github.com/lyusupov/SoftRF/blob/master/documents/images/Prime3-1.jpg)
+
+&nbsp;&nbsp;&nbsp;&nbsp; For **T-TWR Plus**:
+
+<img src="https://github.com/lyusupov/SoftRF/raw/master/documents/images/ham-1.jpg" width="400">
+
+&nbsp;&nbsp;&nbsp;&nbsp; This white LED on the **Heltec Tracker** will start to flicker:
+
+<img src="https://github.com/lyusupov/SoftRF/raw/master/documents/images/midi-2.jpg" width="400">
 
 <br>
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A virtual disk with **TBEAMBOOT** label should appear in your "File manager" afterwards.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A virtual disk with a device specific label should appear in your "File manager" afterwards.<br>
 
-4. Drag the downloaded .uf2 firmware file by your pointing device (mouse, trackball,...) , then drop it into **TBEAMBOOT** disk. Wait until the file transfer is complete.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For **T-Beam Supreme** the label is &nbsp; **TBEAMBOOT**<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For **T-TWR Plus** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **TWRBOOT**<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For **Heltec Tracker** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; **HTBOOT**<br>
+
+4. Drag the downloaded .uf2 firmware file by your pointing device (mouse, trackball,...) , then drop it into **TBEAMBOOT** / **TWRBOOT** / **HTBOOT** disk. Wait until the file transfer is complete.
 
 <br>
 

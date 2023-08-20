@@ -2269,7 +2269,7 @@ static void ognrf_shutdown()
 #endif /* USE_OGN_RF_DRIVER */
 
 AX25Msg Incoming_APRS_Packet;
-char Outgoing_APRS_Comment[80];
+char Outgoing_APRS_Data[160];
 
 #if defined(USE_SA8X8)
 SA818 sa868(&SA8X8_Serial);
@@ -2294,7 +2294,9 @@ extern NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> TWR2_Pixel;
 void sa868_Tx_LED_state(bool val) {
   if (hw_info.model == SOFTRF_MODEL_HAM) {
 #if defined(USE_NEOPIXELBUS_LIBRARY)
-    TWR2_Pixel.SetPixelColor(0, val ? LED_COLOR_RED : LED_COLOR_GREEN);
+    TWR2_Pixel.SetPixelColor(0, val ? LED_COLOR_RED :
+                             settings->power_save & POWER_SAVE_NORECEIVE ?
+                             LED_COLOR_BLACK : LED_COLOR_GREEN);
     TWR2_Pixel.Show();
 #endif /* USE_NEOPIXELBUS_LIBRARY */
   }
@@ -2312,17 +2314,9 @@ static bool sa8x8_probe()
 
 //  sa868.verbose(); // verbose mode
 
-  if (hw_info.revision < 20) {
-    controller.setBand(Band::UHF);
-    controller.setPins(SOC_GPIO_PIN_TWR1_RADIO_PTT,
-                       SOC_GPIO_PIN_TWR1_RADIO_PD,
-                       SOC_GPIO_PIN_TWR1_RADIO_HL);
-  } else {
-    controller.setBand(Band::VHF);
-    controller.setPins(SOC_GPIO_PIN_TWR2_RADIO_PTT,
-                       SOC_GPIO_PIN_TWR2_RADIO_PD,
-                       SOC_GPIO_PIN_TWR2_RADIO_HL);
-  }
+  controller.setPins(SOC_GPIO_PIN_TWR2_RADIO_PTT,
+                     SOC_GPIO_PIN_TWR2_RADIO_PD,
+                     SOC_GPIO_PIN_TWR2_RADIO_HL);
 
   controller.wake();
   controller.lowPower();
@@ -2364,6 +2358,10 @@ static void sa8x8_setup()
   uint32_t frequency = RF_FreqPlan.getChanFrequency(0);
   float MHz = frequency / 1000000.0;
 
+  if (hw_info.revision == 20) {
+    controller.setBand(Band::VHF);
+  }
+
   if (controller.getBand() == Band::UHF) {
     switch (settings->band)
     {
@@ -2384,11 +2382,16 @@ static void sa8x8_setup()
     }
   }
 
-  controller.setGroup(0 /* TBD */, MHz, MHz, 0, 1, 0);
+  byte sq = settings->power_save & POWER_SAVE_NORECEIVE ? 8 : 1;
 
   if (controller.getModel() == Model::SA_868) {
+    controller.setGroup(settings->txpower == RF_TX_POWER_FULL ? 0 : 1,
+                        MHz, MHz, 0, sq, 0);
+
     aprs_preamble = 350UL * 3;
     aprs_tail     = 250UL;
+  } else {
+    controller.setGroup(0 /* 12.5 KHz */, MHz, MHz, 0, sq, 0);
   }
 
   controller.setFilter(1,1,1);
@@ -2403,11 +2406,19 @@ static void sa8x8_setup()
   PacketBuffer.clean();
 
   APRS_init();
-  APRS_setCallsign("NOCALL", 1);
+  APRS_setCallsign("NOCALL", 0 /* 11 - balloons, aircraft, spacecraft, etc */ );
   APRS_setPath1("WIDE1", 1);
   APRS_setPreamble(aprs_preamble);
   APRS_setTail(aprs_tail);
   APRS_setSymbol('\'');
+
+  if (hw_info.model == SOFTRF_MODEL_HAM) {
+#if defined(USE_NEOPIXELBUS_LIBRARY)
+    TWR2_Pixel.SetPixelColor(0, settings->power_save & POWER_SAVE_NORECEIVE ?
+                             LED_COLOR_BLACK : LED_COLOR_GREEN);
+    TWR2_Pixel.Show();
+#endif /* USE_NEOPIXELBUS_LIBRARY */
+  }
 
   APRS_setTxLEDCallback(sa868_Tx_LED_state);
 
@@ -2428,8 +2439,7 @@ static bool sa8x8_receive()
 
 //  controller.receive();
 
-  uint8_t powerPin = hw_info.revision < 20 ? SOC_GPIO_PIN_TWR1_RADIO_HL :
-                                             SOC_GPIO_PIN_TWR2_RADIO_HL;
+  uint8_t powerPin = SOC_GPIO_PIN_TWR2_RADIO_HL;
   AFSK_Poll(true, LOW, powerPin);
 
   if (PacketBuffer.getCount() > 0) {
@@ -2444,11 +2454,10 @@ static bool sa8x8_receive()
 
 static void sa8x8_transmit()
 {
-  uint8_t powerPin = hw_info.revision < 20 ? SOC_GPIO_PIN_TWR1_RADIO_HL :
-                                             SOC_GPIO_PIN_TWR2_RADIO_HL;
+  uint8_t powerPin = SOC_GPIO_PIN_TWR2_RADIO_HL;
   AFSK_TimerEnable(false);
 
-  APRS_sendLoc(Outgoing_APRS_Comment, strlen(Outgoing_APRS_Comment));
+  APRS_sendTNC2Pkt(String(Outgoing_APRS_Data));
 
   do {
     delay(5);
