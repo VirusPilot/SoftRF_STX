@@ -188,17 +188,24 @@ void handleSettings() {
 <option %s value='%d'>%s</option>\
 <option %s value='%d'>%s</option>\
 <option %s value='%d'>%s</option>\
+<!-- <option %s value='%d'>%s</option> -->\
 </select>\
 </td>\
 </tr>"),
     (settings->rf_protocol == RF_PROTOCOL_LEGACY ? "selected" : ""),
      RF_PROTOCOL_LEGACY, legacy_proto_desc.name,
-    (settings->rf_protocol == RF_PROTOCOL_OGNTP ? "selected" : ""),
+    (settings->rf_protocol == RF_PROTOCOL_OGNTP  ? "selected" : ""),
      RF_PROTOCOL_OGNTP, ogntp_proto_desc.name,
-    (settings->rf_protocol == RF_PROTOCOL_P3I ? "selected" : ""),
+    (settings->rf_protocol == RF_PROTOCOL_P3I    ? "selected" : ""),
      RF_PROTOCOL_P3I, p3i_proto_desc.name,
-    (settings->rf_protocol == RF_PROTOCOL_FANET ? "selected" : ""),
-     RF_PROTOCOL_FANET, fanet_proto_desc.name
+    (settings->rf_protocol == RF_PROTOCOL_FANET  ? "selected" : ""),
+     RF_PROTOCOL_FANET, fanet_proto_desc.name,
+    (settings->rf_protocol == RF_PROTOCOL_APRS   ? "selected" : ""),
+#if defined(ENABLE_PROL)
+     RF_PROTOCOL_APRS, prol_proto_desc.name
+#else
+     RF_PROTOCOL_APRS, "PRoL"
+#endif /* ENABLE_PROL */
     );
   } else {
     snprintf_P ( offset, size,
