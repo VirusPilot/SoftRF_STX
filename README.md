@@ -6,12 +6,14 @@
   - if the SoftRF factory ID remains, then ADDR_TYPE is set according to the selected protocol (this is recommended for all airplanes without a transponder)
 
 ## Binaries (unstable beta versions) available for testing
-Binary packages are available for the following platforms:
+beta binary packages are available for the following platforms:
 - T-Beam, update only via WiFi webinterface `SoftRF-esp32.ino.bin`
-- T-Beam S3 Supreme, update via WiFi webinterface `SoftRF-esp32s3.ino.bin` or UF2 method `SoftRF-esp32s3.uf2`
+- T-Beam S3 Supreme, update via UF2 method `SoftRF-esp32s3.uf2`
+  - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
+  - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 - T-Echo, update only via UF2 method `SoftRF-nrf52.uf2` (aka. USB Mass Storage method)
 
-These binaries can be downloaded as part of so-called Artifacts `SoftRF.zip` @ https://github.com/VirusPilot/SoftRF/actions under each workflow.
+The required beta binaries can be downloaded as part of so-called Artifacts `SoftRF.zip` @ https://github.com/VirusPilot/SoftRF/actions under each workflow.
 
 **Please be aware that flashing these unstable beta binaries on your SoftRF device may render it unusable**
 
