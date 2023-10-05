@@ -6,13 +6,14 @@
   - if the SoftRF factory ID remains, then ADDR_TYPE is set according to the selected protocol (this is recommended for all airplanes without a transponder)
 
 ## Binaries (unstable beta versions) available for testing
-beta binary packages are available for the following platforms:
-- T-Beam, update via Chrome, suing https://espressif.github.io/esp-launchpad/
-  - ![image](https://github.com/VirusPilot/SoftRF/assets/43483458/09dfe5c7-ccab-4f9e-8c8e-8af93e060558)
-- T-Beam S3 Supreme, update via UF2 method `SoftRF-esp32s3.uf2`
+Beta binary packages are available for the following platforms and can be downloaded as part of so-called Artifacts located at https://github.com/VirusPilot/SoftRF/actions under the latest workflow
+- **T-Beam**, update via Chrome, using https://espressif.github.io/esp-launchpad/
+![image](https://github.com/VirusPilot/SoftRF/assets/43483458/09dfe5c7-ccab-4f9e-8c8e-8af93e060558)
+  - followed by a RESET
+- **T-Beam S3 Supreme**, update via UF2 method `SoftRF-esp32s3.uf2`
   - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
   - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
-- T-Echo, update only via UF2 method `SoftRF-nrf52.uf2` (aka. USB Mass Storage method)
+- **T-Echo**, update only via UF2 method `SoftRF-nrf52.uf2` (aka. USB Mass Storage method)
 
 The required beta binaries can be downloaded as part of so-called Artifacts `SoftRF.zip` @ https://github.com/VirusPilot/SoftRF/actions under each workflow.
 
@@ -23,7 +24,7 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - **T-Beam and T-Beam S3 Supreme**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
 - **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
-### Arduino IDE settings for T-Beam (up to v1.2)
+### Arduino IDE settings for T-Beam (up to v1.1)
 - Select Tools -> Board -> ESP32 Dev Module
 - Select Tools -> CPU Frequency -> 80MHz
 - Select Tools -> Flash Frequency -> 80MHz
@@ -56,19 +57,12 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - compile/upload
 - press **RESET**
 
-1st alternative for **T-Beam S3 Supreme** (and if you want to maintain the UF2 firmware upload option):
+alternative for **T-Beam S3 Supreme** (and if you want to maintain the UF2 firmware upload option):
 - follow all steps above but do **NOT** compile/upload
 - select **Export Compiled Binary** and then locate `SoftRF.ino.bin`
 - convert `SoftRF.ino.bin` to UF2 using `uf2conv.py SoftRF.ino.bin -c -b 0x00 -f 0xc47e5767 -o SoftRF.ino.uf2` (from https://github.com/microsoft/uf2/tree/master/utils)
 - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
 - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
-
-2nd alternative for **T-Beam S3 Supreme** (and if you want to maintain the UF2 firmware upload option):
-- follow all steps above but do **NOT** compile/upload:
-- select **Export Compiled Binary** and then locate `SoftRF.ino.bin`
-- connect you PC with the SoftRF WiFi
-- select `Firmware Update``
-- upload `SoftRF.ino.bin`
 
 ### Arduino IDE settings for T-Echo
 - Select Tools -> Board -> Nordic nRF52840 DK
