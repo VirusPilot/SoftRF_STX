@@ -7,7 +7,8 @@
 
 ## Binaries (unstable beta versions) available for testing
 beta binary packages are available for the following platforms:
-- T-Beam, update only via WiFi webinterface `SoftRF-esp32.ino.bin`
+- T-Beam, update via Chrome, suing https://espressif.github.io/esp-launchpad/
+  - ![image](https://github.com/VirusPilot/SoftRF/assets/43483458/09dfe5c7-ccab-4f9e-8c8e-8af93e060558)
 - T-Beam S3 Supreme, update via UF2 method `SoftRF-esp32s3.uf2`
   - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
   - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
