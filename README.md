@@ -7,9 +7,8 @@
 
 ## Binaries (unstable beta versions) available for testing
 Beta binary packages are available for the following platforms and can be downloaded as part of so-called Artifacts located at https://github.com/VirusPilot/SoftRF/actions under the latest workflow
-- **T-Beam**, update via Chrome, using https://espressif.github.io/esp-launchpad/
+- **T-Beam**, update via Chrome, using https://espressif.github.io/esp-launchpad/ followed by a manual **RESET**
 ![image](https://github.com/VirusPilot/SoftRF/assets/43483458/09dfe5c7-ccab-4f9e-8c8e-8af93e060558)
-  - followed by a RESET
 - **T-Beam S3 Supreme**, update via UF2 method `SoftRF-esp32s3.uf2`
   - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
   - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
