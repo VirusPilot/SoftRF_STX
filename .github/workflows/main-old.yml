@@ -357,12 +357,12 @@ jobs:
             arduino --verify                 --board $BOARD $PWD/software/firmware/source/SkyWatch/SkyWatch.ino ;
             fi ;
           #fi ;
-          if [[ "$BOARD" =~ "STM32:stm32:"        ]]; then
-            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
-          fi ;
-          if [[ "$BOARD" =~ "STMicroelectronics:stm32:" ]]; then
-            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
-          fi ;
+          # if [[ "$BOARD" =~ "STM32:stm32:"        ]]; then
+          #   arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+          # fi ;
+          # if [[ "$BOARD" =~ "STMicroelectronics:stm32:" ]]; then
+          #   arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+          # fi ;
           if [[ "$BOARD" =~ "energia:cc13xx:"     ]]; then
             energia --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
@@ -398,3 +398,9 @@ jobs:
           if [[ "$BOARD" =~ "rp2040:rp2040:"      ]]; then
             arduino --verify                 --board $BOARD $PWD/software/firmware/source/SkyWatch/SkyWatch.ino ;
           fi ;
+      - uses: actions/upload-artifact@v3
+        with:
+          name: SoftRF
+          path: |
+            software/firmware/source/SoftRF/build/
+          if-no-files-found: error
