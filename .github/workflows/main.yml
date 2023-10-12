@@ -340,7 +340,7 @@ jobs:
           #else
           # AC 3.0-alpha2+ is can work with IDE1
             if [[ "$BOARD" =~ "esp32:esp32:"      ]]; then
-            cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/ ;
+            cd $GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/ ;
             arduino --compile                 --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
             fi ;
           #fi ;
