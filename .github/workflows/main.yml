@@ -25,7 +25,7 @@ jobs:
             # 'esp8266:esp8266:nodemcuv2',
             # 'esp32:esp32:esp32:PartitionScheme=min_spiffs',
             # 'esp32:esp32:esp32s2',
-            'esp32:esp32:esp32s3',
+            'esp32:esp32:esp32s3'
             # 'esp32:esp32:esp32c3',
             # 'esp32:esp32:esp32c6',
             # 'STM32:stm32:Nucleo_64',
