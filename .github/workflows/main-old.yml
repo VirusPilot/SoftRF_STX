@@ -22,24 +22,24 @@ jobs:
       matrix:
         board:
           [
-            'esp8266:esp8266:nodemcuv2',
-            'esp32:esp32:esp32:PartitionScheme=min_spiffs',
-            'esp32:esp32:esp32s2',
+            # 'esp8266:esp8266:nodemcuv2',
+            # 'esp32:esp32:esp32:PartitionScheme=min_spiffs',
+            # 'esp32:esp32:esp32s2',
             'esp32:esp32:esp32s3',
-            'esp32:esp32:esp32c3',
-            'esp32:esp32:esp32c6',
-            'STM32:stm32:Nucleo_64',
-            'STMicroelectronics:stm32:GenF1',
-            'STMicroelectronics:stm32:GenWL',
-            'raspberry',
+            # 'esp32:esp32:esp32c3',
+            # 'esp32:esp32:esp32c6',
+            # 'STM32:stm32:Nucleo_64',
+            # 'STMicroelectronics:stm32:GenF1',
+            # 'STMicroelectronics:stm32:GenWL',
+            # 'raspberry',
             # 'energia:cc13xx:LAUNCHXL_CC1310',
-            'CubeCell:CubeCell:CubeCell-GPS',
-            'CubeCell:CubeCell:CubeCell-Board-PRO',
-            'adafruit:nrf52:pca10056',
-            'arduino:samd:mzero_bl',
-            'arduino:avr:mega',
-            'rp2040:rp2040:generic',
-            'rp2040:rp2040:rpipicow'
+            # 'CubeCell:CubeCell:CubeCell-GPS',
+            # 'CubeCell:CubeCell:CubeCell-Board-PRO',
+            # 'adafruit:nrf52:pca10056',
+            # 'arduino:samd:mzero_bl',
+            # 'arduino:avr:mega',
+            # 'rp2040:rp2040:generic',
+            # 'rp2040:rp2040:rpipicow'
           ]
 
     env:
@@ -357,12 +357,12 @@ jobs:
             arduino --verify                 --board $BOARD $PWD/software/firmware/source/SkyWatch/SkyWatch.ino ;
             fi ;
           #fi ;
-          # if [[ "$BOARD" =~ "STM32:stm32:"        ]]; then
-          #   arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
-          # fi ;
-          # if [[ "$BOARD" =~ "STMicroelectronics:stm32:" ]]; then
-          #   arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
-          # fi ;
+          if [[ "$BOARD" =~ "STM32:stm32:"        ]]; then
+            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+          fi ;
+          if [[ "$BOARD" =~ "STMicroelectronics:stm32:" ]]; then
+            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+          fi ;
           if [[ "$BOARD" =~ "energia:cc13xx:"     ]]; then
             energia --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
