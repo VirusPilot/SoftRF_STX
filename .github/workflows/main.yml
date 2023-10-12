@@ -22,24 +22,24 @@ jobs:
       matrix:
         board:
           [
-            'esp8266:esp8266:nodemcuv2',
-            'esp32:esp32:esp32:PartitionScheme=min_spiffs',
-            'esp32:esp32:esp32s2',
+            # 'esp8266:esp8266:nodemcuv2',
+            # 'esp32:esp32:esp32:PartitionScheme=min_spiffs',
+            # 'esp32:esp32:esp32s2',
             'esp32:esp32:esp32s3',
-            'esp32:esp32:esp32c3',
-            'esp32:esp32:esp32c6',
-            'STM32:stm32:Nucleo_64',
-            'STMicroelectronics:stm32:GenF1',
-            'STMicroelectronics:stm32:GenWL',
-            'raspberry',
+            # 'esp32:esp32:esp32c3',
+            # 'esp32:esp32:esp32c6',
+            # 'STM32:stm32:Nucleo_64',
+            # 'STMicroelectronics:stm32:GenF1',
+            # 'STMicroelectronics:stm32:GenWL',
+            # 'raspberry',
             # 'energia:cc13xx:LAUNCHXL_CC1310',
-            'CubeCell:CubeCell:CubeCell-GPS',
-            'CubeCell:CubeCell:CubeCell-Board-PRO',
-            'adafruit:nrf52:pca10056',
-            'arduino:samd:mzero_bl',
-            'arduino:avr:mega',
-            'rp2040:rp2040:generic',
-            'rp2040:rp2040:rpipicow'
+            # 'CubeCell:CubeCell:CubeCell-GPS',
+            # 'CubeCell:CubeCell:CubeCell-Board-PRO',
+            # 'adafruit:nrf52:pca10056',
+            # 'arduino:samd:mzero_bl',
+            # 'arduino:avr:mega',
+            # 'rp2040:rp2040:generic',
+            # 'rp2040:rp2040:rpipicow'
           ]
 
     env:
@@ -398,3 +398,9 @@ jobs:
           if [[ "$BOARD" =~ "rp2040:rp2040:"      ]]; then
             arduino --verify                 --board $BOARD $PWD/software/firmware/source/SkyWatch/SkyWatch.ino ;
           fi ;
+      - uses: actions/upload-artifact@v3
+        with:
+          name: SoftRF
+          path: |
+            software/firmware/source/SoftRF/build/
+          if-no-files-found: error
