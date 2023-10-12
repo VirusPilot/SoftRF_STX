@@ -340,7 +340,8 @@ jobs:
           #else
           # AC 3.0-alpha2+ is can work with IDE1
             if [[ "$BOARD" =~ "esp32:esp32:"      ]]; then
-            arduino --verify                 --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+            cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/ ;
+            arduino --compile                 --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
             fi ;
           #fi ;
           #if [[ "$BOARD" =~ "esp32:esp32:esp32c6" ]]; then
@@ -401,6 +402,5 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: SoftRF
-          path: |
-            software/firmware/source/SoftRF/build/
+          path: $GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/
           if-no-files-found: error
