@@ -24,7 +24,7 @@ jobs:
           [
             'esp32:esp32:esp32',
             'esp32:esp32:esp32s3',
-            'adafruit:nrf52:pca10056',
+            'adafruit:nrf52:pca10056'
           ]
         artifact:
           [
