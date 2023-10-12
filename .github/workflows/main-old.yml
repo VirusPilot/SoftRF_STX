@@ -1,0 +1,145 @@
+# This is a basic workflow to help you get started with Actions
+
+name: build
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  # push:
+  #   branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        board:
+          [
+            'esp32:esp32:esp32',
+            'esp32:esp32:esp32s3',
+            'adafruit:nrf52:pca10056',
+          ]
+        artifact:
+          [
+            'SoftRF-esp32',
+            'SoftRF-esp32s3',
+            'SoftRF-nrf52'
+          ]
+        path:
+          [
+            'esp32.esp32.esp32',
+            'esp32:esp32:esp32s3',
+            'adafruit:nrf52:pca10056'
+          ]
+    env:
+      ARDUINO_IDE_VERSION: 1.8.13
+      ARDUINO_CLI_VERSION: 0.34.2
+      ENERGIA_IDE_VERSION: 1.8.10E23
+      BOARD: ${{ matrix.board }}
+      ARTIFACT: ${{ matrix.artifact }}
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      #- name: Setup tmate session
+      #  uses: mxschmitt/action-tmate@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Run before_install
+        run: |
+          /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
+          sleep 3
+          export DISPLAY=:1.0
+          if [[ "$BOARD" =~ "energia:" ]]; then
+            sudo dpkg --add-architecture i386 ;
+            sudo apt-get update ;
+            sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 ;
+            wget https://energia.nu/downloads/downloadv4.php?file=energia-$ENERGIA_IDE_VERSION-linux64.tar.xz ;
+            mv "downloadv4.php?file=energia-$ENERGIA_IDE_VERSION-linux64.tar.xz" energia-$ENERGIA_IDE_VERSION-linux64.tar.xz ;
+            tar xf energia-$ENERGIA_IDE_VERSION-linux64.tar.xz ;
+            rm energia-$ENERGIA_IDE_VERSION-linux64.tar.xz ;
+            sudo mv energia-$ENERGIA_IDE_VERSION /usr/local/share/energia ;
+            sudo ln -s /usr/local/share/energia/energia /usr/local/bin/energia ;
+            else
+              wget http://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
+              tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
+              rm arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
+              sudo mv arduino-$ARDUINO_IDE_VERSION /usr/local/share/arduino ;
+              sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino ;
+              if [[ "$BOARD" =~ "adafruit:nrf52:" ]]; then
+                sudo apt-get install python3-pip ;
+                pip3 install setuptools --user ;
+                pip3 install adafruit-nrfutil --user ;
+                pip3 install intelhex --user ;
+              fi
+            fi
+          fi
+      - name: Run install
+        run: |
+          if [[ "$BOARD" =~ "esp32:esp32:esp32:" ]]; then
+            arduino --pref "boardsmanager.additional.urls=https://github.com/espressif/arduino-esp32/releases/download/1.0.5/package_esp32_index.json" --save-prefs ;
+            arduino --install-boards esp32:esp32:1.0.5 ;
+            arduino --board $BOARD --save-prefs ;
+            arduino --pref "custom_CPUFreq=esp32_80"                   --save-prefs ;
+            arduino --pref "custom_DebugLevel=esp32_none"              --save-prefs ;
+            arduino --pref "custom_FlashFreq=esp32_80"                 --save-prefs ;
+            arduino --pref "custom_FlashMode=esp32_dio"                --save-prefs ;
+            arduino --pref "custom_FlashSize=esp32_4M"                 --save-prefs ;
+            arduino --pref "custom_PSRAM=esp32_enabled"                --save-prefs ;
+            arduino --pref "custom_PartitionScheme=esp32_min_spiffs"   --save-prefs ;
+            arduino --pref "custom_UploadSpeed=esp32_921600"           --save-prefs ;
+            cd $HOME/.arduino15/packages/esp32/hardware/esp32/1.0.5/tools/sdk/lib ;
+            rm -f libbt.a ;
+            cp $GITHUB_WORKSPACE/software/firmware/binaries/ESP32/misc/libbt.a . ;
+            cd $GITHUB_WORKSPACE ;
+          fi
+          if [[ "$BOARD" =~ "esp32:esp32:esp32s3" ]]; then
+            arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json" --save-prefs ;
+            arduino --install-boards esp32:esp32:2.0.14 ;
+            arduino --board $BOARD --save-prefs ;
+            arduino --pref "custom_CPUFreq=esp32s3_80"                 --save-prefs ;
+            arduino --pref "custom_DebugLevel=esp32s3_none"            --save-prefs ;
+            arduino --pref "custom_FlashFreq=esp32s3_80"               --save-prefs ;
+            arduino --pref "custom_FlashMode=esp32s3_dio"              --save-prefs ;
+            arduino --pref "custom_FlashSize=esp32s3_8M"               --save-prefs ;
+            arduino --pref "custom_USBMode=esp32s3_default"            --save-prefs ;
+            arduino --pref "custom_CDCOnBoot=esp32s3_cdc"              --save-prefs ;
+            arduino --pref "custom_PSRAM=esp32s3_enabled"              --save-prefs ;
+            arduino --pref "custom_PartitionScheme=esp32s3_default_8MB" --save-prefs ;
+            arduino --pref "custom_UploadSpeed=esp32s3_921600"         --save-prefs ;
+            cd $GITHUB_WORKSPACE ;
+          fi
+          if [[ "$BOARD" =~ "adafruit:nrf52:" ]]; then
+            arduino --pref "boardsmanager.additional.urls=https://adafruit.github.io/arduino-board-index/package_adafruit_index.json" --save-prefs ;
+            arduino --install-boards adafruit:nrf52:1.3.0 ;
+            arduino --board $BOARD --save-prefs ;
+            arduino --pref "custom_debug=pca10056_l0"                 --save-prefs ;
+            arduino --pref "custom_softdevice=pca10056_s140v6"        --save-prefs ;
+            if [[ ! -f ~/.local/bin/adafruit-nrfutil ]]; then
+              ln -s /bin/true ~/.local/bin/adafruit-nrfutil;
+            fi ;
+            cd $GITHUB_WORKSPACE ;
+          fi
+      - name: Run script
+        run: |
+          if [[ "$BOARD" =~ "esp32:esp32:"      ]]; then
+            arduino --verify --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+          fi ;
+          if [[ "$BOARD" =~ "adafruit:nrf52:"     ]]; then
+            arduino --verify --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+          fi ;
+      - uses: actions/upload-artifact@v3
+        with:
+          name: SoftRF
+          path: |
+            software/firmware/source/SoftRF/build//${{ matrix.path }}/
+          if-no-files-found: error
