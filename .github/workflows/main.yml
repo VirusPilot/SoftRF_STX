@@ -35,7 +35,7 @@ jobs:
             # 'energia:cc13xx:LAUNCHXL_CC1310',
             # 'CubeCell:CubeCell:CubeCell-GPS',
             # 'CubeCell:CubeCell:CubeCell-Board-PRO',
-            'adafruit:nrf52:pca10056',
+            'adafruit:nrf52:pca10056'
             # 'arduino:samd:mzero_bl',
             # 'arduino:avr:mega',
             # 'rp2040:rp2040:generic',
