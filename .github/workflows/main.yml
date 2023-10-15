@@ -143,7 +143,8 @@ jobs:
             arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json" --save-prefs ;
             arduino --install-boards esp32:esp32:2.0.14 ;
             arduino --board $BOARD --save-prefs ;
-            arduino --pref "build.path=$PWD/build_esp32_softrf"      --save-prefs ;
+            mkdir build_esp32_softrf;
+            arduino --pref "build.path=$PWD/build_esp32_softrf"        --save-prefs ;
             arduino --pref "custom_CPUFreq=esp32s3_80"                 --save-prefs ;
             arduino --pref "custom_DebugLevel=esp32s3_none"            --save-prefs ;
             arduino --pref "custom_FlashFreq=esp32s3_80"               --save-prefs ;
@@ -324,8 +325,7 @@ jobs:
           #else
           # ESP32 AC 3.0-alpha2+ can work with IDE1
             if [[ "$BOARD" =~ "esp32:esp32:"      ]]; then
-            #mkdir build_esp32_softrf;
-            arduino --verify --pref build.path=./build_esp32_softrf    --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+            arduino --verify --pref build.path=./build_esp32_softrf --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
             fi ;
           #fi ;
           #if [[ "$BOARD" =~ "esp32:esp32:esp32c6" ]]; then
@@ -366,8 +366,7 @@ jobs:
             arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
           if [[ "$BOARD" =~ "adafruit:nrf52:"     ]]; then
-          # mkdir build_nrf52_softrf;
-          arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
+            arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
           if [[ "$BOARD" =~ "arduino:samd:"       ]]; then
             arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
