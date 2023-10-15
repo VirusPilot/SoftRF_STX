@@ -109,8 +109,6 @@ jobs:
             arduino --pref "boardsmanager.additional.urls=https://github.com/espressif/arduino-esp32/releases/download/1.0.5/package_esp32_index.json" --save-prefs ;
             arduino --install-boards esp32:esp32:1.0.5 ;
             arduino --board $BOARD --save-prefs ;
-            mkdir build_esp32_softrf;
-            arduino --pref "build.path=$PWD/build_esp32_softrf"        --save-prefs ;
             arduino --pref "custom_CPUFreq=esp32_80"                   --save-prefs ;
             arduino --pref "custom_DebugLevel=esp32_none"              --save-prefs ;
             arduino --pref "custom_FlashFreq=esp32_80"                 --save-prefs ;
@@ -142,8 +140,6 @@ jobs:
             arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json" --save-prefs ;
             arduino --install-boards esp32:esp32:2.0.14 ;
             arduino --board $BOARD --save-prefs ;
-            mkdir build_esp32_softrf;
-            arduino --pref "build.path=$PWD/build_esp32_softrf"        --save-prefs ;
             arduino --pref "custom_CPUFreq=esp32s3_80"                 --save-prefs ;
             arduino --pref "custom_DebugLevel=esp32s3_none"            --save-prefs ;
             arduino --pref "custom_FlashFreq=esp32s3_80"               --save-prefs ;
