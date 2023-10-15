@@ -325,6 +325,7 @@ jobs:
           #else
           # ESP32 AC 3.0-alpha2+ can work with IDE1
             if [[ "$BOARD" =~ "esp32:esp32:"      ]]; then
+            mkdir build_esp32_softrf;
             arduino --verify --pref build.path=./build_esp32_softrf --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
             fi ;
           #fi ;
