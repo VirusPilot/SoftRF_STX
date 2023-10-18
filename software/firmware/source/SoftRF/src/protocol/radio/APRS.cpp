@@ -236,6 +236,8 @@ size_t aprs_encode(void *pkt, ufo_t *this_aircraft) {
 
   char buf[APRS_PAYLOAD_SIZE];
   char id_s[7];
+  char fpm_s[5];
+
   uint32_t id = this_aircraft->addr & 0x00FFFFFF;
 
   snprintf(id_s, sizeof(id_s), "%06X", id);
@@ -264,6 +266,16 @@ size_t aprs_encode(void *pkt, ufo_t *this_aircraft) {
   int   lon_int = (int) lon;
   float lon_dec = lon - lon_int;
 
+  int fpm = (int) this_aircraft->vs;
+  if (fpm < 0)    fpm = -fpm;
+  if (fpm > 9999) fpm = 9999;
+
+  if (fpm > 999) {
+    snprintf(fpm_s, sizeof(fpm_s),"%4d", fpm);
+  } else {
+    snprintf(fpm_s, sizeof(fpm_s),"%03d", fpm);
+  }
+
   snprintf(buf, sizeof(buf),
            "%s>%s:"
            "/"
@@ -272,7 +284,11 @@ size_t aprs_encode(void *pkt, ufo_t *this_aircraft) {
            "/"
            "%03d%05.2f%c"
            "'"
-           "%03d/%03d/A=%06d !W00! id%08X +000fpm +0.0rot" /* " 7.8dB -1.6kHz gps8x3" */,
+           "%03d/%03d/A=%06d "
+           "!W%c%c! "
+           "id%08X "
+           "%c%sfpm "
+           "+0.0rot" /* " 7.8dB -1.6kHz gps8x3" */,
            strlen(APRS_FromCall) == 0 ? id_s : APRS_FromCall,
            APRS_ToCall,
            gnss.time.hour(), gnss.time.minute(), gnss.time.second(),
@@ -281,7 +297,10 @@ size_t aprs_encode(void *pkt, ufo_t *this_aircraft) {
            (course_i == 0) ? 360 : course_i,
            (int) this_aircraft->speed,        /* knots */
            (altitude_i < 0) ? 0 : altitude_i, /* feet  */
-           id | (XX << 24));
+           '0' + abs((int) (lat_dec * 60000)) % 10,
+           '0' + abs((int) (lon_dec * 60000)) % 10,
+           id | (XX << 24),
+           this_aircraft->vs < 0 ? '-' : '+', fpm_s);
 
   strcpy((char *) pkt, buf);
   return strlen(buf) + 1;
