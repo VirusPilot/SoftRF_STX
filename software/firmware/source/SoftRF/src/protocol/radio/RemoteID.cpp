@@ -22,9 +22,18 @@
 
 #include "../../../SoftRF.h"
 #include "../../driver/RF.h"
+#include "../../driver/EEPROM.h"
 
 #if defined(ENABLE_REMOTE_ID)
 #include <id_open.h>
+
+/*
+ * Source:
+ * https://asd-stan.org/wp-content/uploads/ASD-STAN_DRI_Introduction_to_the_European_digital_RID_UAS_Standard.pdf
+ */
+
+char RID_Operator_ID[ID_SIZE] = "";
+char RID_Drone_ID   [ID_SIZE] = "";
 
 ID_OpenDrone          squitter;
 
@@ -35,23 +44,70 @@ double RID_Base_Lat = 0.0;
 double RID_Base_Lon = 0.0;
 float  RID_Base_Alt = 0.0;
 
+static bool rid_status = false;
+
+const uint8_t aircraft_type_to_odid[] PROGMEM = {
+	ODID_UATYPE_OTHER,
+	ODID_UATYPE_GLIDER,
+	ODID_UATYPE_TETHERED_POWERED_AIRCRAFT,
+	ODID_UATYPE_HELICOPTER_OR_MULTIROTOR,
+	ODID_UATYPE_FREE_FALL_PARACHUTE,
+	ODID_UATYPE_AEROPLANE,
+	ODID_UATYPE_GLIDER,
+	ODID_UATYPE_GLIDER,
+	ODID_UATYPE_AEROPLANE,
+	ODID_UATYPE_AEROPLANE,
+	ODID_UATYPE_OTHER,
+	ODID_UATYPE_FREE_BALLOON,
+	ODID_UATYPE_AIRSHIP,
+	ODID_UATYPE_OTHER,
+	ODID_UATYPE_OTHER,
+	ODID_UATYPE_GROUND_OBSTACLE
+};
+
+#define AT_TO_ODID(x)  (x > 15 ? \
+   ODID_UATYPE_OTHER : pgm_read_byte(&aircraft_type_to_odid[x]))
+
+bool rid_init() {
+  memset(&utm_parameters,0,sizeof(utm_parameters));
+
+  if (strlen(RID_Operator_ID) > 0) {
+    strcpy(utm_parameters.UAS_operator, RID_Operator_ID);
+    rid_status = true;
+  }
+
+  if (strlen(RID_Drone_ID) > 0) {
+    strcpy(utm_parameters.UAV_id, RID_Drone_ID);
+    utm_parameters.ID_type = ODID_IDTYPE_CAA_REGISTRATION_ID;
+  } else {
+    snprintf(utm_parameters.UAV_id, sizeof(utm_parameters.UAV_id), "%08X",
+             SoC->getChipId());
+    utm_parameters.ID_type = ODID_IDTYPE_SERIAL_NUMBER;
+  }
+
+  utm_parameters.UA_type     = AT_TO_ODID(settings->aircraft_type);
+  utm_parameters.ID_type2    = ODID_IDTYPE_NONE;
+  utm_parameters.region      = ODID_CLASSIFICATION_TYPE_EU;
+  utm_parameters.EU_category = ODID_CATEGORY_EU_OPEN;
+  utm_parameters.EU_class    = ODID_CLASS_EU_CLASS_4;
+
+  squitter.init(&utm_parameters);
+
+  memset(&utm_data,0,sizeof(utm_data));
+
+  return rid_status;
+}
+
+bool rid_enabled() {
+  return rid_status;
+}
+
 size_t rid_encode(void *pkt, ufo_t *this_aircraft) {
-
-  uint32_t id = this_aircraft->addr & 0x00FFFFFF;
-
-#if !defined(SOFTRF_ADDRESS)
-  uint8_t addr_type = ADDR_TYPE_ANONYMOUS;
-#else
-  uint8_t addr_type = id == SOFTRF_ADDRESS ? ADDR_TYPE_ICAO : ADDR_TYPE_ANONYMOUS;
-#endif
-
-  uint8_t acft_type = this_aircraft->aircraft_type > AIRCRAFT_TYPE_STATIC ?
-          AIRCRAFT_TYPE_UNKNOWN : this_aircraft->aircraft_type;
 
   utm_data.latitude_d  = (double) this_aircraft->latitude;
   utm_data.longitude_d = (double) this_aircraft->longitude;
   utm_data.alt_msl_m   = (float)  this_aircraft->altitude;
-  utm_data.alt_agl_m   = (float)  0.0 /* TBD */;
+  utm_data.alt_agl_m   = (float)  INV_ALT /* TBD */;
   utm_data.speed_kn    = (int)    this_aircraft->speed;
   utm_data.heading     = (int)    this_aircraft->course;
 
@@ -75,6 +131,22 @@ size_t rid_encode(void *pkt, ufo_t *this_aircraft) {
   sprintf(text,"%s,%s\r\n", lat_s,long_s);
   Serial.print(text);
 #endif
+
+  utm_data.csecs      = (int) gnss.time.centisecond();
+  utm_data.seconds    = (int) gnss.time.second();
+  utm_data.minutes    = (int) gnss.time.minute();
+  utm_data.hours      = (int) gnss.time.hour();
+
+  utm_data.days       = (int) gnss.date.day();
+  utm_data.months     = (int) gnss.date.month();
+  utm_data.years      = (int) gnss.date.year();
+
+/*
+ * SATS_LEVEL_1   4
+ * SATS_LEVEL_2   7
+ * SATS_LEVEL_3  10
+ */
+  utm_data.satellites = (int) gnss.satellites.value();
 
   return 0;
 }
