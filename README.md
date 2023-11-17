@@ -18,7 +18,7 @@ The required beta binaries can be downloaded as part of so-called Artifacts `Sof
 
 **Please be aware that flashing these unstable beta binaries on your SoftRF device may render it unusable**
 
-## Comiling/Flashing from Source Code
+## Compiling/Flashing from Source Code
 You need to be familiar with Arduino to compile and flash it for your platform. You need to install the latest version of **Arduino IDE** and add the following two entries into the Additional Board Manager URLs:
 - **T-Beam and T-Beam S3 Supreme**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
 - **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
