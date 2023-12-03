@@ -37,6 +37,7 @@ jobs:
       - name: Build SoftRF for platform ${{ matrix.board }}
         run: |
           echo 'Building board ${{ matrix.board }}'
+          echo "#define CURRENT_DATE \"$(date +"%Y%m%d")\"" > $GITHUB_WORKSPACE/software/firmware/source/SoftRF/current_date.h
           cd $GITHUB_WORKSPACE
           arduino-cli compile -e -b "${{ matrix.board }}" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
       - name: Running uf2 for nrf52

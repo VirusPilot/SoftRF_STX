@@ -31,8 +31,11 @@
 #include <raspi/raspi.h>
 #endif /* RASPBERRY_PI */
 
+#include "current_date.h"
+
 #define SOFTRF_IDENT            "SoftRF"
-#define SOFTRF_FIRMWARE_VERSION "1.4.stx"
+//#define SOFTRF_FIRMWARE_VERSION "1.4.stx"
+#define SOFTRF_FIRMWARE_VERSION CURRENT_DATE
 #define SOFTRF_USB_FW_VERSION   0x0104
 
 #define ENTRY_EXPIRATION_TIME   10 /* seconds */
