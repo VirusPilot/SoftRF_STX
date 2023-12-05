@@ -1,9 +1,9 @@
 # SoftRF DIY - Stratux compatible fork for T-Beam, T-Beam S3 Supreme and T-Echo
 
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
-- option to enter Aircraft ID
-  - if an Aircraft ID (ICAO hex code) is added, then ADDR_TYPE_ICAO is set for both Legacy and OGN (this is based on the assumtion that your airplane has a transponder)
-  - if the SoftRF factory ID remains, then ADDR_TYPE is set according to the selected protocol (this is recommended for all airplanes without a transponder)
+- option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.4.1/settings)
+  - if added (`AircraftID: ICAO hex code`), then ADDR_TYPE_ICAO is set for both Legacy and OGN (this is based on the assumtion that your airplane has a transponder)
+  - if **not** added, the SoftRF factory ID remains (`AircraftID: 0`) and ADDR_TYPE is set according to the selected protocol (this is recommended for all airplanes without a transponder)
 
 ## Binaries (unstable beta versions) available for testing
 Beta binary packages are available for the following platforms and can be downloaded as part of so-called Artifacts located at https://github.com/VirusPilot/SoftRF/actions under the latest workflow
