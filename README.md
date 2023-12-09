@@ -1,6 +1,7 @@
 # SoftRF DIY - Stratux compatible fork for T-Beam, T-Beam S3 Supreme and T-Echo
 
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
+- change SoftRF WiFi IP from `192.168.1.1` to `192.168.4.1` to avoid conflicts with Stratux WiFi IP
 - option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.4.1/settings)
   - if added (`AircraftID: ICAO hex code`), then ADDR_TYPE_ICAO is set for both Legacy and OGN (this is based on the assumtion that your airplane has a transponder)
   - if **not** added, the SoftRF factory ID remains (`AircraftID: 0`) and ADDR_TYPE is set according to the selected protocol (this is recommended for all airplanes without a transponder)
@@ -9,9 +10,15 @@
 Beta binary packages are available for the following platforms and can be downloaded as part of so-called Artifacts located at https://github.com/VirusPilot/SoftRF/actions under the latest workflow
 - **T-Beam**, update via Chrome, using https://espressif.github.io/esp-launchpad/ followed by a manual **RESET**
 ![image](https://github.com/VirusPilot/SoftRF/assets/43483458/09dfe5c7-ccab-4f9e-8c8e-8af93e060558)
+- **T-Beam**, update via SoftRF WiFi Firmware update page: http://192.168.4.1/firmware
+  - if you are updating an unmodified T-Beam: update via http://192.168.1.1/firmware
+  - please note that the upload will take up to 30s, followed by a reboot
 - **T-Beam S3 Supreme**, update via UF2 method `SoftRF-esp32s3.uf2`
   - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
   - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
+- **T-Beam S3 Supreme**, update via SoftRF WiFi Firmware update page: http://192.168.4.1/firmware
+  - if you are updating an unmodified T-Beam S3 Supreme: update via http://192.168.1.1/firmware
+  - please note that the upload will take up to 30s, followed by a reboot
 - **T-Echo**, update only via UF2 method `SoftRF-nrf52.uf2` (aka. USB Mass Storage method)
 
 The required beta binaries can be downloaded as part of so-called Artifacts `SoftRF.zip` @ https://github.com/VirusPilot/SoftRF/actions under each workflow.
@@ -88,7 +95,7 @@ you first need to apply the following GPS reset:
   - enable NMEA extended protocol
 - LEGACY NMEA traffic messages are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
 - default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
-- WiFi AP IP changed to `192.168.4.1` to avoid conflicts with Stratux WiFi AP IP
+- WiFi IP changed to `192.168.4.1` to avoid conflicts with Stratux WiFi IP
 
 ## T-Echo modifications:
 - L76K GPS configuration:
@@ -108,7 +115,7 @@ you first need to apply the following GPS reset:
 - it appears that on some SX1262 based T-Beams (not the T-Beam S3 Supreme) the modified GPS configuration sometimes reverts to the default GNSS settings, e.g. GLONASS is enabled instead of BEIDOU.
 
 ## Recommendations for T-Beam and T-Beam S3 Supreme:
-- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF webinterface (192.168.4.1)
+- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.4.1/settings
 
 ## Recommendations for T-Echo:
 - load OGN database: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
