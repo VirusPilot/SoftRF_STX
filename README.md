@@ -12,13 +12,13 @@ Beta binary packages are available for the following platforms and can be downlo
 ![image](https://github.com/VirusPilot/SoftRF/assets/43483458/09dfe5c7-ccab-4f9e-8c8e-8af93e060558)
 - **T-Beam**, update via SoftRF WiFi Firmware update page: http://192.168.4.1/firmware
   - if you are updating an unmodified T-Beam: update via http://192.168.1.1/firmware
-  - please note that the upload will take up to 30s, followed by a reboot
+  - please note that the upload will take up to 30s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
 - **T-Beam S3 Supreme**, update via UF2 method `SoftRF-esp32s3.uf2`
   - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
   - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 - **T-Beam S3 Supreme**, update via SoftRF WiFi Firmware update page: http://192.168.4.1/firmware
   - if you are updating an unmodified T-Beam S3 Supreme: update via http://192.168.1.1/firmware
-  - please note that the upload will take up to 30s, followed by a reboot
+  - please note that the upload will take up to 30s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
 - **T-Echo**, update only via UF2 method `SoftRF-nrf52.uf2` (aka. USB Mass Storage method)
 
 The required beta binaries can be downloaded as part of so-called Artifacts `SoftRF.zip` @ https://github.com/VirusPilot/SoftRF/actions under each workflow.
