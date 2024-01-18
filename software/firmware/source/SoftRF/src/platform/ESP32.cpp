@@ -378,6 +378,8 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> TWR2_Pixel(1, SOC_GPIO_PIN_TWR2_NEO
 extern SA818Controller controller;
 extern uint32_t Data_Frequency;
 extern uint32_t Voice_Frequency;
+extern byte     SA8X8_SQL;
+
 extern void sa868_Tx_LED_state(bool);
 
 bool ESP32_R22_workaround = false;
@@ -1403,22 +1405,40 @@ static void ESP32_setup()
 
     delay(200);
 
+#if 0
     calibrate_voltage((adc1_channel_t) ADC1_GPIO2_CHANNEL);
     uint16_t gpio2_voltage = read_voltage(); // avg. of 32 samples
 
     if (gpio2_voltage > 1900) {
+#else
+    pinMode(SOC_GPIO_PIN_TWR2_RADIO_SQL, INPUT_PULLDOWN);
+
+    if (digitalRead(SOC_GPIO_PIN_TWR2_RADIO_SQL) == HIGH) {
+#endif
       esp32_board = ESP32_LILYGO_T_TWR_V2_1;
       hw_info.revision = 21;
 
-      axp_2xxx.setALDO3Voltage(3300); // V2.1 - SA868, NeoPixel
+      axp_2xxx.setALDO3Voltage(3300); // V2.1 - SA868
       axp_2xxx.enableALDO3();
 
 #if defined(USE_SA8X8)
+#if 0
       if (gpio2_voltage > 2400) {
         controller.setBand(Band::VHF);
       } else {
         controller.setBand(Band::UHF);
       }
+#else
+      Wire.begin(SOC_GPIO_PIN_TWR2_SDA , SOC_GPIO_PIN_TWR2_SCL);
+      Wire.beginTransmission(SSD1306_OLED_I2C_ADDR);
+      if (Wire.endTransmission() == 0) {
+        controller.setBand(Band::VHF);
+      }
+      Wire.beginTransmission(SH1106_OLED_I2C_ADDR_ALT);
+      if (Wire.endTransmission() == 0) {
+        controller.setBand(Band::UHF);
+      }
+#endif
 #endif /* USE_SA8X8 */
     } else {
       axp_2xxx.setDC3Voltage  (3400); // V2.0 - SA868, NeoPixel
@@ -1472,10 +1492,12 @@ static void ESP32_setup()
     }
     pinMode(SOC_GPIO_PIN_HELTRK_VEXT_EN,   OUTPUT);
 
-    digitalWrite(SOC_GPIO_PIN_HELTRK_GNSS_RST,  LOW);
-    pinMode(SOC_GPIO_PIN_HELTRK_GNSS_RST,       OUTPUT);
-    delay(100);
-    digitalWrite(SOC_GPIO_PIN_HELTRK_GNSS_RST,  HIGH);
+    if (rtc_get_reset_reason(0) == POWERON_RESET) {
+      digitalWrite(SOC_GPIO_PIN_HELTRK_GNSS_RST, LOW);
+      pinMode(SOC_GPIO_PIN_HELTRK_GNSS_RST,      OUTPUT);
+      delay(100);
+      digitalWrite(SOC_GPIO_PIN_HELTRK_GNSS_RST, HIGH);
+    }
 
     pinMode(SOC_GPIO_PIN_HELTRK_ADC_EN,    INPUT_PULLUP);
 
@@ -2740,6 +2762,10 @@ static void ESP32_EEPROM_extension(int cmd)
               if (vfreq.success()) {
                 Voice_Frequency = vfreq.as<unsigned int>();
               }
+              JsonVariant sql = root["sql"];
+              if (sql.success()) {
+                SA8X8_SQL = sql.as<byte>();
+              }
 #endif /* USE_SA8X8 */
 #if defined(ENABLE_REMOTE_ID)
                 JsonVariant opid = root["uas_opid"];
@@ -2994,11 +3020,21 @@ static byte ESP32_Display_setup()
       }
     } else if (hw_info.model == SOFTRF_MODEL_HAM) {
       Wire.begin(SOC_GPIO_PIN_TWR2_SDA, SOC_GPIO_PIN_TWR2_SCL);
+
       Wire.beginTransmission(SSD1306_OLED_I2C_ADDR);
       has_oled = (Wire.endTransmission() == 0);
       if (has_oled) {
         u8x8 = &u8x8_1_3;
         rval = DISPLAY_OLED_1_3;
+      } else {
+        /* T-TWR V2.1 UHF */
+        Wire.beginTransmission(SH1106_OLED_I2C_ADDR_ALT);
+        has_oled = (Wire.endTransmission() == 0);
+        if (has_oled) {
+          u8x8 = &u8x8_1_3;
+          u8x8->setI2CAddress(SH1106_OLED_I2C_ADDR_ALT);
+          rval = DISPLAY_OLED_1_3;
+        }
       }
     } else if (GPIO_21_22_are_busy) {
       if (hw_info.model == SOFTRF_MODEL_PRIME_MK2 && hw_info.revision >= 8) {
