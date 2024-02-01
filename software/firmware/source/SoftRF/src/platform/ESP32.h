@@ -56,7 +56,13 @@
 #define SerialOutput            Serial0
 #endif /* ARDUINO_USB_CDC_ON_BOOT */
 #elif defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32C6)
+#if ARDUINO_USB_CDC_ON_BOOT
+#define UATSerial               Serial0
+#undef  SerialOutput
+#define SerialOutput            Serial0
+#else
 #define UATSerial               Serial
+#endif /* ARDUINO_USB_CDC_ON_BOOT */
 #else
 #error "This ESP32 family build variant is not supported!"
 #endif /* CONFIG_IDF_TARGET_ESP32 */
@@ -82,8 +88,11 @@
  */
 #if !defined(CONFIG_IDF_TARGET_ESP32C6)
 #define USE_NEOPIXELBUS_LIBRARY
+#else
+#define EXCLUDE_LED_RING
 #endif /* CONFIG_IDF_TARGET_ESP32C6 */
 
+#if !defined(EXCLUDE_LED_RING)
 #if defined(USE_NEOPIXELBUS_LIBRARY)
 #include <NeoPixelBus.h>
 
@@ -107,6 +116,7 @@ extern NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip;
 
 extern Adafruit_NeoPixel strip;
 #endif /* USE_NEOPIXELBUS_LIBRARY */
+#endif /* EXCLUDE_LED_RING */
 
 #define LEDC_CHANNEL_BUZZER     0
 #define BACKLIGHT_CHANNEL       ((uint8_t)1)
@@ -157,7 +167,9 @@ extern Adafruit_NeoPixel strip;
                                 SOC_UNUSED_PIN :                         \
                                 (esp32_board == ESP32_DEVKIT    ? 13 :   \
                                 (esp32_board == ESP32_C3_DEVKIT ?        \
-                                SOC_GPIO_PIN_C3_BUZZER : SOC_UNUSED_PIN)))
+                                SOC_GPIO_PIN_C3_BUZZER :                 \
+                                (esp32_board == ESP32_C6_DEVKIT ?        \
+                                SOC_GPIO_PIN_C6_BUZZER : SOC_UNUSED_PIN))))
 
 /* SPI (does match Heltec & TTGO LoRa32 pins mapping) */
 #define SOC_GPIO_PIN_MOSI       27
@@ -224,6 +236,7 @@ extern Adafruit_NeoPixel strip;
 #include "iomap/LilyGO_TTWR.h"
 #include "iomap/Heltec_Tracker.h"
 #include "iomap/WT0132C6.h"
+#include "iomap/LilyGO_T3C6.h"
 
 extern WebServer server;
 
@@ -251,6 +264,7 @@ enum esp32_board_id {
   ESP32_LILYGO_T_TWR_V2_0,
   ESP32_LILYGO_T_TWR_V2_1,
   ESP32_HELTEC_TRACKER,
+  ESP32_LILYGO_T3C6,
 };
 
 /* https://github.com/espressif/usb-pids/blob/main/allocated-pids.txt#L313 */
@@ -280,6 +294,10 @@ struct rst_info {
 /* ST / SGS/Thomson / Numonyx / XMC(later acquired by Micron) */
 #define ST_ID                   0x20
 #define XMC_XM25QH32B           0x4016
+
+/* Zbit Semiconductor, Inc. */
+#define ZBIT_ID                 0x5E
+#define ZBIT_ZB25VQ32B          0x4016
 
 #define MakeFlashId(v,d)        ((v << 16) | d)
 
@@ -379,7 +397,9 @@ extern const USB_Device_List_t supported_USB_devices[];
 #undef USE_OLED
 #undef USE_TFT
 #if defined(CONFIG_IDF_TARGET_ESP32C6)
-#define EXCLUDE_LED_RING
+#define EXCLUDE_EGM96
+#define EXCLUDE_TEST_MODE
+#undef USE_NMEALIB
 #endif /* C6 */
 #endif /* CONFIG_IDF_TARGET_ESP32SX | C3 | C6 */
 #else
