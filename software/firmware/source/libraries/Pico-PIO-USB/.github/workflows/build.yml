@@ -54,7 +54,7 @@ jobs:
         cmake ..
         make
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: example_binaries
         path: |
