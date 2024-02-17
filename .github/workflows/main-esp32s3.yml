@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  BOARD: 'esp32:esp32:esp32s3:PartitionScheme=default_8MB,CPUFreq=80,PSRAM=enabled,FlashMode=qio,FlashSize=8M,DebugLevel=none,CDCOnBoot=cdc,USBMode=hwcdc'
+  ESP32-S3: 'esp32:esp32:esp32s3:PartitionScheme=default_8MB,CPUFreq=80,PSRAM=enabled,FlashMode=qio,FlashSize=8M,DebugLevel=none,CDCOnBoot=cdc,USBMode=hwcdc'
 
 jobs:
   build:
@@ -30,6 +30,7 @@ jobs:
           sudo apt-get install python3-full
 
           pip3 install adafruit-nrfutil --user
+          
       - name: Install esp32 boards
         shell: bash
         run: |
@@ -37,15 +38,15 @@ jobs:
             arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
             arduino-cli core update-index
             arduino-cli core install esp32:esp32
-      - name: Build SoftRF for platform $BOARD
+      - name: Build SoftRF for ESP32-S3
         run: |
-          echo 'Building board $BOARD'
+          echo 'Building SoftRF for ESP32-S3'
           echo "#define CURRENT_DATE \"$(date +"%Y%m%d")\"" > $GITHUB_WORKSPACE/software/firmware/source/SoftRF/current_date.h
           cd $GITHUB_WORKSPACE
-          arduino-cli compile -e -b "$BOARD" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          arduino-cli compile -e -b "$EPS32-S3" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
       - uses: actions/upload-artifact@v4
         with:
-          name: SoftRF-ESP32S3
+          name: SoftRF-ESP32-S3
           path: |
             software/firmware/source/SoftRF/build/esp32.esp32.esp32s3/
           if-no-files-found: error
