@@ -1,4 +1,4 @@
-name: build-new-style
+name: build-esp32s3
 
 on:
   push:
