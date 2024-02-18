@@ -55,7 +55,7 @@ jobs:
 
           cd $GITHUB_WORKSPACE
           arduino-cli compile -e -b "$NRF52" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/adafruit.nrf52.pca10056/
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/adafruit.nrf52.pca10056"
           ~/uf2/utils/uf2conv.py SoftRF.ino.hex -c -f 0xADA52840 -o SoftRF.uf2
 
           cd $GITHUB_WORKSPACE
@@ -63,7 +63,7 @@ jobs:
 
           cd $GITHUB_WORKSPACE
           arduino-cli compile -e -b "$ESP32S3" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/esp32.esp32.esp32s3/
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/esp32.esp32.esp32s3"
           ~/uf2/utils/uf2conv.py SoftRF.ino.bin -b 0x00 -c -f 0xc47e5767 -o SoftRF.uf2
 
       - uses: actions/upload-artifact@v4
