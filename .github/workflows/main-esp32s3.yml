@@ -1,4 +1,4 @@
-name: build-esp32s3
+name: build-v2
 
 on:
   push:
@@ -15,13 +15,15 @@ env:
   ESP32S3: 'esp32:esp32:esp32s3:PartitionScheme=default_8MB,CPUFreq=80,PSRAM=enabled,FlashMode=qio,FlashSize=8M,DebugLevel=none,CDCOnBoot=cdc,USBMode=hwcdc'
 
 jobs:
-  build:
+  build-v2:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Arduino and Python
+      - name: Install uf2, Arduino and Python
         shell: bash
         run: |
+          git clone https://github.com/microsoft/uf2 ~/uf2
+
           mkdir -p ~/.local/bin
           curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh -s nightly-latest
 
@@ -50,10 +52,20 @@ jobs:
       - name: Build SoftRF
         run: |
           echo "#define CURRENT_DATE \"$(date +"%Y%m%d")\"" > $GITHUB_WORKSPACE/software/firmware/source/SoftRF/current_date.h
+
           cd $GITHUB_WORKSPACE
           arduino-cli compile -e -b "$NRF52" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/adafruit.nrf52.pca10056
+          ~/uf2/utils/uf2conv.py SoftRF.ino.hex -c -f 0xADA52840 -o SoftRF.uf2
+
+          cd $GITHUB_WORKSPACE
           arduino-cli compile -e -b "$ESP32" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+
+          cd $GITHUB_WORKSPACE
           arduino-cli compile -e -b "$ESP32S3" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/esp32.esp32.esp32s3
+          ~/uf2/utils/uf2conv.py SoftRF.ino.bin -b 0x00 -c -f 0xc47e5767 -o SoftRF.uf2
+
       - uses: actions/upload-artifact@v4
         with:
           name: SoftRF
