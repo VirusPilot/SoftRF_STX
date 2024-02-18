@@ -31,13 +31,15 @@ jobs:
 
           pip3 install adafruit-nrfutil --user
           
-      - name: Install esp32 boards
+      - name: Install boards
         shell: bash
         run: |
             arduino-cli config init
             arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+            arduino-cli config add board_manager.additional_urls https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
             arduino-cli core update-index
             arduino-cli core install esp32:esp32
+            arduino-cli core install adafruit:nrf52
       - name: Build SoftRF for ESP32S3
         run: |
           echo 'Building SoftRF for ESP32S3'
