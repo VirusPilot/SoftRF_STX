@@ -43,7 +43,7 @@ jobs:
           echo 'Building SoftRF for ESP32S3'
           echo "#define CURRENT_DATE \"$(date +"%Y%m%d")\"" > $GITHUB_WORKSPACE/software/firmware/source/SoftRF/current_date.h
           cd $GITHUB_WORKSPACE
-          arduino-cli compile -e -b "$EPS32S3" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          arduino-cli compile -e -b "$ESP32S3" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
       - uses: actions/upload-artifact@v4
         with:
           name: SoftRF-ESP32S3
