@@ -11,7 +11,8 @@ on:
 
 env:
   NRF52: 'adafruit:nrf52:pca10056'
-  ESP32: 'esp32:esp32:esp32:PartitionScheme=min_spiffs,CPUFreq=80,PSRAM=enabled,FlashFreq=80,FlashMode=dio,FlashSize=4M,DebugLevel=none'
+#  ESP32: 'esp32:esp32:esp32:PartitionScheme=min_spiffs,CPUFreq=80,PSRAM=enabled,FlashFreq=80,FlashMode=dio,FlashSize=4M,DebugLevel=none'
+  ESP32: 'esp32:esp32:esp32:PartitionScheme=huge_app,CPUFreq=80,PSRAM=enabled,FlashFreq=80,FlashMode=dio,FlashSize=4M,DebugLevel=none'
   ESP32S3: 'esp32:esp32:esp32s3:PartitionScheme=default_8MB,CPUFreq=80,PSRAM=enabled,FlashMode=qio,FlashSize=8M,DebugLevel=none,CDCOnBoot=cdc,USBMode=hwcdc'
 
 jobs:
