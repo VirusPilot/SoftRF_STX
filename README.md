@@ -10,18 +10,18 @@
 Beta binary packages are available for the following platforms and can be downloaded as part of so-called Artifacts located at https://github.com/VirusPilot/SoftRF/actions under the latest workflow
 - **T-Beam**, update via Chrome, using https://espressif.github.io/esp-launchpad/ followed by a manual **RESET**
 ![image](https://github.com/VirusPilot/SoftRF/assets/43483458/09dfe5c7-ccab-4f9e-8c8e-8af93e060558)
-- **T-Beam** (`SoftRF-esp32.ino.bin`), update via SoftRF WiFi Firmware update page: http://192.168.4.1/firmware
+- **T-Beam** (`SoftRF.ino.bin`), update via SoftRF WiFi Firmware update page: http://192.168.4.1/firmware
   - if you are updating an unmodified T-Beam: update via http://192.168.1.1/firmware
   - please note that the upload will take up to 30s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
-- **T-Beam S3 Supreme** (`SoftRF-esp32s3.uf2`), update via UF2 method
+- **T-Beam S3 Supreme** (`SoftRF.ino.uf2`), update via UF2 method
   - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
-  - upload the `SoftRF-esp32s3.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
-- **T-Beam S3 Supreme** (`SoftRF-esp32s3.ino.bin`), update via SoftRF WiFi Firmware update page: http://192.168.4.1/firmware
+  - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
+- **T-Beam S3 Supreme** (`SoftRF.ino.bin`), update via SoftRF WiFi Firmware update page: http://192.168.4.1/firmware
   - if you are updating an unmodified T-Beam S3 Supreme: update via http://192.168.1.1/firmware
   - please note that the upload will take up to 30s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
-- **T-Echo** (`SoftRF-nrf52.uf2`), update only via UF2 method (aka. USB Mass Storage method):
+- **T-Echo** (`SoftRF.ino.uf2`), update only via UF2 method (aka. USB Mass Storage method):
   - connect your T-Echo and put it in UF2 upload mode (double-click **RESET**)
-  - upload the `SoftRF-nrf52.uf2` file to the NRF52BOOT or TECHBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
+  - upload the `SoftRF.ino.uf2` file to the NRF52BOOT or TECHBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
 
 The required beta binaries can be downloaded as part of so-called Artifacts `SoftRF.zip` @ https://github.com/VirusPilot/SoftRF/actions under each workflow.
 
