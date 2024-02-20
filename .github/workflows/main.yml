@@ -410,7 +410,7 @@ jobs:
           if [[ "$BOARD" =~ "rp2040:rp2040:"       ]]; then
             arduino --verify                 --board $BOARD $PWD/software/firmware/source/SkyWatch/SkyWatch.ino ;
           fi ;
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: SoftRF
           path: ./build_*/*.bin
