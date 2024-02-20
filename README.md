@@ -37,7 +37,7 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - Select Tools -> Flash Frequency -> 80MHz
 - Select Tools -> Flash Mode -> DIO
 - Select Tools -> Flash Size -> 4MB
-- Select Tools -> Partition Scheme -> Minimal SPIFFS
+- Select Tools -> Partition Scheme -> Minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)
 - Select Tools -> PSRAM -> Enabled
 - Select Tools -> Upload Speed -> 921600
 - Select Tools -> open serial monitor @ 115200 baud
@@ -51,7 +51,7 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - Select Tools -> Flash Frequency -> 80MHz
 - Select Tools -> Flash Mode -> QIO
 - Select Tools -> Flash Size -> 8MB
-- Select Tools -> Partition Scheme -> 8MB with spiffs (copy https://github.com/lyusupov/tinyuf2/blob/master/ports/espressif/partitions-8MB-SPIFFS.csv to your local Arduino partitionss path, e.g. `..packages/esp32/hardware/esp32/2.0.13/tools/partitions` and replace `default_8MB.csv`)
+- Select Tools -> Partition Scheme -> 8M with spiffs (3MB APP/1.5MB SPIFFS)
 - Select Tools -> PSRAM -> QSPI PSRAM
 - Select Tools -> Upload Speed -> 921600
 - Select Tools -> Upload Mode -> UART0 / Hardware CDC
