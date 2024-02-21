@@ -70,7 +70,7 @@ jobs:
           rm -f *.map
 
           cd $GITHUB_WORKSPACE
-          arduino-cli compile -v -e -b "$ESP32S3" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          arduino-cli compile -e -b "$ESP32S3" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
           cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/esp32.esp32.esp32s3"
           ~/uf2/utils/uf2conv.py SoftRF.ino.bin -b 0x00 -c -f 0xc47e5767 -o SoftRF.ino.uf2
           rm -f *.elf
