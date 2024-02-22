@@ -13,13 +13,13 @@ Beta binary packages are available for the following platforms and can be downlo
 ![image](https://github.com/VirusPilot/SoftRF/assets/43483458/09dfe5c7-ccab-4f9e-8c8e-8af93e060558)
 - **T-Beam** (`SoftRF.zip/esp32.esp32.esp32/SoftRF.ino.bin`), update via SoftRF WiFi Firmware update page http://192.168.4.1/firmware (WiFi password: 12345678)
   - if you are updating an unmodified T-Beam: update via http://192.168.1.1/firmware
-  - please note that the upload will take up to 30s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
+  - please note that the upload will take up to 60s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
 - **T-Beam S3 Supreme** (`SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.uf2`), update via UF2 method
   - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
   - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 - **T-Beam S3 Supreme** (`SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.bin`), update via SoftRF WiFi Firmware update page http://192.168.4.1/firmware (WiFi password: 12345678)
   - if you are updating an unmodified T-Beam S3 Supreme: update via http://192.168.1.1/firmware
-  - please note that the upload will take up to 30s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
+  - please note that the upload will take up to 60s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
 - **T-Echo** (`SoftRF.zip/adafruit.nrf52.pca10056/SoftRF.ino.uf2`), update only via UF2 method (aka. USB Mass Storage method):
   - connect your T-Echo and put it in UF2 upload mode (double-click **RESET**)
   - upload the `SoftRF.ino.uf2` file to the NRF52BOOT or TECHBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
