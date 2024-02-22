@@ -7,22 +7,19 @@
   - if **not** added, the SoftRF factory ID remains (`AircraftID: 0`) and ADDR_TYPE is set according to the selected protocol (this is recommended for all airplanes without a transponder)
 
 ## Binaries (unstable beta versions) available for testing
-Beta binary packages are available for the following platforms and can be downloaded as part of `SoftRF.zip` from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download `SoftRF`)
+Beta binary packages are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact")
 
-- **T-Beam**, update via Chrome, using https://espressif.github.io/esp-launchpad/ followed by a manual **RESET**
-![image](https://github.com/VirusPilot/SoftRF/assets/43483458/09dfe5c7-ccab-4f9e-8c8e-8af93e060558)
-- **T-Beam** (`SoftRF.zip/esp32.esp32.esp32/SoftRF.ino.bin`), update via SoftRF WiFi Firmware update page http://192.168.4.1/firmware (WiFi password: 12345678)
+- **T-Beam and T-Beam S3 Supreme WiFi update method:** update via SoftRF WiFi Firmware update page http://192.168.4.1/firmware (WiFi password: 12345678)
+  - T-Beam Firmware: `SoftRF.zip/esp32.esp32.esp32/SoftRF.ino.bin`
+  - T-Beam S3 Supreme Firmware: `SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.bin`
   - if you are updating an unmodified T-Beam: update via http://192.168.1.1/firmware
   - please note that the upload will take up to 60s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
-- **T-Beam S3 Supreme** (`SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.uf2`), update via UF2 method
+- **T-Beam S3 Supreme UF2 update method** (aka. USB Mass Storage method):
   - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
-  - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
-- **T-Beam S3 Supreme** (`SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.bin`), update via SoftRF WiFi Firmware update page http://192.168.4.1/firmware (WiFi password: 12345678)
-  - if you are updating an unmodified T-Beam S3 Supreme: update via http://192.168.1.1/firmware
-  - please note that the upload will take up to 60s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
-- **T-Echo** (`SoftRF.zip/adafruit.nrf52.pca10056/SoftRF.ino.uf2`), update only via UF2 method (aka. USB Mass Storage method):
-  - connect your T-Echo and put it in UF2 upload mode (double-click **RESET**)
-  - upload the `SoftRF.ino.uf2` file to the NRF52BOOT or TECHBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
+  - upload the `SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
+- **T-Echo UF2 update method** (aka. USB Mass Storage method):
+  - connect your T-Echo to your PC and put it in UF2 upload mode (double-click **RESET**)
+  - upload the `SoftRF.zip/adafruit.nrf52.pca10056/SoftRF.ino.uf2` file to the NRF52BOOT or TECHBOOT drive that shows up on your PC, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
 
 **Please be aware that flashing these unstable beta binaries on your SoftRF device may render it unusable**
 
@@ -113,7 +110,6 @@ you first need to apply the following GPS reset:
 
 ## Issues:
 - on the **T-Beam S3 Supreme the USB CDC mode** still seems to be unstable, therefore a dirty patch is applied so that SoftRF will compile for this target; the only limitation is that SoftRF will only boot if the serial connection is opened up by an external device (which is the case when connected to Stratux)
-- it appears that on some SX1262 based T-Beams (not the T-Beam S3 Supreme) the modified GPS configuration sometimes reverts to the default GNSS settings, e.g. GLONASS is enabled instead of BEIDOU.
 
 ## Recommendations for T-Beam and T-Beam S3 Supreme:
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.4.1/settings
