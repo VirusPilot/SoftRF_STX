@@ -31,7 +31,7 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - **T-Beam and T-Beam S3 Supreme**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
 - **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
-### Arduino IDE settings for T-Beam (up to v1.1)
+### Arduino IDE settings for T-Beam
 - Select Tools -> Board -> ESP32 Dev Module
 - Select Tools -> CPU Frequency -> 80MHz
 - Select Tools -> Flash Frequency -> 80MHz
