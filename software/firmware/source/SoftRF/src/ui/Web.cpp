@@ -49,11 +49,16 @@ void Web_fini()     {}
 
 static uint32_t prev_rx_pkt_cnt = 0;
 
-static const char Logo[] PROGMEM = {
+#if !defined(ARDUINO_ARCH_RENESAS)
 #include "../Logo.h"
-    } ;
+#endif /* ARDUINO_ARCH_RENESAS */
 
+#if !defined(EXCLUDE_OTA)
 #include "jquery_min_js.h"
+#endif /* EXCLUDE_OTA */
+
+#include <WiFiWebServer.h>
+WiFiWebServer server ( 80 );
 
 byte getVal(char c)
 {
@@ -807,7 +812,7 @@ void handleRoot() {
 #endif /* ENABLE_RECORDER */
 
   /* SoC specific part 1 */
-  if (SoC->id != SOC_RP2040) {
+  if (SoC->id != SOC_RP2040 && SoC->id != SOC_RA4M1) {
     snprintf_P ( offset, size, PSTR("\
     <td align=right><input type=button onClick=\"location.href='/firmware'\" value='Firmware update'></td>"));
     len = strlen(offset);
@@ -1178,6 +1183,10 @@ void Web_setup()
   server.on ( "/inline", []() {
     server.send ( 200, "text/plain", "this works as well" );
   } );
+
+  server.onNotFound ( handleNotFound );
+
+#if !defined(EXCLUDE_OTA)
   server.on("/firmware", HTTP_GET, [](){
     SoC->swSer_enableRx(false);
     server.sendHeader(String(F("Connection")), String(F("close")));
@@ -1240,7 +1249,6 @@ $('form').submit(function(e){\
     );
   SoC->swSer_enableRx(true);
   });
-  server.onNotFound ( handleNotFound );
 
   server.on("/update", HTTP_POST, [](){
     SoC->swSer_enableRx(false);
@@ -1277,15 +1285,19 @@ $('form').submit(function(e){\
     }
     yield();
   });
+#endif /* EXCLUDE_OTA */
 
 /* FLASH memory usage optimization */
-#if !defined(ARDUINO_ARCH_RP2040) && !defined(CONFIG_IDF_TARGET_ESP32C6)
+#if !defined(ARDUINO_ARCH_RP2040)       && \
+    !defined(CONFIG_IDF_TARGET_ESP32C6) && \
+    !defined(ARDUINO_ARCH_RENESAS)
+
   server.on ( "/logo.png", []() {
     server.send_P ( 200, "image/png", Logo, sizeof(Logo) );
   } );
-#endif /* ARDUINO_ARCH_RP2040 CONFIG_IDF_TARGET_ESP32C6 */
+#endif /* ARDUINO_ARCH_RP2040 CONFIG_IDF_TARGET_ESP32C6 ARDUINO_ARCH_RENESAS */
 
-#if !defined(ARDUINO_ARCH_RP2040)
+#if !defined(EXCLUDE_OTA)
   server.on ( "/jquery.min.js", []() {
 
     PGM_P content = jquery_min_js_gz;
@@ -1304,7 +1316,7 @@ $('form').submit(function(e){\
     } while (bytes_left > 0) ;
 
   } );
-#endif /* ARDUINO_ARCH_RP2040 */
+#endif /* EXCLUDE_OTA */
 
 #if defined(ENABLE_RECORDER)
   server.on("/flights", HTTP_GET, Handle_Flight_Download);
