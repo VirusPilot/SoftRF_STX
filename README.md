@@ -15,6 +15,7 @@ Beta binary packages are available for the following platforms and can be downlo
 - if you are updating an **unmodified SoftRF T-Beam**: update via http://192.168.1.1/firmware (WiFi password: 12345678)
 - if you are updating a **modified VirusPilot SoftRF T-Beam**: update page via http://192.168.4.1/firmware (WiFi password: 12345678)
 - please note that the upload will take up to 60s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
+- this update method seems to not work on a **T-Beam S3 core module**, no idea why
 
 **T-Beam S3 Supreme - UF2 update method** (aka. USB Mass Storage method):
 - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
