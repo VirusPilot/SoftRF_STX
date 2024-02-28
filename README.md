@@ -10,15 +10,15 @@
 Beta binary packages are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
 
 **T-Beam and T-Beam S3 Supreme - WiFi update method:**
+- this update method **is not working on a T-Beam S3 core module**, no idea why
 - T-Beam Firmware: `SoftRF.zip/esp32.esp32.esp32/SoftRF.ino.bin`
 - T-Beam S3 Supreme Firmware: `SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.bin`
 - if you are updating an **unmodified SoftRF T-Beam**: update via http://192.168.1.1/firmware (WiFi password: 12345678)
 - if you are updating a **modified VirusPilot SoftRF T-Beam**: update page via http://192.168.4.1/firmware (WiFi password: 12345678)
 - please note that the upload will take up to 60s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
-- this update method seems to not work on a **T-Beam S3 core module**, no idea why
 
 **T-Beam S3 Supreme - UF2 update method** (aka. USB Mass Storage method):
-- connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
+- connect your T-Beam S3 Supreme to your PC and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
 - upload the `SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 
 **T-Echo - UF2 update method** (aka. USB Mass Storage method):
