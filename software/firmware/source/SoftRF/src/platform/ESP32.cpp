@@ -4085,8 +4085,9 @@ void handleMainEvent(AceButton* button, uint8_t eventType,
   switch (eventType) {
 #if defined(USE_SA8X8)
     case AceButton::kEventPressed:
-      if (button == &button_ptt &&
-          Voice_Frequency > 0   &&
+      if (button     == &button_ptt &&
+          hw_info.rf == RF_IC_SA8X8 &&
+          Voice_Frequency > 0       &&
           (settings->power_save & POWER_SAVE_NORECEIVE)) {
         bool playback = false;
 #if !defined(EXCLUDE_VOICE_MESSAGE)
@@ -4138,8 +4139,9 @@ void handleMainEvent(AceButton* button, uint8_t eventType,
       }
 #endif /* USE_OLED */
 #if defined(USE_SA8X8)
-      if (button == &button_ptt &&
-          Voice_Frequency > 0   &&
+      if (button     == &button_ptt &&
+          hw_info.rf == RF_IC_SA8X8 &&
+          Voice_Frequency > 0       &&
           (settings->power_save & POWER_SAVE_NORECEIVE)) {
         controller.receive();
         sa868_Tx_LED_state(false);
