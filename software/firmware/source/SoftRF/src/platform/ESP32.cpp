@@ -1138,8 +1138,8 @@ static void ESP32_setup()
                                       SOC_GPIO_PIN_TWR2_SDA,
                                       SOC_GPIO_PIN_TWR2_SCL);
     if (has_axp2101) {
-      esp32_board      = ESP32_LILYGO_T_TWR_V2_0;
-      hw_info.revision = 20;
+      esp32_board      = ESP32_LILYGO_T_TWR2;
+      hw_info.revision = 0;
       hw_info.pmu      = PMU_AXP2101;
 
       // Set the minimum common working voltage of the PMU VBUS input,
@@ -1221,7 +1221,7 @@ static void ESP32_setup()
                        SOC_GPIO_PIN_TWR2_CONS_TX);
 #endif /* ARDUINO_USB_CDC_ON_BOOT */
 
-    if (esp32_board == ESP32_LILYGO_T_TWR_V2_0) {
+    if (esp32_board == ESP32_LILYGO_T_TWR2) {
       int uSD_SS_pin = SOC_GPIO_PIN_TWR2_SD_SS;
 
       /* uSD-SPI init */
@@ -1388,7 +1388,7 @@ static void ESP32_setup()
     pid = (esp32_board == ESP32_TTGO_T_BEAM_SUPREME) ? SOFTRF_USB_PID_PRIME_MK3  :
           (esp32_board == ESP32_S2_T8_V1_1         ) ? SOFTRF_USB_PID_WEBTOP     :
           (esp32_board == ESP32_S3_DEVKIT          ) ? SOFTRF_USB_PID_STANDALONE :
-          (esp32_board == ESP32_LILYGO_T_TWR_V2_0  ) ? SOFTRF_USB_PID_HAM        :
+          (esp32_board == ESP32_LILYGO_T_TWR2      ) ? SOFTRF_USB_PID_HAM        :
           (esp32_board == ESP32_HELTEC_TRACKER     ) ? SOFTRF_USB_PID_MIDI       :
           USB_PID /* 0x1001 */ ;
 
@@ -1400,7 +1400,7 @@ static void ESP32_setup()
     USB.VID(USB_VID); // USB_ESPRESSIF_VID = 0x303A
     USB.PID(pid);
     USB.productName(esp32_board == ESP32_TTGO_T_BEAM_SUPREME ? ESP32S3_Model_Prime3 :
-                    esp32_board == ESP32_LILYGO_T_TWR_V2_0   ? ESP32S3_Model_Ham    :
+                    esp32_board == ESP32_LILYGO_T_TWR2       ? ESP32S3_Model_Ham    :
                     esp32_board == ESP32_HELTEC_TRACKER      ? ESP32S3_Model_Midi   :
                     ESP32SX_Model_Stand);
     USB.firmwareVersion(ESP32SX_Device_Version);
@@ -1475,7 +1475,7 @@ static void ESP32_setup()
       }
     }
 #endif /* EXCLUDE_IMU */
-  } else if (esp32_board == ESP32_LILYGO_T_TWR_V2_0) {
+  } else if (esp32_board == ESP32_LILYGO_T_TWR2) {
 
     /* turn SA868 digital power off to make sure that SQL is inactive */
     digitalWrite(SOC_GPIO_PIN_TWR2_RADIO_PD, LOW);
@@ -1507,8 +1507,7 @@ static void ESP32_setup()
 
     if (probe_1 == LOW && probe_2 == HIGH) {
 #endif
-      esp32_board = ESP32_LILYGO_T_TWR_V2_1;
-      hw_info.revision = 21;
+      hw_info.revision = 1;
 
       axp_2xxx.setBLDO2Voltage(3300); // V2.1 - SA868
       axp_2xxx.enableBLDO2();
@@ -1669,9 +1668,8 @@ static void ESP32_post_init()
     Serial.flush();
   }
 
-  if (hw_info.model == SOFTRF_MODEL_PRIME_MK3  ||
-      esp32_board   == ESP32_LILYGO_T_TWR_V2_0 ||
-      esp32_board   == ESP32_LILYGO_T_TWR_V2_1)
+  if (esp32_board == ESP32_TTGO_T_BEAM_SUPREME ||
+      esp32_board == ESP32_LILYGO_T_TWR2)
   {
     Serial.println();
 
@@ -1706,7 +1704,7 @@ static void ESP32_post_init()
   }
 
 #if !defined(EXCLUDE_VOICE_MESSAGE)
-  if (esp32_board == ESP32_LILYGO_T_TWR_V2_1 && uSD_is_attached)
+  if (esp32_board == ESP32_LILYGO_T_TWR2 && hw_info.revision == 1 && uSD_is_attached)
   {
     char filename[MAX_FILENAME_LEN];
     strcpy(filename, WAV_FILE_PREFIX);
@@ -2227,8 +2225,7 @@ static void ESP32_fini(int reason)
                                  ESP_EXT1_WAKEUP_ALL_LOW);
 #endif /* CONFIG_IDF_TARGET_ESP32C3 */
 
-  } else if (esp32_board == ESP32_LILYGO_T_TWR_V2_0 ||
-             esp32_board == ESP32_LILYGO_T_TWR_V2_1) {
+  } else if (esp32_board == ESP32_LILYGO_T_TWR2) {
 
 #if defined(CONFIG_IDF_TARGET_ESP32S3)
 #if defined(USE_NEOPIXELBUS_LIBRARY)
@@ -2956,8 +2953,7 @@ static void ESP32_SPI_begin()
       SPI.begin(SOC_GPIO_PIN_C3_SCK,  SOC_GPIO_PIN_C3_MISO,
                 SOC_GPIO_PIN_C3_MOSI, SOC_GPIO_PIN_C3_SS);
       break;
-    case ESP32_LILYGO_T_TWR_V2_0:
-    case ESP32_LILYGO_T_TWR_V2_1:
+    case ESP32_LILYGO_T_TWR2:
       SPI.begin(SOC_GPIO_PIN_TWR2_SCK,  SOC_GPIO_PIN_TWR2_MISO,
                 SOC_GPIO_PIN_TWR2_MOSI, SOC_GPIO_PIN_TWR2_SS);
       break;
@@ -3030,7 +3026,7 @@ static void ESP32_swSer_begin(unsigned long baud)
       Serial.println(F("INFO: ESP32-C3 DevKit is detected."));
       Serial_GNSS_In.begin(baud, SERIAL_IN_BITS,
                            SOC_GPIO_PIN_C3_GNSS_RX, SOC_GPIO_PIN_C3_GNSS_TX);
-    } else if (esp32_board == ESP32_LILYGO_T_TWR_V2_0) {
+    } else if (esp32_board == ESP32_LILYGO_T_TWR2 && hw_info.revision == 0) {
       Serial.println(F("INFO: LilyGO T-TWR rev. 2.0 is detected."));
 #if defined(USE_SA8X8)
       if (ESP32_R22_workaround) {
@@ -3039,7 +3035,7 @@ static void ESP32_swSer_begin(unsigned long baud)
 #endif /* USE_SA8X8 */
       Serial_GNSS_In.begin(baud, SERIAL_IN_BITS,
                            SOC_GPIO_PIN_TWR2_GNSS_RX, SOC_GPIO_PIN_TWR2_GNSS_TX);
-    } else if (esp32_board == ESP32_LILYGO_T_TWR_V2_1) {
+    } else if (esp32_board == ESP32_LILYGO_T_TWR2 && hw_info.revision == 1) {
       Serial.print(F("INFO: LilyGO T-TWR rev. 2.1 "));
 #if defined(USE_SA8X8)
       Serial.print(controller.getBand() == Band::VHF ? "VHF " : "UHF ");
@@ -3146,7 +3142,7 @@ static byte ESP32_Display_setup()
         u8x8 = &u8x8_1_3;
         rval = DISPLAY_OLED_1_3;
       }
-    } else if (hw_info.model == SOFTRF_MODEL_HAM) {
+    } else if (esp32_board == ESP32_LILYGO_T_TWR2) {
       Wire.begin(SOC_GPIO_PIN_TWR2_SDA, SOC_GPIO_PIN_TWR2_SCL);
 
       Wire.beginTransmission(SSD1306_OLED_I2C_ADDR);
@@ -3791,7 +3787,7 @@ static void ESP32_Battery_setup()
     calibrate_voltage((adc1_channel_t) ADC1_GPIO9_CHANNEL);
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
     /* use this procedure on T-TWR Plus (has PMU) to calibrate audio ADC */
-    if (esp32_board == ESP32_LILYGO_T_TWR_V2_0) {
+    if (esp32_board == ESP32_LILYGO_T_TWR2 && hw_info.revision == 0) {
 #if defined(USE_SA8X8)
       if (ESP32_R22_workaround) {
         calibrate_voltage((adc1_channel_t) ADC1_GPIO1_CHANNEL);
@@ -3800,7 +3796,7 @@ static void ESP32_Battery_setup()
       {
         calibrate_voltage((adc1_channel_t) ADC1_GPIO1_CHANNEL, ADC_ATTEN_DB_0);
       }
-    } else if (esp32_board == ESP32_LILYGO_T_TWR_V2_1) {
+    } else if (esp32_board == ESP32_LILYGO_T_TWR2 && hw_info.revision == 1) {
       calibrate_voltage((adc1_channel_t) ADC1_GPIO1_CHANNEL, ADC_ATTEN_DB_0);
     } else if (esp32_board == ESP32_HELTEC_TRACKER) {
       calibrate_voltage((adc1_channel_t) ADC1_GPIO1_CHANNEL);
@@ -3943,8 +3939,7 @@ static bool ESP32_Baro_setup()
 
     Wire.setPins(SOC_GPIO_PIN_C3_SDA, SOC_GPIO_PIN_C3_SCL);
 
-  } else if (esp32_board == ESP32_LILYGO_T_TWR_V2_0 ||
-             esp32_board == ESP32_LILYGO_T_TWR_V2_1) {
+  } else if (esp32_board == ESP32_LILYGO_T_TWR2) {
 
     Wire.setPins(SOC_GPIO_PIN_TWR2_SDA, SOC_GPIO_PIN_TWR2_SCL);
 
@@ -4014,8 +4009,7 @@ static bool ESP32_Baro_setup()
 static void ESP32_UATSerial_begin(unsigned long baud)
 {
 #if defined(USE_SA8X8)
-  if (esp32_board == ESP32_LILYGO_T_TWR_V2_0 ||
-      esp32_board == ESP32_LILYGO_T_TWR_V2_1) {
+  if (esp32_board == ESP32_LILYGO_T_TWR2) {
     SA8X8_Serial.begin(baud, SERIAL_IN_BITS,
                        SOC_GPIO_PIN_TWR2_RADIO_RX,
                        SOC_GPIO_PIN_TWR2_RADIO_TX);
@@ -4036,9 +4030,7 @@ static void ESP32_UATSerial_updateBaudRate(unsigned long baud)
 static void ESP32_UATModule_restart()
 {
 #if defined(USE_SA8X8)
-  if (esp32_board == ESP32_LILYGO_T_TWR_V2_0) {
-    /* TBD */
-  } else if (esp32_board == ESP32_LILYGO_T_TWR_V2_1) {
+  if (esp32_board == ESP32_LILYGO_T_TWR2) {
     /* TBD */
   }
   else
@@ -4194,13 +4186,13 @@ static void ESP32_Button_setup()
   if (( hw_info.model == SOFTRF_MODEL_PRIME_MK2 &&
        (hw_info.revision == 2 || hw_info.revision == 5)) ||
        esp32_board == ESP32_S2_T8_V1_1        ||
-       hw_info.model == SOFTRF_MODEL_HAM      ||
+       esp32_board == ESP32_LILYGO_T_TWR2     ||
        esp32_board == ESP32_HELTEC_TRACKER    ||
        esp32_board == ESP32_S3_DEVKIT) {
     button_pin = esp32_board == ESP32_S2_T8_V1_1 ? SOC_GPIO_PIN_T8_S2_BUTTON  :
                  esp32_board == ESP32_S3_DEVKIT  ? SOC_GPIO_PIN_S3_BUTTON     :
                  esp32_board == ESP32_HELTEC_TRACKER ? SOC_GPIO_PIN_S3_BUTTON :
-                 hw_info.model == SOFTRF_MODEL_HAM ?
+                 esp32_board == ESP32_LILYGO_T_TWR2 ?
                  SOC_GPIO_PIN_TWR2_ENC_BUTTON : SOC_GPIO_PIN_TBEAM_V05_BUTTON;
 
     // Button(s) uses external pull up resistor.
@@ -4220,7 +4212,7 @@ static void ESP32_Button_setup()
     PageButtonConfig->setLongPressDelay(2000);
 
 #if defined(USE_SA8X8)
-    if (hw_info.model == SOFTRF_MODEL_HAM) {
+    if (esp32_board == ESP32_LILYGO_T_TWR2) {
       int ptt_pin = SOC_GPIO_PIN_TWR2_BUTTON;
 
       pinMode(ptt_pin, INPUT_PULLUP);
@@ -4257,12 +4249,12 @@ static void ESP32_Button_loop()
   if (esp32_board == ESP32_TTGO_T_BEAM         ||
       esp32_board == ESP32_TTGO_T_BEAM_SUPREME ||
       esp32_board == ESP32_S2_T8_V1_1          ||
-      hw_info.model == SOFTRF_MODEL_HAM        ||
+      esp32_board == ESP32_LILYGO_T_TWR2       ||
       esp32_board == ESP32_HELTEC_TRACKER      ||
       esp32_board == ESP32_S3_DEVKIT) {
     button_1.check();
 #if defined(USE_SA8X8)
-    if (hw_info.model == SOFTRF_MODEL_HAM) {
+    if (esp32_board == ESP32_LILYGO_T_TWR2) {
       button_ptt.check();
     }
 #endif /* USE_SA8X8 */
@@ -4272,11 +4264,11 @@ static void ESP32_Button_loop()
 static void ESP32_Button_fini()
 {
   if (esp32_board == ESP32_S2_T8_V1_1        ||
-      hw_info.model == SOFTRF_MODEL_HAM      ||
+      esp32_board == ESP32_LILYGO_T_TWR2     ||
       esp32_board == ESP32_HELTEC_TRACKER    ||
       esp32_board == ESP32_S3_DEVKIT) {
     int button_pin = esp32_board == ESP32_S2_T8_V1_1 ? SOC_GPIO_PIN_T8_S2_BUTTON :
-                     hw_info.model == SOFTRF_MODEL_HAM ?
+                     esp32_board == ESP32_LILYGO_T_TWR2 ?
                      SOC_GPIO_PIN_TWR2_ENC_BUTTON : SOC_GPIO_PIN_S3_BUTTON;
     while (digitalRead(button_pin) == LOW);
   }
