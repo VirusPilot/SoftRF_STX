@@ -57,7 +57,9 @@
 #undef  SerialOutput
 #define SerialOutput            Serial0
 #endif /* ARDUINO_USB_CDC_ON_BOOT */
-#elif defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32C6)
+#elif defined(CONFIG_IDF_TARGET_ESP32C2) || \
+      defined(CONFIG_IDF_TARGET_ESP32C3) || \
+      defined(CONFIG_IDF_TARGET_ESP32C6)
 #if ARDUINO_USB_CDC_ON_BOOT
 #define UATSerial               Serial0
 #undef  SerialOutput
@@ -88,7 +90,9 @@
  * NeoPixelBus is already "flickering-free" on ESP32 (with I2S or RMT)
  * but the "Core" needs update onto the most recent one
  */
-#if !defined(CONFIG_IDF_TARGET_ESP32C6)
+#if defined(CONFIG_IDF_TARGET_ESP32C2)
+#define EXCLUDE_LED_RING
+#elif !defined(CONFIG_IDF_TARGET_ESP32C6)
 #define USE_NEOPIXELBUS_LIBRARY
 #else
 #define USE_ADAFRUIT_NEO_LIBRARY
@@ -135,6 +139,8 @@ extern Adafruit_NeoPixel strip;
 #define SOC_GPIO_PIN_LED        7
 #elif defined(CONFIG_IDF_TARGET_ESP32S3)
 #define SOC_GPIO_PIN_LED        SOC_UNUSED_PIN /* TBD 14? */
+#elif defined(CONFIG_IDF_TARGET_ESP32C2)
+#define SOC_GPIO_PIN_LED        SOC_UNUSED_PIN /* TBD */
 #elif defined(CONFIG_IDF_TARGET_ESP32C3)
 #define SOC_GPIO_PIN_LED        19 /* D1 */
 #elif defined(CONFIG_IDF_TARGET_ESP32C6)
@@ -253,6 +259,7 @@ enum rst_reason {
 enum esp32_board_id {
   ESP32_DEVKIT,
   ESP32_S3_DEVKIT,
+  ESP32_C2_DEVKIT,
   ESP32_C3_DEVKIT,
   ESP32_C6_DEVKIT,
   ESP32_TTGO_V2_OLED,
@@ -392,7 +399,9 @@ extern ESP32_USBSerial_device_t ESP32_USB_Serial;
 extern const USB_Device_List_t supported_USB_devices[];
 
 #endif /* USE_USB_HOST */
-#elif defined(CONFIG_IDF_TARGET_ESP32C3) || defined(CONFIG_IDF_TARGET_ESP32C6)
+#elif defined(CONFIG_IDF_TARGET_ESP32C2) || \
+      defined(CONFIG_IDF_TARGET_ESP32C3) || \
+      defined(CONFIG_IDF_TARGET_ESP32C6)
 #undef USE_OLED
 #undef USE_TFT
 #if defined(CONFIG_IDF_TARGET_ESP32C6)
