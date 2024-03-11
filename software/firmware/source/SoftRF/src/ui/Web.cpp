@@ -1305,6 +1305,7 @@ $('form').submit(function(e){\
 
 /* FLASH memory usage optimization */
 #if !defined(ARDUINO_ARCH_RP2040)       && \
+    !defined(CONFIG_IDF_TARGET_ESP32C2) && \
     !defined(CONFIG_IDF_TARGET_ESP32C6) && \
     !defined(ARDUINO_ARCH_RENESAS)
 
