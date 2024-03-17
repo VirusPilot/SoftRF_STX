@@ -44,8 +44,8 @@
 #define SerialOutput            SerialUSB
 #define Serial_GNSS_In          Serial1
 #elif defined(ARDUINO_UNOR4_WIFI)
-#define SerialOutput            Serial1
-#define Serial_GNSS_In          Serial2
+#define SerialOutput            Serial
+#define Serial_GNSS_In          Serial1
 #else
 #error "This Renesas R7FA4M1 build variant is not supported!"
 #endif
@@ -117,8 +117,14 @@ struct rst_info {
 #define SOC_GPIO_PIN_ANT_RXTX SOC_UNUSED_PIN
 
 /* I2C */
+#if defined(ARDUINO_UNOR4_WIFI)
+#define SOC_GPIO_PIN_SDA      WIRE1_SDA_PIN
+#define SOC_GPIO_PIN_SCL      WIRE1_SCL_PIN
+#define Wire                  Wire1
+#else
 #define SOC_GPIO_PIN_SDA      WIRE_SDA_PIN
 #define SOC_GPIO_PIN_SCL      WIRE_SCL_PIN
+#endif /* ARDUINO_UNOR4_WIFI */
 
 #define SOC_GPIO_PIN_LED      SOC_UNUSED_PIN
 #define SOC_GPIO_PIN_GNSS_PPS PIN_A3
@@ -138,7 +144,8 @@ struct rst_info {
 #define USE_WIFI_CUSTOM       true
 #include <WiFiS3.h>
 #define Serial_setDebugOutput(x) ({})
-//#define EXCLUDE_BLUETOOTH
+#define EXCLUDE_BLUETOOTH
+#define EXCLUDE_SOFTRF_HEARTBEAT
 #endif
 
 #define EXCLUDE_CC13XX
@@ -182,7 +189,11 @@ extern Adafruit_NeoPixel strip;
 #endif /* EXCLUDE_LED_RING */
 
 #if defined(USE_OLED)
+#if defined(ARDUINO_UNOR4_WIFI)
+#define U8X8_OLED_I2C_BUS_TYPE  U8X8_SSD1306_128X64_NONAME_2ND_HW_I2C
+#else
 #define U8X8_OLED_I2C_BUS_TYPE  U8X8_SSD1306_128X64_NONAME_HW_I2C
+#endif /* ARDUINO_UNOR4_WIFI */
 #endif /* USE_OLED */
 
 #endif /* PLATFORM_RA4M1_H */
