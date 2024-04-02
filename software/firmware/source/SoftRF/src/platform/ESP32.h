@@ -338,7 +338,7 @@ struct rst_info {
 //#define USE_GDL90_MSL
 #define USE_OGN_ENCRYPTION
 #define ENABLE_PROL
-#define EXCLUDE_VOICE_MESSAGE
+//#define EXCLUDE_VOICE_MESSAGE
 
 //#define EXCLUDE_GNSS_UBLOX    /* Neo-6/7/8, M10 */
 //#define ENABLE_UBLOX_RFS        /* revert factory settings (when necessary)  */
@@ -353,6 +353,7 @@ struct rst_info {
 #define EXCLUDE_LK8EX1
 //#define EXCLUDE_IMU
 //#define EXCLUDE_MAG
+#define EXCLUDE_BME680
 
 #if !defined(CONFIG_IDF_TARGET_ESP32)
 #define EXCLUDE_UATM

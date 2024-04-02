@@ -165,7 +165,7 @@ extern  SoftSPI RadioSPI;
 #define MAX_NMEATCP_CLIENTS   1
 //#define EXCLUDE_BLUETOOTH  /* +5.7K HEAP */
 #endif /* EXCLUDE_WIFI */
-//#define EXCLUDE_SOFTRF_HEARTBEAT
+#define EXCLUDE_SOFTRF_HEARTBEAT
 #else
 #define EXCLUDE_WIFI
 #define EXCLUDE_BLUETOOTH
@@ -190,6 +190,7 @@ extern  SoftSPI RadioSPI;
 /* -------------------------------------- */
 #define EXCLUDE_BMP180           //  -    kb
 //#define EXCLUDE_BMP280         //  -    kb
+#define EXCLUDE_BME680           //  -    kb
 #define EXCLUDE_MPL3115A2        //  -    kb
 #define EXCLUDE_NRF905           //  -    kb
 #define EXCLUDE_UATM             //  -    kb

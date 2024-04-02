@@ -35,6 +35,7 @@
 #include "../protocol/data/D1090.h"
 
 #include <WDT.h>
+#include <r_lpm.h>
 
 #if !defined(ARDUINO_ARCH_RENESAS_UNO)
 #error "ARDUINO UNO is the only one supported at this time"
@@ -303,8 +304,16 @@ static void RA4M1_fini(int reason)
   pinMode(SOC_GPIO_PIN_USB_SW, INPUT);
 #endif /* ARDUINO_UNOR4_WIFI */
 
-  while (true); /* TBD */
-  // NVIC_SystemReset();
+  lpm_instance_ctrl_t p_api_ctrl;
+  lpm_cfg_t p_cfg;
+
+  p_cfg.low_power_mode       = LPM_MODE_DEEP; // LPM_MODE_SLEEP LPM_MODE_STANDBY LPM_MODE_STANDBY_SNOOZE LPM_MODE_DEEP
+  p_cfg.standby_wake_sources = LPM_STANDBY_WAKE_SOURCE_IRQ0 | LPM_STANDBY_WAKE_SOURCE_RTCALM;
+  p_cfg.dtc_state_in_snooze  = LPM_SNOOZE_DTC_DISABLE; // LPM_SNOOZE_DTC_ENABLE LPM_SNOOZE_DTC_DISABLE
+
+  R_LPM_Open(&p_api_ctrl, &p_cfg);
+
+  R_LPM_LowPowerModeEnter(&p_api_ctrl);
 }
 
 static void RA4M1_reset()
