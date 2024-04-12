@@ -69,7 +69,7 @@ jobs:
           rm -f *.map
 
           cd $GITHUB_WORKSPACE
-          cp -f $GITHUB_WORKSPACE/software/firmware/source/SoftRF/partitions-8MB-SPIFFS.txt /home/runner/.arduino15/packages/esp32/hardware/esp32/2.0.14/tools/partitions/default_8MB.csv
+          cp -f $GITHUB_WORKSPACE/software/firmware/source/SoftRF/partitions-8MB-SPIFFS.txt /home/runner/.arduino15/packages/esp32/hardware/esp32/2.0.15/tools/partitions/default_8MB.csv
           arduino-cli compile -e -b "$ESP32S3" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
           cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/esp32.esp32.esp32s3"
           ~/uf2/utils/uf2conv.py SoftRF.ino.bin -b 0x00 -c -f 0xc47e5767 -o SoftRF.ino.uf2
