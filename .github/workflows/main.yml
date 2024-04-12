@@ -28,6 +28,7 @@ jobs:
             'esp32:esp32:esp32s3',
             'esp32:esp32:esp32c3',
             'esp32:esp32:esp32c6',
+            'esp32:esp32:esp32h2',
             'STM32:stm32:Nucleo_64',
             'STMicroelectronics:stm32:GenF1',
             'STMicroelectronics:stm32:GenWL',
@@ -41,7 +42,8 @@ jobs:
             'arduino:renesas_uno:minima',
             'arduino:renesas_uno:unor4wifi',
             'rp2040:rp2040:generic',
-            'rp2040:rp2040:rpipicow'
+            'rp2040:rp2040:rpipicow',
+            'SiliconLabs:silabs:thingplusmatter_ble'
           ]
 
     env:
@@ -81,14 +83,12 @@ jobs:
               sudo apt-get update ;
               sudo apt-get install libsqlite3-dev libasound2-dev libsndfile1-dev ;
             else
-              # ESP32 AC 3.0-alpha1 needs IDE2 or CLI
-              #if [[ "$BOARD" =~ "esp32:esp32:esp32c6" ]]; then
-              #  wget https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz ;
-              #  tar xzf arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz arduino-cli ;
-              #  rm arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz ;
-              #  sudo mv arduino-cli /usr/local/bin/ ;
-              #else
-              # ESP32 AC 3.0-alpha2+ can work with IDE1
+              if [[ "$BOARD" =~ "SiliconLabs:silabs:" ]]; then
+                wget https://github.com/arduino/arduino-cli/releases/download/${ARDUINO_CLI_VERSION}/arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz ;
+                tar xzf arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz arduino-cli ;
+                rm arduino-cli_${ARDUINO_CLI_VERSION}_Linux_64bit.tar.gz ;
+                sudo mv arduino-cli /usr/local/bin/ ;
+              else
                 wget http://downloads.arduino.cc/arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
                 tar xf arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
                 rm arduino-$ARDUINO_IDE_VERSION-linux64.tar.xz ;
@@ -100,7 +100,7 @@ jobs:
                   pip3 install adafruit-nrfutil --user ;
                   pip3 install intelhex --user ;
                 fi
-              #fi
+              fi
             fi
           fi
       - name: Run install
@@ -192,7 +192,6 @@ jobs:
             arduino --pref "custom_UploadSpeed=esp32c3_921600"         --save-prefs ;
             cd $GITHUB_WORKSPACE ;
           fi
-          # ESP32 AC 3.0-alpha1 needs IDE2 or CLI
           #if [[ "$BOARD" =~ "esp32:esp32:esp32c6" ]]; then
           #  arduino-cli config init ;
           #  arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json ;
@@ -201,7 +200,6 @@ jobs:
           #  # arduino-cli board attach -b $BOARD ;
           #  cd $GITHUB_WORKSPACE ;
           #fi
-          # ESP32 AC 3.0-alpha2+ can work with IDE1
           if [[ "$BOARD" =~ "esp32:esp32:esp32c6" ]]; then
             arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json" --save-prefs ;
             arduino --install-boards esp32:esp32:3.0.0-alpha3 ;
@@ -221,6 +219,30 @@ jobs:
             tar xzf ${NIM_BLE_VERSION}.tar.gz ;
             rm ${NIM_BLE_VERSION}.tar.gz ;
             mv NimBLE-Arduino-${NIM_BLE_VERSION} $HOME/Arduino/libraries/ ;
+            cd $GITHUB_WORKSPACE ;
+          fi
+          #if [[ "$BOARD" =~ "esp32:esp32:esp32h2" ]]; then
+          #  arduino-cli config init ;
+          #  arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json ;
+          #  arduino-cli core update-index ;
+          #  arduino-cli core install esp32:esp32@3.0.0-alpha3 ;
+          #  # arduino-cli board attach -b $BOARD ;
+          #  cd $GITHUB_WORKSPACE ;
+          #fi
+          if [[ "$BOARD" =~ "esp32:esp32:esp32h2" ]]; then
+            arduino --pref "boardsmanager.additional.urls=https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_dev_index.json" --save-prefs ;
+            arduino --install-boards esp32:esp32:3.0.0-alpha3 ;
+            arduino --board $BOARD --save-prefs ;
+            arduino --pref "custom_CPUFreq=esp32h2_80"                 --save-prefs ;
+            arduino --pref "custom_DebugLevel=esp32h2_none"            --save-prefs ;
+            arduino --pref "custom_FlashFreq=esp32h2_64"               --save-prefs ;
+            arduino --pref "custom_FlashMode=esp32h2_dio"              --save-prefs ;
+            arduino --pref "custom_FlashSize=esp32h2_4M"               --save-prefs ;
+            arduino --pref "custom_PSRAM=esp32h2_enabled"              --save-prefs ;
+            arduino --pref "custom_PartitionScheme=esp32h2_huge_app"   --save-prefs ;
+            arduino --pref "custom_UploadSpeed=esp32h2_921600"         --save-prefs ;
+            cd $HOME/.arduino15/packages/esp32/hardware/esp32/3.0.0-alpha3 ;
+            sed -i "s\echo '-DARDUINO_CORE_BUILD'\echo -DARDUINO_CORE_BUILD\g" platform.txt ;
             cd $GITHUB_WORKSPACE ;
           fi
           if [[ "$BOARD" =~ "STM32:stm32:" ]]; then
@@ -345,6 +367,20 @@ jobs:
             fi
             cd $GITHUB_WORKSPACE ;
           fi
+          #if [[ "$BOARD" =~ "SiliconLabs:silabs:" ]]; then
+          #  arduino --pref "boardsmanager.additional.urls=https://siliconlabs.github.io/arduino/package_arduinosilabs_index.json" --save-prefs ;
+          #  arduino --install-boards SiliconLabs:silabs:1.0.0 ;
+          #  arduino --board $BOARD --save-prefs ;
+          #  cd $GITHUB_WORKSPACE ;
+          #fi
+          if [[ "$BOARD" =~ "SiliconLabs:silabs:" ]]; then
+            arduino-cli config init ;
+            arduino-cli config add board_manager.additional_urls https://siliconlabs.github.io/arduino/package_arduinosilabs_index.json ;
+            arduino-cli core update-index ;
+            arduino-cli core install SiliconLabs:silabs@1.0.0 ;
+            # arduino-cli board attach -b $BOARD ;
+            cd $GITHUB_WORKSPACE ;
+          fi
 
       - name: Run script
         run: |
@@ -357,29 +393,29 @@ jobs:
           if [[ "$BOARD" =~ "esp8266:esp8266:"     ]]; then
             arduino --verify                 --board $BOARD $PWD/software/firmware/source/SkyWatch/SkyWatch.ino ;
           fi ;
-          # ESP32 AC 3.0-alpha1 needs IDE2 or CLI
-          #if [[ "$BOARD" =~ "esp32:esp32:esp32c6" ]]; then
+          #if [[ "$BOARD" =~ "esp32:esp32:esp32h2" ]]; then
           #  arduino-cli compile -v --build-properties upload.maximum_size=2500000 -b "$BOARD" $PWD/software/firmware/source/SoftRF ;
           #else
-          # ESP32 AC 3.0-alpha2+ can work with IDE1
             if [[ "$BOARD" =~ "esp32:esp32:"       ]]; then
             arduino --verify                 --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
             fi ;
           #fi ;
-          #if [[ "$BOARD" =~ "esp32:esp32:esp32c6" ]]; then
-          #  arduino-cli compile -v --build-properties upload.maximum_size=2500000 -b "$BOARD" $PWD/software/firmware/source/SkyView ;
-          #else
+          if [[ "$BOARD" =~ "esp32:esp32:esp32h2" ]]; then
+            #  SkyView is not available for H2
+            true ;
+          else
             if [[ "$BOARD" =~ "esp32:esp32:"       ]]; then
             arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SkyView/SkyView.ino ;
             fi ;
-          #fi ;
-          #if [[ "$BOARD" =~ "esp32:esp32:esp32c6" ]]; then
-          #  arduino-cli compile -v --build-properties upload.maximum_size=2500000 -b "$BOARD" $PWD/software/firmware/source/SkyWatch ;
-          #else
+          fi ;
+          if [[ "$BOARD" =~ "esp32:esp32:esp32h2" ]]; then
+            #  SkyWatch is not available for H2
+            true ;
+          else
             if [[ "$BOARD" =~ "esp32:esp32:"       ]]; then
             arduino --verify                 --board $BOARD $PWD/software/firmware/source/SkyWatch/SkyWatch.ino ;
             fi ;
-          #fi ;
+          fi ;
           if [[ "$BOARD" =~ "STM32:stm32:"         ]]; then
             arduino --verify --verbose-build --board $BOARD $PWD/software/firmware/source/SoftRF/SoftRF.ino ;
           fi ;
@@ -424,8 +460,6 @@ jobs:
           if [[ "$BOARD" =~ "rp2040:rp2040:"       ]]; then
             arduino --verify                 --board $BOARD $PWD/software/firmware/source/SkyWatch/SkyWatch.ino ;
           fi ;
-      - uses: actions/upload-artifact@v4
-        with:
-          name: SoftRF
-          path: ./build_*/*.bin
-          if-no-files-found: error
+          if [[ "$BOARD" =~ "SiliconLabs:silabs:"  ]]; then
+            arduino-cli compile -v -b "$BOARD" $PWD/software/firmware/source/SoftRF ;
+          fi ;

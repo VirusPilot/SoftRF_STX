@@ -26,9 +26,9 @@
 #include <esp_bt.h>
 #include <BLEDevice.h>
 #endif /* CONFIG_IDF_TARGET_ESP32S2 */
-#if !defined(CONFIG_IDF_TARGET_ESP32C6)
+#if !defined(CONFIG_IDF_TARGET_ESP32C6) && !defined(CONFIG_IDF_TARGET_ESP32H2)
 #include <soc/rtc_cntl_reg.h>
-#endif /* CONFIG_IDF_TARGET_ESP32C6 */
+#endif /* CONFIG_IDF_TARGET_ESP32C6  || H2 */
 #include <soc/efuse_reg.h>
 #include <Wire.h>
 #include <rom/rtc.h>
@@ -465,7 +465,7 @@ static void ESP32_setup()
   esp_err_t ret = ESP_OK;
   uint8_t null_mac[6] = {0};
 
-#if defined(CONFIG_IDF_TARGET_ESP32C6)
+#if defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32H2)
   ret = esp_read_mac(efuse_mac, ESP_MAC_WIFI_STA);
   if (ret != ESP_OK) {
 #else
@@ -476,7 +476,7 @@ static void ESP32_setup()
      * abort or use the default base MAC address which is stored in BLK0 of EFUSE by doing
      * nothing.
      */
-#endif /* CONFIG_IDF_TARGET_ESP32C6 */
+#endif /* CONFIG_IDF_TARGET_ESP32C6  || H2 */
     ESP_LOGI(TAG, "Use base MAC address which is stored in BLK0 of EFUSE");
     chipmacid = ESP.getEfuseMac();
   } else {
@@ -587,6 +587,9 @@ static void ESP32_setup()
 #elif defined(CONFIG_IDF_TARGET_ESP32C6)
     default:
       esp32_board   = ESP32_C6_DEVKIT;
+#elif defined(CONFIG_IDF_TARGET_ESP32H2)
+    default:
+      esp32_board   = ESP32_H2_DEVKIT;
 #else
 #error "This ESP32 family build variant is not supported!"
 #endif
@@ -1441,7 +1444,8 @@ static void ESP32_setup()
 
 #elif ARDUINO_USB_CDC_ON_BOOT && \
       (defined(CONFIG_IDF_TARGET_ESP32C3) || \
-       defined(CONFIG_IDF_TARGET_ESP32C6))
+       defined(CONFIG_IDF_TARGET_ESP32C6) || \
+       defined(CONFIG_IDF_TARGET_ESP32H2))
 
   Serial.begin(SERIAL_OUT_BR);
 
@@ -1527,14 +1531,22 @@ static void ESP32_setup()
       axp_2xxx.setALDO3Voltage(3300); // V2.1 - Amp. OE Ctrl
 
 #if defined(USE_SA8X8)
-      Wire.begin(SOC_GPIO_PIN_TWR2_SDA , SOC_GPIO_PIN_TWR2_SCL);
-      Wire.beginTransmission(SH1106_OLED_I2C_ADDR);
-      if (Wire.endTransmission() == 0) {
-        controller.setBand(Band::VHF);
-      }
-      Wire.beginTransmission(SH1106_OLED_I2C_ADDR_ALT);
-      if (Wire.endTransmission() == 0) {
-        controller.setBand(Band::UHF);
+      for (uint8_t addr = 1; addr < 127; addr++) {
+          Wire.beginTransmission(addr);
+          if (Wire.endTransmission() == 0) {
+              switch (addr) {
+              case SH1106_OLED_I2C_ADDR:
+                  controller.setBand(Band::VHF);
+                  addr = 127;
+                  break;
+              case SH1106_OLED_I2C_ADDR_ALT:
+                  controller.setBand(Band::UHF);
+                  addr = 127;
+                  break;
+              default:
+                  break;
+              }
+          }
       }
 #endif /* USE_SA8X8 */
     } else {
@@ -2142,7 +2154,9 @@ static void ESP32_fini(int reason)
 
   SPI.end();
 
+#if !defined(EXCLUDE_WIFI)
   esp_wifi_stop();
+#endif /* EXCLUDE_WIFI */
 
 #if defined(CONFIG_IDF_TARGET_ESP32)
   esp_bt_controller_disable();
@@ -2447,7 +2461,7 @@ static long ESP32_random(long howsmall, long howBig)
   return random(howsmall, howBig);
 }
 
-#if !defined(CONFIG_IDF_TARGET_ESP32S2) && defined(USE_BLE_MIDI)
+#if !defined(EXCLUDE_BLUETOOTH) && defined(USE_BLE_MIDI)
 extern bool deviceConnected;
 extern BLECharacteristic* pMIDICharacteristic;
 
@@ -2517,7 +2531,7 @@ static void ESP32_Sound_test(int var)
     pinMode(SOC_GPIO_PIN_BUZZER, INPUT_PULLDOWN);
   }
 
-#if !defined(CONFIG_IDF_TARGET_ESP32S2) && defined(USE_BLE_MIDI)
+#if !defined(EXCLUDE_BLUETOOTH) && defined(USE_BLE_MIDI)
   if (settings->volume != BUZZER_OFF                  &&
       settings->bluetooth == BLUETOOTH_LE_HM10_SERIAL &&
       pMIDICharacteristic != NULL                     &&
@@ -2587,7 +2601,7 @@ static void ESP32_Sound_tone(int hz, uint8_t volume)
     }
   }
 
-#if !defined(CONFIG_IDF_TARGET_ESP32S2) && defined(USE_BLE_MIDI)
+#if !defined(EXCLUDE_BLUETOOTH) && defined(USE_BLE_MIDI)
   if (volume != BUZZER_OFF                            &&
       settings->bluetooth == BLUETOOTH_LE_HM10_SERIAL &&
       pMIDICharacteristic != NULL                     &&
@@ -3199,7 +3213,7 @@ static byte ESP32_Display_setup()
     } else if (esp32_board == ESP32_LILYGO_T_TWR2) {
       Wire.begin(SOC_GPIO_PIN_TWR2_SDA, SOC_GPIO_PIN_TWR2_SCL);
 
-      Wire.beginTransmission(SSD1306_OLED_I2C_ADDR);
+      Wire.beginTransmission(SH1106_OLED_I2C_ADDR);
       has_oled = (Wire.endTransmission() == 0);
       if (has_oled) {
         u8x8 = &u8x8_1_3;
@@ -3210,7 +3224,7 @@ static byte ESP32_Display_setup()
         has_oled = (Wire.endTransmission() == 0);
         if (has_oled) {
           u8x8 = &u8x8_1_3;
-          u8x8->setI2CAddress(SH1106_OLED_I2C_ADDR_ALT);
+          u8x8->setI2CAddress(SH1106_OLED_I2C_ADDR_ALT << 1);
           rval = DISPLAY_OLED_1_3;
         }
       }
@@ -3863,6 +3877,8 @@ static void ESP32_Battery_setup()
     calibrate_voltage((adc1_channel_t) ADC1_GPIO1_CHANNEL);
 #elif defined(CONFIG_IDF_TARGET_ESP32C6)
     calibrate_voltage(SOC_GPIO_PIN_C6_BATTERY);
+#elif defined(CONFIG_IDF_TARGET_ESP32H2)
+    /* TBD */
 #else
 #error "This ESP32 family build variant is not supported!"
 #endif /* CONFIG_IDF_TARGET_ESP32 */
@@ -4783,7 +4799,8 @@ IODev_ops_t ESP32SX_USBSerial_ops = {
 
 #if ARDUINO_USB_MODE && \
     (defined(CONFIG_IDF_TARGET_ESP32C3) || \
-     defined(CONFIG_IDF_TARGET_ESP32C6))
+     defined(CONFIG_IDF_TARGET_ESP32C6) || \
+     defined(CONFIG_IDF_TARGET_ESP32H2))
 
 #define USB_TX_FIFO_SIZE (MAX_TRACKING_OBJECTS * 65 + 75 + 75 + 42 + 20)
 #define USB_RX_FIFO_SIZE (256)
@@ -4791,9 +4808,9 @@ IODev_ops_t ESP32SX_USBSerial_ops = {
 #if ARDUINO_USB_CDC_ON_BOOT
 #define USBSerial                Serial
 #else
-#if defined(CONFIG_IDF_TARGET_ESP32C6)
+#if defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32H2)
 #define USBSerial                HWCDCSerial
-#endif /* CONFIG_IDF_TARGET_ESP32C6 */
+#endif /* CONFIG_IDF_TARGET_ESP32C6  || H2 */
 #endif /* ARDUINO_USB_CDC_ON_BOOT */
 
 static void ESP32CX_USB_setup()
@@ -4990,9 +5007,12 @@ const SoC_ops_t ESP32_ops = {
 #elif defined(CONFIG_IDF_TARGET_ESP32C6)
   SOC_ESP32C6,
   "ESP32-C6",
+#elif defined(CONFIG_IDF_TARGET_ESP32H2)
+  SOC_ESP32H2,
+  "ESP32-H2",
 #else
 #error "This ESP32 family build variant is not supported!"
-#endif /* CONFIG_IDF_TARGET_ESP32-S2-S3-C3-C6 */
+#endif /* CONFIG_IDF_TARGET_ESP32-S2-S3-C3-C6-H2 */
   ESP32_setup,
   ESP32_post_init,
   ESP32_loop,
@@ -5017,17 +5037,18 @@ const SoC_ops_t ESP32_ops = {
   ESP32_SPI_begin,
   ESP32_swSer_begin,
   ESP32_swSer_enableRx,
-#if !defined(CONFIG_IDF_TARGET_ESP32S2)
+#if !defined(EXCLUDE_BLUETOOTH)
   &ESP32_Bluetooth_ops,
 #else
   NULL,
-#endif /* CONFIG_IDF_TARGET_ESP32S2 */
+#endif /* EXCLUDE_BLUETOOTH */
 #if (defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3)) && \
    (ARDUINO_USB_CDC_ON_BOOT || defined(USE_USB_HOST))
   &ESP32SX_USBSerial_ops,
 #elif ARDUINO_USB_MODE && \
       (defined(CONFIG_IDF_TARGET_ESP32C3) || \
-       defined(CONFIG_IDF_TARGET_ESP32C6))
+       defined(CONFIG_IDF_TARGET_ESP32C6) || \
+       defined(CONFIG_IDF_TARGET_ESP32H2))
   &ESP32CX_USBSerial_ops,
 #else
   NULL,
