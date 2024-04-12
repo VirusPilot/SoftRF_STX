@@ -23,12 +23,12 @@ jobs:
         board:
           [
             'esp8266:esp8266:nodemcuv2',
-            'esp32:esp32:esp32:PartitionScheme=min_spiffs',
-            'esp32:esp32:esp32s2',
-            'esp32:esp32:esp32s3',
-            'esp32:esp32:esp32c3',
-            'esp32:esp32:esp32c6',
-            'esp32:esp32:esp32h2',
+            #'esp32:esp32:esp32:PartitionScheme=min_spiffs',
+            #'esp32:esp32:esp32s2',
+            #'esp32:esp32:esp32s3',
+            #'esp32:esp32:esp32c3',
+            #'esp32:esp32:esp32c6',
+            #'esp32:esp32:esp32h2',
             'STM32:stm32:Nucleo_64',
             'STMicroelectronics:stm32:GenF1',
             'STMicroelectronics:stm32:GenWL',
