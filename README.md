@@ -113,7 +113,7 @@ you first need to apply the following GPS reset:
 - if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux; please note the following limitations when adding a baro module to your T-Beam: https://github.com/lyusupov/SoftRF/issues/32#issuecomment-420242682
 
 ## Issues:
-- on the **T-Beam S3 Supreme the USB CDC mode** still seems to be unstable, therefore a dirty patch is applied so that SoftRF will compile for this target; the only limitation is that SoftRF will only boot if the serial connection is opened up by an external device (which is the case when connected to Stratux)
+- sometimes SoftRF does not boot when plugged into a running Stratux, a Stratux powercycle will resolve it
 
 ## Recommendations for T-Beam and T-Beam S3 Supreme:
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.4.1/settings
