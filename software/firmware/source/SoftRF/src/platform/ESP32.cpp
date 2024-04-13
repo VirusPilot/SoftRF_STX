@@ -177,7 +177,6 @@ char UDPpacketBuffer[UDP_PACKET_BUFSIZE];
 #include <Adafruit_SPIFlash.h>
 #include "../driver/EPD.h"
 #include "uCDB.hpp"
-#include "USB.h"
 
 SPIClass uSD_SPI(HSPI);
 #define  SD_CONFIG SdSpiConfig(uSD_SS_pin, SHARED_SPI, SD_SCK_MHZ(16), &uSD_SPI)
