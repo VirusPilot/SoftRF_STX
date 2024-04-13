@@ -1,1 +1,1 @@
-#define CURRENT_DATE "20230101"
+#define CURRENT_DATE "240101"
