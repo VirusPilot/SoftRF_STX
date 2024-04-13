@@ -437,6 +437,11 @@ static bool play_file(char *filename)
 #endif /* USE_SA8X8 */
 #endif /* CONFIG_IDF_TARGET_ESP32S3 */
 
+#if CONFIG_TINYUSB_ENABLED && \
+    (defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3))
+#include <USB.h>
+#endif /* CONFIG_TINYUSB_ENABLED */
+
 #if defined(ENABLE_D1090_INPUT)
 #include <mode-s.h>
 
@@ -1403,7 +1408,7 @@ static void ESP32_setup()
 
 #if ARDUINO_USB_CDC_ON_BOOT && \
     (defined(CONFIG_IDF_TARGET_ESP32S2) || defined(CONFIG_IDF_TARGET_ESP32S3))
-#if 0
+#if CONFIG_TINYUSB_ENABLED
   if (USB.manufacturerName(ESP32SX_Device_Manufacturer)) {
     char usb_serial_number[16];
     uint16_t pid;
@@ -1430,7 +1435,7 @@ static void ESP32_setup()
     USB.serialNumber(usb_serial_number);
     USB.begin();
   }
-#endif
+#endif /* CONFIG_TINYUSB_ENABLED */
 
   Serial.begin(SERIAL_OUT_BR);
 
@@ -4809,7 +4814,11 @@ IODev_ops_t ESP32SX_USBSerial_ops = {
 #define USBSerial                Serial
 #else
 #if defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32H2)
+#if HWCDC_SERIAL_IS_DEFINED
 #define USBSerial                HWCDCSerial
+#else
+#define USBSerial                Serial /* TBD */
+#endif /* HWCDC_SERIAL_IS_DEFINED */
 #endif /* CONFIG_IDF_TARGET_ESP32C6  || H2 */
 #endif /* ARDUINO_USB_CDC_ON_BOOT */
 
