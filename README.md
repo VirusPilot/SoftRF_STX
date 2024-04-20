@@ -1,3 +1,5 @@
+## ATTENTION: it is strongly recommended to only use OGN or FANET protocols, all other protocols are not working any more
+
 # SoftRF DIY - Stratux compatible fork for T-Beam, T-Beam S3 Supreme and T-Echo
 
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
