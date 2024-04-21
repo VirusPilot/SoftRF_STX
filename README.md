@@ -23,6 +23,38 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 
 **Please be aware that flashing these binaries on your SoftRF device may render it unusable**
 
+## T-Beam S3 Supreme modifications:
+- u-blox GPS configuration:
+  - enable GSA, GSV, VTG
+  - enable GPS, GALILEO, BEIDOU and SBAS
+  - enable NMEA extended protocol
+- LEGACY NMEA traffic messages are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
+- default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
+- WiFi IP changed to `192.168.4.1` to avoid conflicts with Stratux WiFi IP
+
+## T-Echo modifications:
+- L76K GPS configuration:
+  - enable GSA, GSV, VTG
+  - enable GPS, GLONASS and BEIDOU
+  - NMEA output through USB (instead of Bluetooth)
+- default connection with Stratux: **USB** (115200 baud), the USB T-Echo connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
+- LK8EX1 and LEGACY traffic messages over serial connection are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
+
+## Limitations:
+- GPS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GPS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
+- the L76K only supports the NMEA "strict" protocol version, therefore some extended satellite information (like elevation, azimut and numbering) is not provided for some satellites and therefore the GPS info page in Stratux is incomplete. Furthermore BEIDOU satellites are not displayed at all but are in fact used and counted for "in solution"
+- if your T-Beam S3 Supreme or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux
+
+## Recommendations for T-Beam S3 Supreme:
+- load OGN database: https://github.com/lyusupov/SoftRF/wiki/Prime-Edition-MkIII#aircrafts-database
+- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.4.1/settings
+
+## Recommendations for T-Echo:
+- load OGN database: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
+- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings) by **downloading** the following scripts, **opening** them in a browser to generate the appropriate $PSRFC and $PSKVC sentences and then **sending** these generated sentences to the SoftRF device via a serial USB console (e.g. Arduino IDE comes with a nice built in serial USB console):
+  - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/basic.html (e.g. Protocol, Aircraft type, Aircraft ID)
+  - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/ui.html (e.g. Units, e-Paper 'ghosts' removal)
+
 ## DANGER ZONE - NOT RECOMMENDED FOR UNEXPERIENCED USERS
 ## Compiling/Flashing from Source Code
 You need to be familiar with Arduino to compile and flash it for your platform. You need to install the latest version of **Arduino IDE** and add the following two entries into the Additional Board Manager URLs:
@@ -81,42 +113,3 @@ alternative for **T-Echo**:
 - convert `SoftRF.ino.bin` to UF2 using `uf2conv.py SoftRF.ino.bin -c -b 0x00 -f 0xADA52840 -o SoftRF.ino.uf2` (from https://github.com/microsoft/uf2/tree/master/utils)
 - connect your T-Echo and put it in UF2 upload mode (double-click **RESET**)
 - upload the `SoftRF.ino.uf2` file to the NRF52BOOT or TECHBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
-
-## In case you want to convert a T-Beam based OGN Tracker to run SoftRF
-you first need to apply the following GPS reset:
-- https://github.com/VirusPilot/LilyGo-T-Beam-GPS-Reset, otherwise the GPS chipset won't work with SoftRF (OGN Tracker uses 57600 baud vs. SoftRF using 9600 baud for the GPS-CPU connection)
-- as a alternative you may consider using: https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series/tree/master/examples/GPS/UBlox_Recovery, please uncomment the `utility.h` file according to your board model, otherwise compilation will report an error
-
-## T-Beam S3 Supreme modifications:
-- u-blox GPS configuration:
-  - enable GSA, GSV, VTG
-  - enable GPS, GALILEO, BEIDOU and SBAS
-  - enable NMEA extended protocol
-- LEGACY NMEA traffic messages are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
-- default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
-- WiFi IP changed to `192.168.4.1` to avoid conflicts with Stratux WiFi IP
-
-## T-Echo modifications:
-- L76K GPS configuration:
-  - enable GSA, GSV, VTG
-  - enable GPS, GLONASS and BEIDOU
-  - NMEA output through USB (instead of Bluetooth)
-- default connection with Stratux: **USB** (115200 baud), the USB T-Echo connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
-- LK8EX1 and LEGACY traffic messages over serial connection are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
-
-## Limitations:
-- GPS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GPS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
-- the L76K only supports the NMEA "strict" protocol version, therefore some extended satellite information (like elevation, azimut and numbering) is not provided for some satellites and therefore the GPS info page in Stratux is incomplete. Furthermore BEIDOU satellites are not displayed at all but are in fact used and counted for "in solution"
-- if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux; please note the following limitations when adding a baro module to your T-Beam: https://github.com/lyusupov/SoftRF/issues/32#issuecomment-420242682
-
-## Issues:
-- sometimes SoftRF does not boot when hot-plugged into a running Stratux, a Stratux powercycle will resolve it
-
-## Recommendations for T-Beam S3 Supreme:
-- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.4.1/settings
-
-## Recommendations for T-Echo:
-- load OGN database: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
-- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings) by **downloading** the following scripts, **opening** them in a browser to generate the appropriate $PSRFC and $PSKVC sentences and then **sending** these generated sentences to the SoftRF device via a serial USB console (e.g. Arduino IDE comes with a nice built in serial USB console):
-  - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/basic.html (e.g. Protocol, Aircraft type, Aircraft ID)
-  - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/ui.html (e.g. Units, e-Paper 'ghosts' removal)
