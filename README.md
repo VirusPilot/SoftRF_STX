@@ -13,7 +13,7 @@
 ## Binaries (unstable beta versions) available for testing
 Beta binary packages are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
 
-**T-Beam and T-Beam S3 Supreme - WiFi update method:**
+**T-Beam S3 Supreme - WiFi update method:**
 - this update method **is not working on a T-Beam S3 core module**, no idea why
 - T-Beam Firmware: `SoftRF.zip/esp32.esp32.esp32/SoftRF.ino.bin`
 - T-Beam S3 Supreme Firmware: `SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.bin`
