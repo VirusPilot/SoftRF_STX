@@ -1,4 +1,6 @@
-## ATTENTION: it is strongly recommended to only use OGN or FANET protocols, all other protocols are not working any more
+## ATTENTION: it is strongly recommended to only use OGN or FANET protocols, all other protocols are not working
+## ATTENTION: at this point only T-Beam S3 Supreme is tested on a regular basis, all other platforms are no longer provided
+## ATTENTION: it is recommended to migrate to the following OGN tracker implementation: https://github.com/pjalocha/ogn-tracker
 
 # SoftRF DIY - Stratux compatible fork for T-Beam, T-Beam S3 Supreme and T-Echo
 
