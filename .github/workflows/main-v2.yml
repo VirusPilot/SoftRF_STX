@@ -55,20 +55,20 @@ jobs:
         run: |
           echo "#define CURRENT_DATE \"$(date +"24%m%d")\"" > $GITHUB_WORKSPACE/software/firmware/source/SoftRF/current_date.h
 
-          cd $GITHUB_WORKSPACE
-          arduino-cli compile -e -b "$NRF52" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/adafruit.nrf52.pca10056"
-          ~/uf2/utils/uf2conv.py SoftRF.ino.hex -c -f 0xADA52840 -o SoftRF.ino.uf2
-          rm -f *.elf
-          rm -f *.map
-          rm -f *.hex
-          rm -f *.zip
+          # cd $GITHUB_WORKSPACE
+          # arduino-cli compile -e -b "$NRF52" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          # cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/adafruit.nrf52.pca10056"
+          # ~/uf2/utils/uf2conv.py SoftRF.ino.hex -c -f 0xADA52840 -o SoftRF.ino.uf2
+          # rm -f *.elf
+          # rm -f *.map
+          # rm -f *.hex
+          # rm -f *.zip
 
-          cd $GITHUB_WORKSPACE
-          arduino-cli compile -e -b "$ESP32" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/esp32.esp32.esp32"
-          rm -f *.elf
-          rm -f *.map
+          # cd $GITHUB_WORKSPACE
+          # arduino-cli compile -e -b "$ESP32" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          # cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/esp32.esp32.esp32"
+          # rm -f *.elf
+          # rm -f *.map
 
           cd $GITHUB_WORKSPACE
           cp -f $GITHUB_WORKSPACE/software/firmware/source/SoftRF/partitions-8MB-SPIFFS.txt /home/runner/.arduino15/packages/esp32/hardware/esp32/2.0.15/tools/partitions/default_8MB.csv
