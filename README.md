@@ -2,8 +2,7 @@
 ## ATTENTION: only T-Beam S3 Supreme and T-Echo UF2 binaries are provided/tested on a regular basis, all other platforms are no longer provided
 ## ATTENTION: it is recommended to migrate to the following OGN tracker implementation: https://github.com/pjalocha/ogn-tracker
 
-# SoftRF DIY - Stratux compatible fork for T-Beam S3 Supreme and T-Echo
-
+## Features
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
 - change SoftRF WiFi IP from `192.168.1.1` to `192.168.4.1` to avoid conflicts with Stratux WiFi IP
 - option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.4.1/settings)
