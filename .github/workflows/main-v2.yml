@@ -55,14 +55,14 @@ jobs:
         run: |
           echo "#define CURRENT_DATE \"$(date +"24%m%d")\"" > $GITHUB_WORKSPACE/software/firmware/source/SoftRF/current_date.h
 
-          # cd $GITHUB_WORKSPACE
-          # arduino-cli compile -e -b "$NRF52" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-          # cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/adafruit.nrf52.pca10056"
-          # ~/uf2/utils/uf2conv.py SoftRF.ino.hex -c -f 0xADA52840 -o SoftRF.ino.uf2
-          # rm -f *.elf
-          # rm -f *.map
-          # rm -f *.hex
-          # rm -f *.zip
+          cd $GITHUB_WORKSPACE
+          arduino-cli compile -e -b "$NRF52" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/adafruit.nrf52.pca10056"
+          ~/uf2/utils/uf2conv.py SoftRF.ino.hex -c -f 0xADA52840 -o SoftRF.ino.uf2
+          rm -f *.elf
+          rm -f *.map
+          rm -f *.hex
+          rm -f *.zip
 
           # cd $GITHUB_WORKSPACE
           # arduino-cli compile -e -b "$ESP32" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
@@ -77,6 +77,7 @@ jobs:
           ~/uf2/utils/uf2conv.py SoftRF.ino.bin -b 0x00 -c -f 0xc47e5767 -o SoftRF.ino.uf2
           rm -f *.elf
           rm -f *.map
+          rm -f *.bin
 
       - uses: actions/upload-artifact@v4
         with:
