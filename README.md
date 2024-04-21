@@ -1,8 +1,8 @@
 ## ATTENTION: it is strongly recommended to only use OGN or FANET protocols, all other protocols are not working
-## ATTENTION: at this point only T-Beam S3 Supreme is tested on a regular basis, all other platforms are no longer provided
+## ATTENTION: only T-Beam S3 Supreme and T-Echo UF2 binaries are provided/tested on a regular basis, all other platforms are no longer provided
 ## ATTENTION: it is recommended to migrate to the following OGN tracker implementation: https://github.com/pjalocha/ogn-tracker
 
-# SoftRF DIY - Stratux compatible fork for T-Beam, T-Beam S3 Supreme and T-Echo
+# SoftRF DIY - Stratux compatible fork for T-Beam S3 Supreme and T-Echo
 
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
 - change SoftRF WiFi IP from `192.168.1.1` to `192.168.4.1` to avoid conflicts with Stratux WiFi IP
@@ -10,16 +10,8 @@
   - if added (`AircraftID: ICAO hex code`), then ADDR_TYPE_ICAO is set for both Legacy and OGN (this is based on the assumtion that your airplane has a transponder)
   - if **not** added, the SoftRF factory ID remains (`AircraftID: 0`) and ADDR_TYPE is set according to the selected protocol (this is recommended for all airplanes without a transponder)
 
-## Binaries (unstable beta versions) available for testing
-Beta binary packages are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
-
-**T-Beam S3 Supreme - WiFi update method:**
-- this update method **is not working on a T-Beam S3 core module**, no idea why
-- T-Beam Firmware: `SoftRF.zip/esp32.esp32.esp32/SoftRF.ino.bin`
-- T-Beam S3 Supreme Firmware: `SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.bin`
-- if you are updating an **unmodified SoftRF T-Beam**: update via http://192.168.1.1/firmware (WiFi password: 12345678)
-- if you are updating a **modified VirusPilot SoftRF T-Beam**: update page via http://192.168.4.1/firmware (WiFi password: 12345678)
-- please note that the upload will take up to 60s, followed by an automatic reboot (in case of no reboot, a powercycle might help)
+## UF2 Binaries
+UF2 binaries are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
 
 **T-Beam S3 Supreme - UF2 update method** (aka. USB Mass Storage method):
 - connect your T-Beam S3 Supreme to your PC and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
@@ -29,8 +21,9 @@ Beta binary packages are available for the following platforms and can be downlo
 - connect your T-Echo to your PC and put it in UF2 upload mode (double-click **RESET**)
 - upload the `SoftRF.zip/adafruit.nrf52.pca10056/SoftRF.ino.uf2` file to the **NRF52BOOT** or **TECHBOOT** drive that shows up on your PC, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
 
-**Please be aware that flashing these unstable beta binaries on your SoftRF device may render it unusable**
+**Please be aware that flashing these binaries on your SoftRF device may render it unusable**
 
+## DANGER ZONE - NOT RECOMMENDED FOR UNEXPERIENCED USERS
 ## Compiling/Flashing from Source Code
 You need to be familiar with Arduino to compile and flash it for your platform. You need to install the latest version of **Arduino IDE** and add the following two entries into the Additional Board Manager URLs:
 - **T-Beam and T-Beam S3 Supreme**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
@@ -94,7 +87,7 @@ you first need to apply the following GPS reset:
 - https://github.com/VirusPilot/LilyGo-T-Beam-GPS-Reset, otherwise the GPS chipset won't work with SoftRF (OGN Tracker uses 57600 baud vs. SoftRF using 9600 baud for the GPS-CPU connection)
 - as a alternative you may consider using: https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series/tree/master/examples/GPS/UBlox_Recovery, please uncomment the `utility.h` file according to your board model, otherwise compilation will report an error
 
-## T-Beam and T-Beam S3 Supreme modifications:
+## T-Beam S3 Supreme modifications:
 - u-blox GPS configuration:
   - enable GSA, GSV, VTG
   - enable GPS, GALILEO, BEIDOU and SBAS
@@ -119,7 +112,7 @@ you first need to apply the following GPS reset:
 ## Issues:
 - sometimes SoftRF does not boot when hot-plugged into a running Stratux, a Stratux powercycle will resolve it
 
-## Recommendations for T-Beam and T-Beam S3 Supreme:
+## Recommendations for T-Beam S3 Supreme:
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.4.1/settings
 
 ## Recommendations for T-Echo:
