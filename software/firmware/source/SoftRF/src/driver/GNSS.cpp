@@ -197,6 +197,7 @@ const uint8_t setGSA[] PROGMEM = {0xF0, 0x02, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01
 const uint8_t setGSV[] PROGMEM = {0xF0, 0x03, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01}; /* enable GSV for Stratux */
 const uint8_t setRMC[] PROGMEM = {0xF0, 0x04, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable RMC for Stratux */
 const uint8_t setVTG[] PROGMEM = {0xF0, 0x05, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01}; /* enable VTG for Stratux */
+const uint8_t setGST[] PROGMEM = {0xF0, 0x07, 0x00, 0x05, 0x00, 0x00, 0x00, 0x01}; /* enable GST for Stratux */
 
  /* CFG-PRT */
 uint8_t setBR[] = {0x01, 0x00, 0x00, 0x00, 0xD0, 0x08, 0x00, 0x00, 0x00, 0x96,
@@ -224,6 +225,9 @@ const uint8_t factoryUBX[] PROGMEM = { 0xB5, 0x62, 0x06, 0x09, 0x0D, 0x00, 0xFF,
 
 // UBX-CFG-VALSET Stratux settings for u-blox M10S
 // -----------------------------------------------
+// CFG_MSGOUT_NMEA_ID_GST_UART1 = 1
+const uint8_t CFG_MSGOUT_NMEA_ID_GST_UART1[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x09, 0x00, 0x01, 0x01, 0x00, 0x00, 0xD4, 0x00, 0x91, 0x20, 0x01, 0x21, 0x52};
+
 // CFG_MSGOUT_NMEA_ID_GLL_UART1 = 0
 const uint8_t CFG_MSGOUT_NMEA_ID_GLL_UART1[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x09, 0x00, 0x01, 0x01, 0x00, 0x00, 0xCA, 0x00, 0x91, 0x20, 0x00, 0x16, 0x1F};
 
@@ -540,6 +544,18 @@ static void setup_UBX()
       Serial.println(F("Sucessfully set NMEA VTG"));
     }
 
+    msglen = makeUBXCFG(0x06, 0x01, sizeof(setGST), setGST);
+    sendUBX(GNSSbuf, msglen);
+    gnss_set_sucess = getUBX_ACK(0x06, 0x01);
+    if (!gnss_set_sucess)
+    {
+      Serial.println(F("WARNING: Unable to set NMEA GST"));
+    }
+    else
+    {
+      Serial.println(F("Sucessfully set NMEA GST"));
+    }
+
     msglen = makeUBXCFG(0x06, 0x01, sizeof(setGSA), setGSA);
     sendUBX(GNSSbuf, msglen);
     gnss_set_sucess = getUBX_ACK(0x06, 0x01);
@@ -563,6 +579,16 @@ static void setup_UBX()
     if (gnss_set_sucess)
     {
       Serial.println(F("Sucessfully configured u-blox M10S (disable GLL)"));
+    }
+
+    for (int i = 0; i < sizeof(CFG_MSGOUT_NMEA_ID_GST_UART1); i++)
+    {
+      Serial_GNSS_Out.write(pgm_read_byte(&CFG_MSGOUT_NMEA_ID_GST_UART1[i]));
+    }
+    gnss_set_sucess = getUBX_ACK(0x06, 0x8A);
+    if (gnss_set_sucess)
+    {
+      Serial.println(F("Sucessfully configured u-blox M10S (enable GST)"));
     }
 
     for (int i = 0; i < sizeof(CFG_NAVSPG_DYNMODEL); i++)
