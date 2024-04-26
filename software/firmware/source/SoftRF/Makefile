@@ -117,7 +117,8 @@ PRORAD_CPPS   := $(PRORAD_PATH)/Legacy.cpp \
                  $(PRORAD_PATH)/OGNTP.cpp  \
                  $(PRORAD_PATH)/UAT978.cpp \
                  $(PRORAD_PATH)/ES1090.cpp \
-                 $(PRORAD_PATH)/APRS.cpp
+                 $(PRORAD_PATH)/APRS.cpp   \
+                 $(PRORAD_PATH)/ADSL.cpp
 
 PRODAT_CPPS   := $(PRODAT_PATH)/NMEA.cpp    \
                  $(PRODAT_PATH)/GDL90.cpp   \
@@ -184,6 +185,8 @@ OBJS          := $(SRC_CPPS:.cpp=.o) \
                  $(RADIO_PATH)/lmic/radio.o $(RADIO_PATH)/lmic/oslmic.o \
                  $(RADIO_PATH)/lmic/lmic.o \
                  $(OGNLIB_PATH)/ldpc.o \
+                 $(OGNLIB_PATH)/ognconv.o \
+                 $(OGNLIB_PATH)/format.o \
                  $(GNSSLIB_PATH)/TinyGPS++.o \
                  $(TIMELIB_PATH)/Time.o \
                  $(NRF905_PATH)/nRF905.o \
