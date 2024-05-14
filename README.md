@@ -1,4 +1,4 @@
-## ATTENTION: it is strongly recommended to only use OGN or FANET protocols, all other protocols are not working
+## ATTENTION: it is strongly recommended to only use OGN (default) or FANET protocols, all other protocols are not working
 ## ATTENTION: only T-Beam S3 Supreme and T-Echo UF2 binaries are provided/tested on a regular basis, all other platforms are no longer provided
 ## ATTENTION: it is recommended to migrate to the following OGN tracker implementation: https://github.com/pjalocha/ogn-tracker
 
