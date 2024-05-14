@@ -141,14 +141,20 @@ static const uint32_t table[8] = LEGACY_KEY1;
 void make_key(uint32_t key[4], uint32_t timestamp, uint32_t address) {
     int8_t i, ndx;
     for (i = 0; i < 4; i++) {
+#if USE_AIR_V6
         ndx = ((timestamp >> 23) & 1) ? i+4 : i ;
+#elif USE_AIR_V7
+        ndx = i ;
+#else
+#error "Unknown AIR protocol version"
+#endif /* USE_AIR_Vx */
         key[i] = obscure(table[ndx] ^ ((timestamp >> 6) ^ address), LEGACY_KEY2) ^ LEGACY_KEY3;
     }
 }
 
-bool legacy_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop) {
+static bool legacy_v6_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop) {
 
-    legacy_packet_t *pkt = (legacy_packet_t *) legacy_pkt;
+    legacy_v6_packet_t *pkt = (legacy_v6_packet_t *) legacy_pkt;
 
     float ref_lat = this_aircraft->latitude;
     float ref_lon = this_aircraft->longitude;
@@ -162,7 +168,7 @@ bool legacy_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop) {
     make_key(key, timestamp, (pkt->addr << 8) & 0xffffff);
     btea((uint32_t *) pkt + 1, -5, key);
 
-    for (ndx = 0; ndx < sizeof (legacy_packet_t); ndx++) {
+    for (ndx = 0; ndx < sizeof (legacy_v6_packet_t); ndx++) {
       pkt_parity += parity(*(((unsigned char *) pkt) + ndx));
     }
     if (pkt_parity % 2) {
@@ -223,9 +229,16 @@ bool legacy_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop) {
     return true;
 }
 
+#if USE_AIR_V6
+
+bool legacy_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop) {
+
+    return legacy_v6_decode(legacy_pkt, this_aircraft, fop);
+}
+
 size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
 
-    legacy_packet_t *pkt = (legacy_packet_t *) legacy_pkt;
+    legacy_v6_packet_t *pkt = (legacy_v6_packet_t *) legacy_pkt;
 
     int ndx;
     uint8_t pkt_parity=0;
@@ -294,13 +307,13 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
     pkt->ns[0] = ns; pkt->ns[1] = ns; pkt->ns[2] = ns; pkt->ns[3] = ns;
     pkt->ew[0] = ew; pkt->ew[1] = ew; pkt->ew[2] = ew; pkt->ew[3] = ew;
 
-    pkt->_unk0 = 0;
+    pkt->type  = 0;
     pkt->_unk1 = 0;
     pkt->_unk2 = 0;
     pkt->_unk3 = 0;
 //    pkt->_unk4 = 0;
 
-    for (ndx = 0; ndx < sizeof (legacy_packet_t); ndx++) {
+    for (ndx = 0; ndx < sizeof (legacy_v6_packet_t); ndx++) {
       pkt_parity += parity(*(((unsigned char *) pkt) + ndx));
     }
 
@@ -316,5 +329,37 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
 #endif
     btea((uint32_t *) pkt + 1, 5, key);
 
-    return (sizeof(legacy_packet_t));
+    return (sizeof(legacy_v6_packet_t));
 }
+
+#elif USE_AIR_V7
+/*
+ * Volunteer contributors are welcome:
+ * https://pastebin.com/YB1ppAbt
+ */
+
+bool legacy_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop) {
+
+    legacy_v7_packet_t *pkt = (legacy_v7_packet_t *) legacy_pkt;
+
+    if (pkt->type == 0) { /* Air V6 position */
+      return legacy_v6_decode(legacy_pkt, this_aircraft, fop);
+    }
+
+    /* TODO */
+
+    return false /* true */;
+}
+
+size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
+
+    legacy_v7_packet_t *pkt = (legacy_v7_packet_t *) legacy_pkt;
+
+    /* TODO */
+
+    return (sizeof(legacy_v7_packet_t));
+}
+
+#else
+#error "Unknown AIR protocol version"
+#endif /* USE_AIR_Vx */
