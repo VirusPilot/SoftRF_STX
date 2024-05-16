@@ -28,8 +28,9 @@
 #include "../../driver/RF.h"
 #include "../../driver/EEPROM.h"
 
-#define USE_AIR_V6  1
-#define USE_AIR_V7  0
+#define USE_AIR_V6          1
+#define USE_AIR_V7          0
+#define USE_INTERLEAVING    0
 
 const rf_proto_desc_t legacy_proto_desc = {
   .name            = {'L','e','g','a','c','y', 0},
@@ -174,6 +175,10 @@ static bool legacy_v6_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop)
 
     legacy_v6_packet_t *pkt = (legacy_v6_packet_t *) legacy_pkt;
 
+    if (pkt->type != 0) { /* not Air V6 position */
+        return false;
+    }
+
     float ref_lat = this_aircraft->latitude;
     float ref_lon = this_aircraft->longitude;
     float geo_separ = this_aircraft->geoid_separation;
@@ -247,14 +252,7 @@ static bool legacy_v6_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop)
     return true;
 }
 
-#if USE_AIR_V6
-
-bool legacy_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop) {
-
-    return legacy_v6_decode(legacy_pkt, this_aircraft, fop);
-}
-
-size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
+static size_t legacy_v6_encode(void *legacy_pkt, ufo_t *this_aircraft) {
 
     legacy_v6_packet_t *pkt = (legacy_v6_packet_t *) legacy_pkt;
 
@@ -298,6 +296,7 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
     int16_t vs10 = (int16_t) roundf(vsf * 10.0f);
     pkt->vs = this_aircraft->stealth ? 0 : vs10 >> pkt->smult;
 
+    pkt->type = 0; /* Air V6 position */
     pkt->addr = id & 0x00FFFFFF;
 
     if (this_aircraft->addr_type != ADDR_TYPE_ICAO) {
@@ -325,7 +324,6 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
     pkt->ns[0] = ns; pkt->ns[1] = ns; pkt->ns[2] = ns; pkt->ns[3] = ns;
     pkt->ew[0] = ew; pkt->ew[1] = ew; pkt->ew[2] = ew; pkt->ew[3] = ew;
 
-    pkt->type  = 0;
     pkt->_unk1 = 0;
     pkt->_unk2 = 0;
     pkt->_unk3 = 0;
@@ -350,7 +348,19 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
     return (sizeof(legacy_v6_packet_t));
 }
 
-#elif USE_AIR_V7
+#if USE_AIR_V6
+
+bool legacy_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop) {
+
+    return legacy_v6_decode(legacy_pkt, this_aircraft, fop);
+}
+
+size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
+
+    return legacy_v6_encode(legacy_pkt, this_aircraft);
+}
+
+#elif USE_AIR_V7 || USE_INTERLEAVING
 /*
  * Volunteer contributors are welcome:
  * https://pastebin.com/YB1ppAbt
@@ -367,7 +377,11 @@ static const uint16_t lon_div_table[] = {
   267, 299, 330, 362, 425, 489, 552, 616, 679, 743, 806, 806
 };
 
-static int descale( unsigned int value, unsigned int mbits, unsigned int ebits)
+#if USE_INTERLEAVING
+static bool use_v6_on_tx = true;
+#endif /* USE_INTERLEAVING */
+
+static int descale(unsigned int value, unsigned int mbits, unsigned int ebits)
 {
     unsigned int offset   = (1 << mbits);
     unsigned int signbit  = (offset << ebits);
@@ -386,14 +400,46 @@ static int descale( unsigned int value, unsigned int mbits, unsigned int ebits)
     return (negative ? -(int)value : value);
 }
 
+static unsigned int enscale_unsigned(unsigned int value,
+                                     unsigned int mbits,
+                                     unsigned int ebits)
+{
+    unsigned int offset  = (1 << mbits);
+    unsigned int max_val = (offset << ebits) - 1;
+
+    if (value >= offset) {
+      unsigned int e      = 0;
+      unsigned int m      = offset + value;
+      unsigned int mlimit = offset + offset - 1;
+
+      while (m > mlimit) {
+          m >>= 1;
+          e += offset;
+          if (e > max_val) {
+              return (max_val);
+          }
+      }
+      m -= offset;
+      value = (e | m);
+    }
+
+    return (value);
+}
+
 bool legacy_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop) {
     const uint32_t xxtea_key[4] = LEGACY_KEY5;
     uint32_t key_v7[4];
 
     legacy_v7_packet_t *pkt = (legacy_v7_packet_t *) legacy_pkt;
 
+#if !USE_INTERLEAVING
     if (pkt->type == 0) { /* Air V6 position */
       return legacy_v6_decode(legacy_pkt, this_aircraft, fop);
+    }
+#endif /* USE_INTERLEAVING */
+
+    if (pkt->type != 2) { /* not Air V7 position */
+        return false;
     }
 
     uint32_t *wpkt = (uint32_t *) legacy_pkt;
@@ -413,12 +459,64 @@ bool legacy_decode(void *legacy_pkt, ufo_t *this_aircraft, ufo_t *fop) {
     wpkt[4] ^= key_v7[2];
     wpkt[5] ^= key_v7[3];
 
+    fop->protocol = RF_PROTOCOL_LEGACY;
+
+    fop->addr = pkt->addr;
+    fop->addr_type = pkt->addr_type;
+    fop->timestamp = timestamp;
+
+    fop->stealth = pkt->stealth;
+    fop->no_track = pkt->no_track;
+    fop->aircraft_type = pkt->aircraft_type;
+
+    float ref_lat = this_aircraft->latitude;
+    float ref_lon = this_aircraft->longitude;
+    float geo_separ = this_aircraft->geoid_separation;
+
+    int16_t alt = descale(pkt->alt, 12, 1) - 1000 ; /* relative to WGS84 ellipsoid */
+    fop->altitude = (float) alt - geo_separ;
+
+    int32_t round_lat = (int32_t) (ref_lat * 1e7) / 52;
+    int32_t lat = (pkt->lat - round_lat) % (uint32_t) 0x100000;
+    if (lat >= 0x080000) lat -= 0x100000;
+    lat = ((lat + round_lat) * 52) /* + 0x40 */;
+    fop->latitude = (float)lat / 1e7;
+
+    int ilat = (int)fabs(fop->latitude);
+    if (ilat > 89) { ilat = 89; }
+    int32_t lon_div = (ilat < 14) ? 52 : lon_div_table[ilat-14];
+
+    int32_t round_lon = (int32_t) (ref_lon * 1e7) / lon_div;
+    int32_t lon = (pkt->lon - round_lon) % (uint32_t) 0x100000;
+    if (lon >= 0x080000) lon -= 0x100000;
+    lon = ((lon + round_lon) * lon_div) /* + 0x40 */;
+    fop->longitude = (float)lon / 1e7;
+
+    uint16_t speed10 = (uint16_t) descale(pkt->hs, 8, 2);
+    fop->speed = speed10 / (10 * _GPS_MPS_PER_KNOT);
+
+    int16_t vs10 = (int16_t) descale(pkt->vs, 6, 2);
+    fop->vs = ((float) vs10) * (_GPS_FEET_PER_METER * 6.0);
+
+    float course = pkt->course;
+    fop->course = course / 2;
+
     /* TODO */
 
-    return false /* true */;
+    return true;
 }
 
 size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
+
+#if USE_INTERLEAVING
+    if (use_v6_on_tx) {
+      use_v6_on_tx = false;
+      return legacy_v6_encode(legacy_pkt, this_aircraft);
+    }
+
+    use_v6_on_tx = true;
+#endif /* USE_INTERLEAVING */
+
     const uint32_t xxtea_key[4] = LEGACY_KEY5;
     uint32_t key_v7[4];
 
@@ -439,7 +537,7 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
     float vsf = this_aircraft->vs / (_GPS_FEET_PER_METER * 60.0); /* m/s */
 
     pkt->addr = id & 0x00FFFFFF;
-    pkt->type = 2;
+    pkt->type = 2; /* Air V7 position */
 
 #if !defined(SOFTRF_ADDRESS)
     pkt->addr_type = ADDR_TYPE_FLARM; /* ADDR_TYPE_ANONYMOUS */
@@ -457,11 +555,7 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
     alt += 1000;
     if (alt <     0) { alt =     0; }
     if (alt > 16383) { alt = 16383; }
-    if (alt < 4096) {
-      pkt->alt = alt;
-    } else {
-      pkt->alt = (alt >> 2) | (1 << 12); /* TODO */
-    }
+    pkt->alt = enscale_unsigned(alt, 12, 1);
 
     pkt->lat = ((lat / 52) + (lat & 0x40 /* TBD */ ? (lat < 0 ? -1 : 1) : 0)) & 0xFFFFF;
 
@@ -475,11 +569,7 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
 
     uint16_t speed10 = (uint16_t) roundf(speedf * 10.0f);
     if (speed10 > 1023) { speed10 = 1023; }
-    if (speed10 < 256) {
-      pkt->hs = speed10;
-    } else {
-      pkt->hs = (speed10 >> 2) | (1 << 8); /* TODO */
-    }
+    pkt->hs = enscale_unsigned(speed10, 8, 2);
 
     int16_t vs10 = (int16_t) roundf(vsf * 10.0f);
     if (vs10 >  255) { vs10 =  255; }
@@ -502,7 +592,7 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
     pkt->_unk6  = 0;
     pkt->_unk7  = 0;
     pkt->_unk8  = 0;
-    // pkt->_unk9  = 0;
+    pkt->_unk9  = 0; /* TBD */
     pkt->_unk10 = 0;
 
     key_v7[0] = wpkt[0];
