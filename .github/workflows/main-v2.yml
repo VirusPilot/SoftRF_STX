@@ -67,6 +67,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           arduino-cli compile -e -b "$ESP32" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
           cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/esp32.esp32.esp32"
+          cp -f $GITHUB_WORKSPACE/software/firmware/source/SoftRF/boot_app0.bin .
           rm -f *.elf
           rm -f *.map
 
