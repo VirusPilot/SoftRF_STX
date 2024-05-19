@@ -12,7 +12,7 @@ on:
 env:
   NRF52: 'adafruit:nrf52:pca10056'
   # arduino-cli board details -b esp32:esp32:esp32
-  ESP32: 'esp32:esp32:esp32:PartitionScheme=min_spiffs,CPUFreq=80,PSRAM=enabled,FlashFreq=80,FlashMode=dio,FlashSize=4M,DebugLevel=none'
+  ESP32: 'esp32:esp32:esp32:PartitionScheme=huge_app,CPUFreq=80,PSRAM=enabled,FlashFreq=80,FlashMode=dio,FlashSize=4M,DebugLevel=none'
   # arduino-cli board details -b esp32:esp32:esp32s3
   ESP32S3: 'esp32:esp32:esp32s3:PartitionScheme=default_8MB,CPUFreq=80,PSRAM=enabled,FlashMode=qio,FlashSize=8M,DebugLevel=none,CDCOnBoot=cdc,USBMode=default'
 
@@ -64,11 +64,11 @@ jobs:
           rm -f *.hex
           rm -f *.zip
 
-          # cd $GITHUB_WORKSPACE
-          # arduino-cli compile -e -b "$ESP32" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-          # cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/esp32.esp32.esp32"
-          # rm -f *.elf
-          # rm -f *.map
+          cd $GITHUB_WORKSPACE
+          arduino-cli compile -e -b "$ESP32" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/esp32.esp32.esp32"
+          rm -f *.elf
+          rm -f *.map
 
           cd $GITHUB_WORKSPACE
           cp -f $GITHUB_WORKSPACE/software/firmware/source/SoftRF/partitions-8MB-SPIFFS.txt /home/runner/.arduino15/packages/esp32/hardware/esp32/2.0.16/tools/partitions/default_8MB.csv
