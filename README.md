@@ -66,7 +66,7 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - Select Tools -> Flash Frequency -> 80MHz
 - Select Tools -> Flash Mode -> DIO
 - Select Tools -> Flash Size -> 4MB
-- Select Tools -> Partition Scheme -> Minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)
+- Select Tools -> Partition Scheme -> Huge App (3MB no OTA/1MB SPIFFS)
 - Select Tools -> PSRAM -> Enabled
 - Select Tools -> Upload Speed -> 921600
 - Select Tools -> open serial monitor @ 115200 baud
@@ -83,8 +83,8 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - Select Tools -> Partition Scheme -> 8M with spiffs (3MB APP/1.5MB SPIFFS)
 - Select Tools -> PSRAM -> QSPI PSRAM
 - Select Tools -> Upload Speed -> 921600
-- Select Tools -> Upload Mode -> UART0 / Hardware CDC
-- Select Tools -> USB Mode -> Hardware CDC and JTAG
+- Select Tools -> Upload Mode -> USB-OTG CDC (TinyUSB)
+- Select Tools -> USB Mode -> USB-OTG CDC (TinyUSB)
 - Select Tools -> USB Firmware MSC on Boot -> disabled
 - Select Tools -> USB DFU on Boot -> disabled
 - Select Tools -> USB CDC on Boot -> enabled
