@@ -1,4 +1,4 @@
-## ATTENTION: it is strongly recommended to only use open standards based ADS-L, OGN or FANET protocols
+## ATTENTION: it is strongly recommended to only use the following open standards based protocols: ADS-L, OGN or FANET
 ## ATTENTION: only T-Beam S3 Supreme and T-Echo UF2 binaries are provided/tested on a regular basis
 ## ATTENTION: it is recommended to migrate to the following OGN/ADS-L/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker
 
