@@ -1,6 +1,6 @@
-## ATTENTION: it is strongly recommended to only use OGN (default) or FANET protocols
+## ATTENTION: it is strongly recommended to only use open standards based ADS-L, OGN or FANET protocols
 ## ATTENTION: only T-Beam S3 Supreme and T-Echo UF2 binaries are provided/tested on a regular basis
-## ATTENTION: it is recommended to migrate to the following OGN tracker implementation: https://github.com/pjalocha/ogn-tracker
+## ATTENTION: it is recommended to migrate to the following OGN/ADS-L/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker
 
 ## Features
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
