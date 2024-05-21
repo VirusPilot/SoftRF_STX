@@ -168,12 +168,13 @@ size_t adsl_encode(void *pkt, ufo_t *this_aircraft) {
 
   t.Init();
   t.setAddress(this_aircraft->addr);
-#if !defined(SOFTRF_ADDRESS)
-  t.setAddrTypeOGN(ADDR_TYPE_ANONYMOUS);
-#else
-  t.setAddrTypeOGN(this_aircraft->addr == SOFTRF_ADDRESS ?
-                   ADDR_TYPE_ICAO : ADDR_TYPE_ANONYMOUS);
-#endif
+
+  if (this_aircraft->addr_type != ADDR_TYPE_ICAO) {
+    t.setAddrTypeOGN(ADDR_TYPE_RANDOM);
+  } else {
+    t.setAddrTypeOGN(ADDR_TYPE_ICAO);
+  }
+    
   t.setRelay(0);
   t.setAcftTypeOGN((int16_t) this_aircraft->aircraft_type);
   pos.Encode(t);

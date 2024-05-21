@@ -163,7 +163,7 @@ size_t ogntp_encode(void *pkt, ufo_t *this_aircraft) {
   ogn_tx_pkt.Packet.Header.Address  = this_aircraft->addr;
 
   if (this_aircraft->addr_type != ADDR_TYPE_ICAO) {
-    ogn_tx_pkt.Packet.Header.AddrType = ADDR_TYPE_ANONYMOUS; // OGN
+    ogn_tx_pkt.Packet.Header.AddrType = ADDR_TYPE_RANDOM;
   } else {
     ogn_tx_pkt.Packet.Header.AddrType = ADDR_TYPE_ICAO;
   }
