@@ -399,7 +399,7 @@ static void setup_UBX()
     }
   }
 
-  unsigned int new_baudrate = 115200;
+  unsigned int new_baudrate = 9600;
   setBR[ 8] = (new_baudrate      ) & 0xFF;
   setBR[ 9] = (new_baudrate >>  8) & 0xFF;
   setBR[10] = (new_baudrate >> 16) & 0xFF;
