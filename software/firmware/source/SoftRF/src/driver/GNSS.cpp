@@ -249,6 +249,7 @@ const uint8_t CFG_RATE_NAV[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x0A, 0x00, 0x01
 // CFG-SIGNAL-..._ENA = default (The default configuration is concurrent reception of GPS, Galileo and BeiDou B1I with QZSS and SBAS enabled)
 
  /* Stratux Setup: enable GPS & Galileo & Beidou for u-blox 8 */
+#if !defined(GPS_HIGH_RATE)
 const uint8_t setGNSS_U8[] PROGMEM = {0x00, 0x00, 0xFF, 0x07,
                                       0x00, 0x08, 0x10, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable GPS */
                                       0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable SBAS */
@@ -257,6 +258,16 @@ const uint8_t setGNSS_U8[] PROGMEM = {0x00, 0x00, 0xFF, 0x07,
                                       0x03, 0x08, 0x10, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable Beidou */
                                       0x05, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable QZSS */
                                       0x06, 0x08, 0x10, 0x00, 0x00, 0x00, 0x01, 0x01}; /* disable Glonass */
+#else
+const uint8_t setGNSS_U8[] PROGMEM = {0x00, 0x00, 0xFF, 0x07,
+                                      0x00, 0x08, 0x10, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable GPS */
+                                      0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable SBAS */
+                                      0x02, 0x08, 0x08, 0x00, 0x00, 0x00, 0x01, 0x01,  /* disable Galileo */
+                                      0x04, 0x00, 0x08, 0x00, 0x00, 0x00, 0x01, 0x01,  /* disable IMES */
+                                      0x03, 0x08, 0x10, 0x00, 0x00, 0x00, 0x01, 0x01,  /* disable Beidou */
+                                      0x05, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable QZSS */
+                                      0x06, 0x08, 0x10, 0x00, 0x00, 0x00, 0x01, 0x01}; /* disable Glonass */
+#endif
 
  /* Stratux Setup: set NMEA protocol version and numbering for u-blox 8 */
 const uint8_t setNMEA_U8[] PROGMEM = {0x00, 0x40, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,  /* NMEA protocol v4.0 extended */
@@ -275,12 +286,15 @@ const uint8_t defaultCFG[] PROGMEM = {0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 
 const uint8_t saveCFG[] PROGMEM = {0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03};
 
  /* Stratux Setup: set update rate */
-const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x0A, 0x00, 0x01, 0x00}; /* set to 1Hz (10Hz measurement rate, 10 measurements per navigation solution) */
+#if !defined(GPS_HIGH_RATE)
+  const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x0A, 0x00, 0x01, 0x00}; /* set to 1Hz (10Hz measurement rate, 10 measurements per navigation solution) */
+#else
+  const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x01, 0x00, 0x01, 0x00}; /* set to 10Hz (10Hz measurement rate, 1 measurements per navigation solution) */
+#endif
+
 //const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x05, 0x00, 0x01, 0x00}; /* set to 2Hz (10Hz measurement rate, 5 measurements per navigation solution) */
 //const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x03, 0x00, 0x01, 0x00}; /* set to 3.3Hz (10Hz measurement rate, 3 measurements per navigation solution) */
 //const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x02, 0x00, 0x01, 0x00}; /* set to 5Hz (10Hz measurement rate, 2 measurements per navigation solution) */
-//const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x01, 0x00, 0x01, 0x00}; /* set to 10Hz (10Hz measurement rate, 1 measurements per navigation solution) */
-
 //const uint8_t setRATE[] PROGMEM = {0xE8, 0x03, 0x01, 0x00, 0x01, 0x00}; /* set to 1Hz (1Hz measurement rate, 1 measurement per navigation solution) */
 //const uint8_t setRATE[] PROGMEM = {0xF4, 0x01, 0x01, 0x00, 0x01, 0x00}; /* set to 2Hz (2Hz measurement rate, 1 measurement per navigation solution) */
 //const uint8_t setRATE[] PROGMEM = {0xC8, 0x00, 0x01, 0x00, 0x01, 0x00}; /* set to 5Hz (5Hz measurement rate, 1 measurement per navigation solution) */
@@ -399,7 +413,7 @@ static void setup_UBX()
     }
   }
 
-  unsigned int new_baudrate = 9600;
+  unsigned int new_baudrate = SERIAL_IN_BR;
   setBR[ 8] = (new_baudrate      ) & 0xFF;
   setBR[ 9] = (new_baudrate >>  8) & 0xFF;
   setBR[10] = (new_baudrate >> 16) & 0xFF;

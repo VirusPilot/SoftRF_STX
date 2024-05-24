@@ -75,6 +75,8 @@
 #define NMEA_UDP_PORT     10110
 #define NMEA_TCP_PORT     2000
 
+//#define GPS_HIGH_RATE // 10Hz GPS-only update rate
+
 /*
  * Serial I/O default values.
  * Can be overridden by platfrom-specific code.
@@ -85,7 +87,11 @@
  * for most of GNSS modules
  * being used in SoftRF project
  */
+#if !defined(GPS_HIGH_RATE)
 #define SERIAL_IN_BR      9600
+#else
+#define SERIAL_IN_BR      115200
+#endif
 #endif
 #if !defined(SERIAL_IN_BITS)
 #define SERIAL_IN_BITS    SERIAL_8N1
