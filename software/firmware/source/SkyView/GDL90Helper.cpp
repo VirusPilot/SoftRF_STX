@@ -138,7 +138,7 @@ static void GDL90_Parse_Character(char c)
 
         fo.ID          = gdl_traffic.address;
         fo.IDType      = gdl_traffic.addressType == ADS_B_WITH_ICAO_ADDRESS ?
-                                          ADDR_TYPE_ICAO : ADDR_TYPE_ANONYMOUS;
+                                          ADDR_TYPE_ICAO : ADDR_TYPE_OGN;
 
         fo.latitude    = gdl_traffic.latitude;
         fo.longitude   = gdl_traffic.longitude;
@@ -178,7 +178,7 @@ static void GDL90_Parse_Character(char c)
 
         ThisAircraft.ID          = ownship.address;
         ThisAircraft.IDType      = ownship.addressType == ADS_B_WITH_ICAO_ADDRESS ?
-                                          ADDR_TYPE_ICAO : ADDR_TYPE_ANONYMOUS;
+                                          ADDR_TYPE_ICAO : ADDR_TYPE_OGN;
 
         ThisAircraft.latitude    = ownship.latitude;
         ThisAircraft.longitude   = ownship.longitude;

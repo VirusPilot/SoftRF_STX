@@ -450,8 +450,8 @@ void NMEA_Export()
               total_objects++;
 
               char str_climb_rate[8] = "";
-              uint8_t addr_type = Container[i].addr_type > ADDR_TYPE_ANONYMOUS ?
-                                  ADDR_TYPE_ANONYMOUS : Container[i].addr_type;
+              uint8_t addr_type = Container[i].addr_type > ADDR_TYPE_OGN ?
+                                  ADDR_TYPE_OGN : Container[i].addr_type;
 
               bearing = Container[i].bearing;
               alarm_level = Container[i].alarm_level;

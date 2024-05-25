@@ -245,9 +245,9 @@ size_t aprs_encode(void *pkt, ufo_t *this_aircraft) {
   snprintf(id_s, sizeof(id_s), "%06X", id);
 
 #if !defined(SOFTRF_ADDRESS)
-  uint8_t addr_type = ADDR_TYPE_ANONYMOUS;
+  uint8_t addr_type = ADDR_TYPE_OGN;
 #else
-  uint8_t addr_type = id == SOFTRF_ADDRESS ? ADDR_TYPE_ICAO : ADDR_TYPE_ANONYMOUS;
+  uint8_t addr_type = id == SOFTRF_ADDRESS ? ADDR_TYPE_ICAO : ADDR_TYPE_OGN;
 #endif
 
   uint8_t acft_type = this_aircraft->aircraft_type > AIRCRAFT_TYPE_STATIC ?

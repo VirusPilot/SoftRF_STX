@@ -170,7 +170,7 @@ size_t adsl_encode(void *pkt, ufo_t *this_aircraft) {
   t.setAddress(this_aircraft->addr);
 
   if (this_aircraft->addr_type != ADDR_TYPE_ICAO) {
-    t.setAddrTypeOGN(ADDR_TYPE_RANDOM);
+    t.setAddrTypeOGN(ADDR_TYPE_OGN);
   } else {
     t.setAddrTypeOGN(ADDR_TYPE_ICAO);
   }

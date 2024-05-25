@@ -102,7 +102,7 @@ static void TFT_Draw_Text()
       case ADDR_TYPE_FLARM:
         db = DB_FLN;
         break;
-      case ADDR_TYPE_ANONYMOUS:
+      case ADDR_TYPE_OGN:
         db = DB_OGN;
         break;
       case ADDR_TYPE_P3I:

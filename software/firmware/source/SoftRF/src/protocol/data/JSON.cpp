@@ -392,7 +392,7 @@ void parseD1090(JsonObject& root)
 
         if (aircraft_array[i].hex[0] == '~') {
           fo.addr = strtoul (&aircraft_array[i].hex[1], NULL, 16);
-          fo.addr_type = ADDR_TYPE_ANONYMOUS;
+          fo.addr_type = ADDR_TYPE_OGN;
         } else {
           fo.addr = strtoul (&aircraft_array[i].hex[0], NULL, 16);
           fo.addr_type = ADDR_TYPE_ICAO;
