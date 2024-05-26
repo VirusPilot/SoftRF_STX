@@ -297,11 +297,7 @@ static size_t legacy_v6_encode(void *legacy_pkt, ufo_t *this_aircraft) {
     pkt->type = 0; /* Air V6 position */
     pkt->addr = id & 0x00FFFFFF;
 
-    if (this_aircraft->addr_type != ADDR_TYPE_ICAO) {
-      pkt->addr_type = ADDR_TYPE_OGN;
-    } else {
-      pkt->addr_type = ADDR_TYPE_ICAO;
-    }
+    pkt->addr_type = this_aircraft->addr_type;
     
     pkt->parity = 0;
 
@@ -576,13 +572,7 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
 
     pkt->addr          = id & 0x00FFFFFF;
     pkt->type          = 2; /* Air V7 position */
-
-    if (this_aircraft->addr_type != ADDR_TYPE_ICAO) {
-      pkt->addr_type = ADDR_TYPE_OGN;
-    } else {
-      pkt->addr_type = ADDR_TYPE_ICAO;
-    }
-
+    pkt->addr_type     = this_aircraft->addr_type;
     pkt->stealth       = this_aircraft->stealth;
     pkt->no_track      = this_aircraft->no_track;
 
