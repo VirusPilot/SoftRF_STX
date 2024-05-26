@@ -76,6 +76,7 @@
 #define NMEA_TCP_PORT     2000
 
 //#define GPS_HIGH_RATE // 10Hz GPS-only update rate
+#define EXCLUDE_AIR6
 
 /*
  * Serial I/O default values.
