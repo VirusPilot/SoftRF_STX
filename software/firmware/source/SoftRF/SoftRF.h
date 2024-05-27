@@ -76,6 +76,7 @@
 #define NMEA_TCP_PORT     2000
 
 //#define GPS_HIGH_RATE // 10Hz GPS-only update rate
+//#define GPS_MEDIUM_RATE // 5Hz GPS-only update rate
 #define EXCLUDE_AIR6
 
 /*
@@ -88,7 +89,7 @@
  * for most of GNSS modules
  * being used in SoftRF project
  */
-#if !defined(GPS_HIGH_RATE)
+#if !defined(GPS_HIGH_RATE) && !defined(GPS_MEDIUM_RATE)
 #define SERIAL_IN_BR      9600
 #else
 #define SERIAL_IN_BR      115200

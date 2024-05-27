@@ -286,10 +286,15 @@ const uint8_t defaultCFG[] PROGMEM = {0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 
 const uint8_t saveCFG[] PROGMEM = {0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03};
 
  /* Stratux Setup: set update rate */
-#if !defined(GPS_HIGH_RATE)
-  const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x0A, 0x00, 0x01, 0x00}; /* set to 1Hz (10Hz measurement rate, 10 measurements per navigation solution) */
-#else
+
+#if defined(GPS_HIGH_RATE)
   const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x01, 0x00, 0x01, 0x00}; /* set to 10Hz (10Hz measurement rate, 1 measurements per navigation solution) */
+#else
+#if defined(GPS_MEDIUM_RATE)
+  const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x02, 0x00, 0x01, 0x00}; /* set to 5Hz (10Hz measurement rate, 2 measurements per navigation solution) */
+#else
+  const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x0A, 0x00, 0x01, 0x00}; /* set to 1Hz (10Hz measurement rate, 10 measurements per navigation solution) */
+#endif
 #endif
 
 //const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x05, 0x00, 0x01, 0x00}; /* set to 2Hz (10Hz measurement rate, 5 measurements per navigation solution) */
