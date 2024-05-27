@@ -55,8 +55,8 @@ extern const gnss_chip_ops_t goke_ops; /* forward declaration */
 boolean gnss_set_sucess = false ;
 TinyGPSPlus gnss;  // Create an Instance of the TinyGPS++ object called gnss
 
-uint8_t GNSSbuf[250]; // at least 3 lines of 80 characters each
-                      // and 40+30*N bytes for "UBX-MON-VER" payload
+// max. buffer for GPS only: (GGA+GSA+GSV+RMC+VTC+GST = 6 lines) * 80 * 10(Hz) = 4800
+uint8_t GNSSbuf[5000];
 
 int GNSS_cnt           = 0;
 uint16_t FW_Build_Year = 2000 + ((__DATE__[ 9]) - '0') * 10 + ((__DATE__[10]) - '0');
@@ -249,7 +249,7 @@ const uint8_t CFG_RATE_NAV[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x0A, 0x00, 0x01
 // CFG-SIGNAL-..._ENA = default (The default configuration is concurrent reception of GPS, Galileo and BeiDou B1I with QZSS and SBAS enabled)
 
  /* Stratux Setup: enable GPS & Galileo & Beidou for u-blox 8 */
-#if !defined(GPS_HIGH_RATE)
+#if !defined(GPS_HIGH_RATE) && !defined(GPS_MEDIUM_RATE)
 const uint8_t setGNSS_U8[] PROGMEM = {0x00, 0x00, 0xFF, 0x07,
                                       0x00, 0x08, 0x10, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable GPS */
                                       0x01, 0x01, 0x03, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable SBAS */
