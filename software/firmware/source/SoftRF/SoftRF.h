@@ -83,30 +83,14 @@
  * Serial I/O default values.
  * Can be overridden by platfrom-specific code.
  */
-#if !defined(SERIAL_IN_BR)
-/*
- * 9600 is default value of NMEA baud rate
- * for most of GNSS modules
- * being used in SoftRF project
- */
-#if !defined(GPS_HIGH_RATE) && !defined(GPS_MEDIUM_RATE)
-#define SERIAL_IN_BR      9600
-#else
-#define SERIAL_IN_BR      115200
-#endif
-#endif
+
+#define SERIAL_IN_BR      115200 /* Stratux */
+
 #if !defined(SERIAL_IN_BITS)
 #define SERIAL_IN_BITS    SERIAL_8N1
 #endif
 
-/*
- * 38400 is known as maximum baud rate
- * that HC-05 Bluetooth module
- * can handle without symbols loss.
- *
- * Applicable for Standalone Edition. Inherited by most of other SoftRF platforms.
- */
-#define STD_OUT_BR        115200
+#define STD_OUT_BR        115200 /* Stratux */
 #define STD_OUT_BITS      SERIAL_8N1
 
 #if !defined(SERIAL_OUT_BR)
