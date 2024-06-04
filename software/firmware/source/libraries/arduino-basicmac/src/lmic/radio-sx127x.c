@@ -598,6 +598,11 @@ static void txfsk (void) {
     // power-up tcxo
     power_tcxo();
 
+    // Make sure the FIFO is empty to avoid spurious re-transmissions of received data
+    // courtesy of Nick Bonniere:
+    // the FIFO can be cleared by setting the FIFO-overun bit
+    writeReg(FSKRegIrqFlags2, IRQ_FSK2_FIFOOVERRUN_MASK);
+
     // enter standby mode (required for FIFO loading))
     writeReg(RegOpMode, OPMODE_FSK_STANDBY);
 
