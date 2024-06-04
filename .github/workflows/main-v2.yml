@@ -27,7 +27,7 @@ jobs:
           git clone https://github.com/microsoft/uf2 ~/uf2
 
           mkdir -p ~/.local/bin
-          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh -s nightly-latest
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh
 
           mkdir $HOME/Arduino
           ln -s $GITHUB_WORKSPACE/software/firmware/source/libraries $HOME/Arduino/libraries
