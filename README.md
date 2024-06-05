@@ -63,6 +63,7 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
 ### Arduino IDE settings for T-Beam
+- Install "esp32 by Espressif" version 2.0.17 under "BOARDS MANAGER" 
 - Select Tools -> Board -> ESP32 Dev Module
 - Select Tools -> CPU Frequency -> 80MHz
 - Select Tools -> Flash Frequency -> 80MHz
@@ -77,6 +78,7 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - compile/upload
 
 ### Arduino IDE settings for T-Beam S3 Supreme (Caution: the UF2 firmware upload option will no longer work after the following steps)
+- Install "esp32 by Espressif" version 2.0.17 under "BOARDS MANAGER" 
 - Select Tools -> Board -> ESP32S3 Dev Module
 - Select Tools -> CPU Frequency -> 80MHz
 - Select Tools -> Flash Frequency -> 80MHz
@@ -103,6 +105,7 @@ alternative for **T-Beam S3 Supreme** (and if you want to maintain the UF2 firmw
 - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 
 ### Arduino IDE settings for T-Echo
+- Install "Adafruit nRF52 by Adafruit" under "BOARDS MANAGER" 
 - Select Tools -> Board -> Nordic nRF52840 DK
 - connect your T-Echo
 - Select Tools -> Port -> (select accodingly)
