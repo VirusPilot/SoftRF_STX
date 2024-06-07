@@ -43,8 +43,8 @@ String station_psk  = MY_ACCESSPOINT_PSK ;
 
 String host_name = HOSTNAME;
 
-IPAddress local_IP(192,168,4,1);
-IPAddress gateway(192,168,4,1);
+IPAddress local_IP(192,168,1,1);
+IPAddress gateway(192,168,1,1);
 IPAddress subnet(255,255,255,0);
 
 /**
