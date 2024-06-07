@@ -6,8 +6,7 @@
 
 ## Features
 - enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
-- change SoftRF WiFi IP from `192.168.1.1` to `192.168.4.1` to avoid conflicts with Stratux WiFi IP
-- option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.4.1/settings)
+- option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.1.1/settings)
   - if added (`AircraftID: <ICAO hex Code>`), then ADDR_TYPE_ICAO is set (this is based on the assumtion that your airplane has a transponder)
   - if **not** added, then the SoftRF factory ID remains (`AircraftID: 0`) and ADDR_TYPE_FLARM is set
 
@@ -31,7 +30,6 @@ UF2 binaries are available for the following platforms and can be downloaded as 
   - enable NMEA extended protocol
 - LEGACY NMEA traffic messages are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
 - default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi
-- WiFi IP changed to `192.168.4.1` to avoid conflicts with Stratux WiFi IP
 
 ## T-Echo modifications:
 - L76K GPS configuration:
@@ -48,7 +46,7 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 
 ## Recommendations for T-Beam S3 Supreme:
 - load OGN database: https://github.com/lyusupov/SoftRF/wiki/Prime-Edition-MkIII#aircrafts-database
-- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.4.1/settings
+- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.1.1/settings
 
 ## Recommendations for T-Echo:
 - load OGN database: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
