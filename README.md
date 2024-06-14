@@ -63,7 +63,7 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 ### Arduino IDE settings for T-Beam
 - Install "esp32 by Espressif" version 2.0.17 under "BOARDS MANAGER" 
 - Select Tools -> Board -> ESP32 Dev Module
-- Select Tools -> CPU Frequency -> 80MHz
+- Select Tools -> CPU Frequency -> 240MHz
 - Select Tools -> Flash Frequency -> 80MHz
 - Select Tools -> Flash Mode -> DIO
 - Select Tools -> Flash Size -> 4MB
@@ -78,7 +78,7 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 ### Arduino IDE settings for T-Beam S3 Supreme (Caution: the UF2 firmware upload option will no longer work after the following steps)
 - Install "esp32 by Espressif" version 2.0.17 under "BOARDS MANAGER" 
 - Select Tools -> Board -> ESP32S3 Dev Module
-- Select Tools -> CPU Frequency -> 80MHz
+- Select Tools -> CPU Frequency -> 240MHz
 - Select Tools -> Flash Frequency -> 80MHz
 - Select Tools -> Flash Mode -> QIO
 - Select Tools -> Flash Size -> 8MB
