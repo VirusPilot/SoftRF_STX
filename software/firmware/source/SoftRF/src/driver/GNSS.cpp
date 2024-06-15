@@ -55,11 +55,8 @@ extern const gnss_chip_ops_t goke_ops; /* forward declaration */
 boolean gnss_set_sucess = false ;
 TinyGPSPlus gnss;  // Create an Instance of the TinyGPS++ object called gnss
 
-#if !defined(GPS_HIGH_RATE) && !defined(GPS_MEDIUM_RATE)
-  uint8_t GNSSbuf[250]; // at least 3 lines of 80 characters each and 40+30*N bytes for "UBX-MON-VER" payload
-#else
-  uint8_t GNSSbuf[5000]; // max. buffer for GPS only: (GGA+GSA+GSV+RMC+VTC+GST = 6 lines) * 80 * 10(Hz) = 4800
-#endif
+// uint8_t GNSSbuf[250]; // at least 3 lines of 80 characters each and 40+30*N bytes for "UBX-MON-VER" payload
+uint8_t GNSSbuf[5000]; // max. buffer for GPS_HIGH_RATE: (GGA+GSA+GSV+RMC+VTC+GST = 6 lines) * 80 * 10(Hz) = 4800
 
 int GNSS_cnt           = 0;
 uint16_t FW_Build_Year = 2000 + ((__DATE__[ 9]) - '0') * 10 + ((__DATE__[10]) - '0');
