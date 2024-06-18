@@ -26,14 +26,14 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 ## T-Beam S3 Supreme modifications:
 - u-blox GPS configuration:
   - enable GSA, GSV, VTG, GST
-  - enable GPS, GALILEO, BEIDOU and SBAS
+  - enable GPS, GALILEO, BEIDOU and SBAS (u-blox 10 default)
   - enable NMEA extended protocol
 - LEGACY NMEA traffic messages are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
 - default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi (`/boot/firmware/config.txt` for Bookworm)
 
 ## T-Echo modifications:
 - L76K GPS configuration:
-  - enable GSA, GSV, VTG, GST
+  - enable GSA, GSV, VTG
   - enable GPS, GLONASS and BEIDOU
   - NMEA output through USB (instead of Bluetooth)
 - default connection with Stratux: **USB** (115200 baud), the USB T-Echo connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi (`/boot/firmware/config.txt` for Bookworm)
