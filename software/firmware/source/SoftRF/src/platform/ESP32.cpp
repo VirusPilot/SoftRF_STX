@@ -155,7 +155,7 @@ unsigned long TaskInfoTime;
 #endif /* USE_EPD_TASK */
 
 const char *Hardware_Rev[] = {
-  [0] = "TBD",
+  [0] = "2024-02-28",
   [1] = "TBD",
   [2] = "TBD",
   [3] = "Unknown"
@@ -228,7 +228,6 @@ PCF8563_Class *rtc              = nullptr;
 I2CBus        *i2c              = nullptr;
 
 static bool ESP32_has_spiflash  = false;
-static uint32_t spiflash_id     = 0;
 static bool FATFS_is_mounted    = false;
 static bool ADB_is_open         = false;
 static bool RTC_sync            = false;
@@ -262,7 +261,7 @@ ui_settings_t ui_settings = {
     .units        = UNITS_METRIC,
     .zoom         = ZOOM_MEDIUM,
     .protocol     = PROTOCOL_NMEA,
-    .rotate       = ROTATE_90,
+    .rotate       = ROTATE_0,
     .orientation  = DIRECTION_TRACK_UP,
     .adb          = DB_OGN,
     .idpref       = ID_TYPE,
@@ -580,7 +579,7 @@ static void ESP32_setup()
    *  Heltec Tracker  |               | GIGADEVICE_GD25Q64
    *                  | WT0132C6-S5   | ZBIT_ZB25VQ32B
    *  LilyGO T3-C6    | ESP32-C6-MINI | XMC_XM25QH32B
-   *  LilyGO T3-S3-EP | ESP32-S3-MINI |
+   *  LilyGO T3-S3-EP | ESP32-S3-MINI | XMC_XM25QH32B
    */
 
   if (psramFound()) {
@@ -660,9 +659,6 @@ static void ESP32_setup()
       /* Heltec Tracker has no PSRAM onboard */
       esp32_board    = ESP32_HELTEC_TRACKER;
       hw_info.model  = SOFTRF_MODEL_MIDI;
-      break;
-    case MakeFlashId(ST_ID, XMC_XM25QH32B):
-      esp32_board    = ESP32_LILYGO_T3S3_EPD; /* ESP32-S3-MINI-1U */
       break;
     default:
       esp32_board    = ESP32_S3_DEVKIT;
@@ -1340,7 +1336,8 @@ static void ESP32_setup()
 
   } else if (esp32_board == ESP32_LILYGO_T3S3_EPD) {
 
-    hw_info.model = SOFTRF_MODEL_INK;
+    hw_info.model    = SOFTRF_MODEL_INK;
+    hw_info.revision = 0; /* 2024-02-28 */
 
 #if ARDUINO_USB_CDC_ON_BOOT
     SerialOutput.begin(SERIAL_OUT_BR, SERIAL_OUT_BITS,
@@ -1356,6 +1353,8 @@ static void ESP32_setup()
 #if defined(USE_RADIOLIB)
     lmic_pins.dio[0] = SOC_GPIO_PIN_T3S3_DIO1;
 #endif /* USE_RADIOLIB */
+
+    pinMode(SOC_GPIO_PIN_T3S3_3V3EN, INPUT_PULLUP);
 
     int uSD_SS_pin = SOC_GPIO_PIN_T3S3_SD_SS;
 
@@ -1432,9 +1431,8 @@ static void ESP32_setup()
   ESP32_has_spiflash = SPIFlash->begin(possible_devices,
                                        EXTERNAL_FLASH_DEVICE_COUNT);
   if (ESP32_has_spiflash) {
-    spiflash_id = SPIFlash->getJEDECID();
+    uint32_t capacity = ESP32_getFlashId() & 0xFF;
 
-    uint32_t capacity = spiflash_id & 0xFF;
     if (capacity >= 0x17) { /* equal or greater than 1UL << 23 (8 MiB) */
       hw_info.storage = STORAGE_FLASH;
 
@@ -2476,6 +2474,13 @@ static void ESP32_fini(int reason)
     pinMode(SOC_GPIO_PIN_HELTRK_ADC_EN,    INPUT);
     pinMode(SOC_GPIO_PIN_HELTRK_VEXT_EN,   INPUT);
     pinMode(SOC_GPIO_PIN_HELTRK_LED,       INPUT);
+
+#if !defined(CONFIG_IDF_TARGET_ESP32C2) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+    esp_sleep_enable_ext1_wakeup(1ULL << SOC_GPIO_PIN_S3_BUTTON,
+                                 ESP_EXT1_WAKEUP_ALL_LOW);
+#endif /* CONFIG_IDF_TARGET_ESP32C2 || C3 */
+  } else if (esp32_board == ESP32_LILYGO_T3S3_EPD) {
+    pinMode(SOC_GPIO_PIN_T3S3_3V3EN,       INPUT_PULLDOWN);
 
 #if !defined(CONFIG_IDF_TARGET_ESP32C2) && !defined(CONFIG_IDF_TARGET_ESP32C3)
     esp_sleep_enable_ext1_wakeup(1ULL << SOC_GPIO_PIN_S3_BUTTON,
