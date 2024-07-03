@@ -77,7 +77,6 @@
 
 //#define GPS_HIGH_RATE // 10Hz GPS-only update rate
 //#define GPS_MEDIUM_RATE // 5Hz GPS-only update rate
-#define EXCLUDE_AIR6
 
 /*
  * Serial I/O default values.
