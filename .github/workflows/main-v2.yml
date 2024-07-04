@@ -78,6 +78,8 @@ jobs:
           ~/uf2/utils/uf2conv.py SoftRF.ino.bin -b 0x00 -c -f 0xc47e5767 -o SoftRF.ino.uf2
           rm -f *.elf
           rm -f *.map
+          rm -f SoftRF.ino.partitions.bin
+          rm -f SoftRF.ino.bootloader.bin
 
       - uses: actions/upload-artifact@v4
         with:
