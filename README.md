@@ -1,5 +1,5 @@
 ## ATTENTION: it is strongly recommended to only use the following open standards based protocols: ADS-L, OGN or FANET
-## ATTENTION: only T-Beam S3 Supreme and T-Echo UF2 binaries are provided/tested on a regular basis
+## ATTENTION: only T-Beam, T-Beam S3 Supreme and T-Echo binaries are provided/tested on a regular basis
 ### It is recommended to consider the following alternatives:
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF
 - ADS-L/OGN/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker (WIP)
@@ -21,9 +21,15 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - connect your T-Echo to your PC and put it in UF2 upload mode (double-click **RESET**)
 - upload the `SoftRF.zip/adafruit.nrf52.pca10056/SoftRF.ino.uf2` file to the **NRF52BOOT** or **TECHBOOT** drive that shows up on your PC, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
 
-**Please be aware that flashing these binaries on your SoftRF device may render it unusable**
+## "classic" Binaries
+"classic" binaries are available for the **T-Beam up to v1.2** and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
+- connect your T-Beam to your PC (via USB)
+- open https://espressif.github.io/esp-launchpad/ with your **Chrome** browser, select "DIY" and "connect" your T-Beam
+- it may be necessary the execute "Erase Flash" once
+- upload all files from the `SoftRF.zip/esp32.esp32.esp32` folder according to the following order and execute "Program":
+![Chrome T-Beam Flash Tool](https://github.com/VirusPilot/SoftRF/assets/43483458/bc84d81f-a71f-46e7-a4d8-c7c2ff45bc2e)
 
-## T-Beam S3 Supreme modifications:
+## T-Beam and T-Beam S3 Supreme modifications:
 - u-blox GPS configuration:
   - enable GSA, GSV, VTG, GST
   - enable GPS, GALILEO, BEIDOU and SBAS (u-blox 10 default)
@@ -42,10 +48,13 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 ## Limitations:
 - GPS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GPS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
 - the L76K only supports the NMEA "strict" protocol version, therefore some extended satellite information (like elevation, azimut and numbering) is not provided for some satellites and therefore the GPS info page in Stratux is incomplete. Furthermore BEIDOU satellites are not displayed at all but are in fact used and counted for "in solution"
-- if your T-Beam S3 Supreme or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux
+- if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux
 
 ## Recommendations for T-Beam S3 Supreme:
 - load OGN database: https://github.com/lyusupov/SoftRF/wiki/Prime-Edition-MkIII#aircrafts-database
+- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.1.1/settings
+
+## Recommendations for T-Beam:
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.1.1/settings
 
 ## Recommendations for T-Echo:
