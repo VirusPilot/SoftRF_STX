@@ -40,8 +40,6 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - L76K GPS configuration:
   - enable GSA, GSV, VTG
   - enable GPS, GLONASS and BEIDOU
-  - NMEA output through USB (instead of Bluetooth)
-- default connection with Stratux: **USB** (115200 baud), the USB T-Echo connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi (`/boot/firmware/config.txt` for Bookworm)
 - LK8EX1 messages over serial connection are disabled
 
 ## Limitations:
