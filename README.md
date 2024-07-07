@@ -36,21 +36,21 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 ![Chrome T-Beam Flash Tool](https://github.com/VirusPilot/SoftRF/assets/43483458/bc84d81f-a71f-46e7-a4d8-c7c2ff45bc2e)
 
 ## T-Beam and T-Beam S3 Supreme modifications:
-- u-blox GPS configuration:
+- u-blox GNSS configuration:
   - enable GSA, GSV, VTG, GST
   - enable GPS, GALILEO, BEIDOU and SBAS (u-blox 10 default)
   - enable NMEA extended protocol
 - default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi (`/boot/firmware/config.txt` for Bookworm)
 
 ## T-Echo modifications:
-- L76K GPS configuration:
+- L76K GNSS configuration:
   - enable GSA, GSV, VTG
   - enable GPS, GLONASS and BEIDOU
 - LK8EX1 messages over serial connection are disabled
 
 ## Limitations:
-- GNSS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GPS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
-- the L76K only supports the NMEA "strict" protocol version, therefore some extended satellite information (like elevation, azimut and numbering) is not provided for some satellites and therefore the GPS info page in Stratux is incomplete. Furthermore BEIDOU satellites are not displayed at all but are in fact used and counted for "in solution"
+- GNSS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GNSS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
+- the L76K only supports the NMEA "strict" protocol version, therefore some extended satellite information (like elevation, azimut and numbering) is not provided for some satellites and therefore the GNSS info page in Stratux is incomplete. Furthermore BEIDOU satellites are not displayed at all but are in fact used and counted for "in solution"
 - if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux
 
 ## Recommendations for T-Beam S3 Supreme:
