@@ -4,11 +4,17 @@
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF
 - ADS-L/OGN/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker (WIP)
 
-## Features
-- enable SoftRF to work as a proper GPS and Baro source for Stratux (through USB)
+### General Features:
 - option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.1.1/settings)
   - if added (`AircraftID: <ICAO hex Code>`), then ADDR_TYPE_ICAO is set (this is based on the assumtion that your airplane has a transponder)
   - if **not** added, then the SoftRF factory ID remains (`AircraftID: 0`) and ADDR_TYPE_FLARM is set
+
+### T-Beam and T-Beam S3 Supreme Features:
+- **USB mode** (default): enable SoftRF to work as a proper GNSS and Baro source for Stratux
+- **Bluetooth LE mode** (requires settings change, see below): enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon
+
+### T-Echo Features:
+- enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (through Bluetooth LE)
 
 ## UF2 Binaries
 UF2 binaries are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
@@ -43,7 +49,7 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - LK8EX1 messages over serial connection are disabled
 
 ## Limitations:
-- GPS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GPS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
+- GNSS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GPS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
 - the L76K only supports the NMEA "strict" protocol version, therefore some extended satellite information (like elevation, azimut and numbering) is not provided for some satellites and therefore the GPS info page in Stratux is incomplete. Furthermore BEIDOU satellites are not displayed at all but are in fact used and counted for "in solution"
 - if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux
 
