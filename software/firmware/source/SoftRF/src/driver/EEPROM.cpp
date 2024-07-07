@@ -112,7 +112,7 @@ void EEPROM_defaults()
 
   eeprom_block.field.settings.nmea_g     = true;
   eeprom_block.field.settings.nmea_p     = false;
-  eeprom_block.field.settings.nmea_l     = false; /* not required for Stratux */
+  eeprom_block.field.settings.nmea_l     = true;
   eeprom_block.field.settings.nmea_s     = true;
 
 #if (ARDUINO_USB_CDC_ON_BOOT && !defined(USE_USB_HOST)) || \
@@ -120,7 +120,7 @@ void EEPROM_defaults()
   eeprom_block.field.settings.nmea_out   = NMEA_USB;
 #else
   eeprom_block.field.settings.nmea_out   = hw_info.model == SOFTRF_MODEL_BADGE     ?
-                                           NMEA_USB :
+                                           NMEA_BLUETOOTH :
                                            hw_info.model == SOFTRF_MODEL_ES        ?
                                            NMEA_OFF :
                                            hw_info.model == SOFTRF_MODEL_ACADEMY  ||
