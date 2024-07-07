@@ -34,7 +34,6 @@ UF2 binaries are available for the following platforms and can be downloaded as 
   - enable GSA, GSV, VTG, GST
   - enable GPS, GALILEO, BEIDOU and SBAS (u-blox 10 default)
   - enable NMEA extended protocol
-- LEGACY NMEA traffic messages are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
 - default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi (`/boot/firmware/config.txt` for Bookworm)
 
 ## T-Echo modifications:
@@ -43,7 +42,7 @@ UF2 binaries are available for the following platforms and can be downloaded as 
   - enable GPS, GLONASS and BEIDOU
   - NMEA output through USB (instead of Bluetooth)
 - default connection with Stratux: **USB** (115200 baud), the USB T-Echo connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi (`/boot/firmware/config.txt` for Bookworm)
-- LK8EX1 and LEGACY traffic messages over serial connection are disabled (to relax data rate, Stratux receives LEGACY directly anyhow)
+- LK8EX1 messages over serial connection are disabled
 
 ## Limitations:
 - GPS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GPS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
