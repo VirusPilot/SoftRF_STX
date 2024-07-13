@@ -42,6 +42,7 @@ jobs:
       - name: Build SoftRF
         run: |
           cd $GITHUB_WORKSPACE
+          rm $GITHUB_WORKSPACE/software/firmware/source/SoftRF/build_opt.h
           arduino-cli compile -e -b "$S76G" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
           cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/STM32:stm32:Nucleo_64"
 
