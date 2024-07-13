@@ -35,7 +35,8 @@ jobs:
         shell: bash
         run: |
             arduino-cli config init
-            arduino-cli config add board_manager.additional_urls https://github.com/stm32duino/BoardManagerFiles/raw/07bcfb337e4c9abe83a029b39e33ddff5a6df2ef/STM32/package_stm_index.json
+            # arduino-cli config add board_manager.additional_urls https://github.com/stm32duino/BoardManagerFiles/raw/07bcfb337e4c9abe83a029b39e33ddff5a6df2ef/STM32/package_stm_index.json
+            arduino-cli config add board_manager.additional_urls https://github.com/stm32duino/BoardManagerFiles/blob/master/STM32/package_stm_index.json
             arduino-cli core update-index
             arduino-cli core install STM32:stm32@1.9.0
 
@@ -44,7 +45,10 @@ jobs:
           cd $GITHUB_WORKSPACE
           rm $GITHUB_WORKSPACE/software/firmware/source/SoftRF/build_opt.h
           arduino-cli compile -e -b "$S76G" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-#         cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/STM32.stm32.Nucleo_64"
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/STM32.stm32.Nucleo_64"
+          rm -f *.elf
+          rm -f *.map
+          rm -f *.hex
 
       - uses: actions/upload-artifact@v4
         with:
