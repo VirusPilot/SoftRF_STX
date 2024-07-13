@@ -1,0 +1,53 @@
+name: build-v2
+
+on:
+  #push:
+  #  branches:
+  #    - master
+  #  paths-ignore:
+  #    - '**.md'
+  #    - '**.yml'
+  workflow_dispatch:
+
+env:
+  # arduino-cli board details -b STM32:stm32:Nucleo_64
+  STM32: 'STM32:stm32:Nucleo_64:pnum=NUCLEO_L073RZ,xserial=none,usb=CDCgen,upload_method=dfuMethod'
+
+jobs:
+  build-v2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uf2, Arduino and Python
+        shell: bash
+        run: |
+
+          mkdir -p ~/.local/bin
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh
+
+          mkdir $HOME/Arduino
+          ln -s $GITHUB_WORKSPACE/software/firmware/source/libraries $HOME/Arduino/libraries
+
+          sudo apt-get update --fix-missing
+          sudo apt-get install python3-full
+          
+      - name: Install boards
+        shell: bash
+        run: |
+            arduino-cli config init
+            arduino-cli config add board_manager.additional_urls https://github.com/stm32duino/BoardManagerFiles/raw/07bcfb337e4c9abe83a029b39e33ddff5a6df2ef/STM32/package_stm_index.json
+            arduino-cli core update-index
+            arduino-cli core install STM32:stm32:1.9.0
+
+      - name: Build SoftRF
+        run: |
+          cd $GITHUB_WORKSPACE
+          arduino-cli compile -e -b "$STM32" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/STM32:stm32:Nucleo_64"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SoftRF
+          path: |
+            software/firmware/source/SoftRF/build/
+          if-no-files-found: error
