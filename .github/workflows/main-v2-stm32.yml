@@ -1,4 +1,4 @@
-name: build-v2
+name: build-v2-stm32
 
 on:
   #push:
@@ -11,7 +11,7 @@ on:
 
 env:
   # arduino-cli board details -b STM32:stm32:Nucleo_64
-  STM32: 'STM32:stm32:Nucleo_64:pnum=NUCLEO_L073RZ,xserial=none,usb=CDCgen,upload_method=dfuMethod'
+  S76G: 'STM32:stm32:Nucleo_64:pnum=NUCLEO_L073RZ,xserial=none,usb=CDCgen,upload_method=dfuMethod'
 
 jobs:
   build-v2:
@@ -42,7 +42,7 @@ jobs:
       - name: Build SoftRF
         run: |
           cd $GITHUB_WORKSPACE
-          arduino-cli compile -e -b "$STM32" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          arduino-cli compile -e -b "$S76G" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
           cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/STM32:stm32:Nucleo_64"
 
       - uses: actions/upload-artifact@v4
