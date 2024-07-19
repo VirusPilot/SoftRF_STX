@@ -49,6 +49,7 @@ const char EPD_GNSS_text[]    = "GNSS    ";
 const char EPD_Display_text[] = "DISPLAY ";
 const char EPD_RTC_text[]     = "RTC     ";
 const char EPD_Flash_text[]   = "FLASH   ";
+const char EPD_Card_text[]    = "CARD    ";
 const char EPD_Baro_text[]    = "BARO  ";
 const char EPD_IMU_text[]     = "IMU   ";
 
@@ -81,23 +82,32 @@ bool EPD_setup(bool splash_screen)
 
   display->init( /* 38400 */ );
 
-  display->setRotation((3 + ui->rotate) & 0x3); /* 270 deg. is default angle */
+  display->setRotation((ROTATE_270 + ui->rotate) & 0x3); /* 270 deg. is default angle */
+
   display->setTextColor(GxEPD_BLACK);
   display->setTextWrap(false);
-
-  display->setFont(&FreeMonoBold24pt7b);
-  display->getTextBounds(EPD_SoftRF_text1, 0, 0, &tbx1, &tby1, &tbw1, &tbh1);
-  display->getTextBounds(EPD_SoftRF_text3, 0, 0, &tbx3, &tby3, &tbw3, &tbh3);
 
   display->setFullWindow();
 
   display->fillScreen(GxEPD_WHITE);
+
+#if defined(EPD_ASPECT_RATIO_1C1) || defined(EPD_ASPECT_RATIO_2C1)
+#if defined(EPD_ASPECT_RATIO_1C1)
+  display->setFont(&FreeMonoBold24pt7b);
+#elif defined(EPD_ASPECT_RATIO_2C1)
+  display->setFont(&FreeMonoBold18pt7b);
+#endif
+  display->getTextBounds(EPD_SoftRF_text1, 0, 0, &tbx1, &tby1, &tbw1, &tbh1);
+  display->getTextBounds(EPD_SoftRF_text3, 0, 0, &tbx3, &tby3, &tbw3, &tbh3);
 
   if (hw_info.model == SOFTRF_MODEL_BADGE ||
       hw_info.model == SOFTRF_MODEL_INK) {
 
     x = (display->width()  - tbw1) / 2;
     y = (display->height() + tbh1) / 2 - tbh3;
+#if defined(EPD_ASPECT_RATIO_2C1)
+    y -= 10;
+#endif /* EPD_ASPECT_RATIO_2C1 */
     display->setCursor(x, y);
     display->print(EPD_SoftRF_text1);
 
@@ -106,13 +116,23 @@ bool EPD_setup(bool splash_screen)
 
     x = (display->width()  - tbw2) / 2;
     y = (display->height() + tbh2) / 2;
+#if defined(EPD_ASPECT_RATIO_2C1)
+    y -= 10;
+#endif /* EPD_ASPECT_RATIO_2C1 */
     display->setCursor(x, y);
     display->print(EPD_SoftRF_text2);
 
+#if defined(EPD_ASPECT_RATIO_1C1)
     display->setFont(&FreeMonoBold24pt7b);
+#elif defined(EPD_ASPECT_RATIO_2C1)
+    display->setFont(&FreeMonoBold18pt7b);
+#endif
 
     x = (display->width()  - tbw3) / 2;
     y = (display->height() + tbh3) / 2 + tbh3;
+#if defined(EPD_ASPECT_RATIO_2C1)
+    y -= 10;
+#endif /* EPD_ASPECT_RATIO_2C1 */
     display->setCursor(x, y);
     display->print(EPD_SoftRF_text3);
 
@@ -125,6 +145,13 @@ bool EPD_setup(bool splash_screen)
     display->getTextBounds(buf, 0, 0, &tbx4, &tby4, &tbw4, &tbh4);
     x = (display->width() - tbw4) / 2;
     y = display->height() - tbh4;
+#if defined(EPD_ASPECT_RATIO_2C1)
+  if (display->epd2.panel    == GxEPD2::DEPG0213BN &&
+      display->height()      == 128                &&
+      display->getRotation() == ROTATE_270) {
+    y -= 6;
+  }
+#endif /* EPD_ASPECT_RATIO_2C1 */
     display->setCursor(x, y);
     display->print(buf);
 
@@ -134,6 +161,7 @@ bool EPD_setup(bool splash_screen)
     display->setCursor(x, y);
     display->print(EPD_SoftRF_text1);
   }
+#endif /* EPD_ASPECT_RATIO_1C1 || EPD_ASPECT_RATIO_2C1 */
 
   // first update should be full refresh
   display->display(false);
@@ -190,8 +218,10 @@ void EPD_info1()
 {
   switch (hw_info.display)
   {
+#if defined(EPD_ASPECT_RATIO_1C1) || defined(EPD_ASPECT_RATIO_2C1)
   case DISPLAY_EPD_1_54:
   case DISPLAY_EPD_2_7:
+  case DISPLAY_EPD_2_13:
     int16_t  tbx, tby;
     uint16_t tbw, tbh;
 
@@ -210,6 +240,14 @@ void EPD_info1()
     x = 5;
     y = (tbh + INFO_1_LINE_SPACING - 2);
 
+#if defined(EPD_ASPECT_RATIO_2C1)
+    if (display->epd2.panel    == GxEPD2::DEPG0213BN &&
+        display->height()      == 128                &&
+        display->getRotation() == ROTATE_90) {
+      y += 6;
+    }
+#endif /* EPD_ASPECT_RATIO_2C1 */
+
     display->setCursor(x, y);
     display->print(EPD_Radio_text);
     display->print(hw_info.rf != RF_IC_NONE ? "+" : "-");
@@ -220,13 +258,13 @@ void EPD_info1()
     display->print(EPD_GNSS_text);
     display->print(hw_info.gnss != GNSS_MODULE_NONE ? "+" : "-");
 
-    y += (tbh + INFO_1_LINE_SPACING);
-
-    display->setCursor(x, y);
-    display->print(EPD_Display_text);
-    display->print(hw_info.display != DISPLAY_NONE ? "+" : "-");
-
     if (hw_info.model == SOFTRF_MODEL_BADGE) {
+      y += (tbh + INFO_1_LINE_SPACING);
+
+      display->setCursor(x, y);
+      display->print(EPD_Display_text);
+      display->print(hw_info.display != DISPLAY_NONE ? "+" : "-");
+
       y += (tbh + INFO_1_LINE_SPACING);
 
       display->setCursor(x, y);
@@ -239,16 +277,25 @@ void EPD_info1()
       display->print(EPD_Flash_text);
       display->print(hw_info.storage == STORAGE_FLASH ? "+" : "-");
 
+    } else if (hw_info.model == SOFTRF_MODEL_INK) {
       y += (tbh + INFO_1_LINE_SPACING);
 
-      if (hw_info.baro == BARO_MODULE_NONE) {
-        display->setFont(&FreeMono18pt7b);
-      }
-
       display->setCursor(x, y);
-      display->print(EPD_Baro_text);
-      display->print(hw_info.baro != BARO_MODULE_NONE ? "  +" : "N/A");
+      display->print(EPD_Card_text);
+      display->print(hw_info.storage == STORAGE_CARD  ? "+" : "-");
+    }
 
+    y += (tbh + INFO_1_LINE_SPACING);
+
+    if (hw_info.baro == BARO_MODULE_NONE) {
+      display->setFont(&FreeMono18pt7b);
+    }
+
+    display->setCursor(x, y);
+    display->print(EPD_Baro_text);
+    display->print(hw_info.baro != BARO_MODULE_NONE ? "  +" : "N/A");
+
+    if (hw_info.model == SOFTRF_MODEL_BADGE) {
       y += (tbh + INFO_1_LINE_SPACING);
 
       if (hw_info.imu == IMU_NONE) {
@@ -280,6 +327,7 @@ void EPD_info1()
 #endif
 
     break;
+#endif /* EPD_ASPECT_RATIO_1C1 || EPD_ASPECT_RATIO_2C1 */
 
   case DISPLAY_NONE:
   default:
@@ -293,6 +341,7 @@ void EPD_info2(int acfts, char *reg, char *mam, char *cn)
 
   switch (hw_info.display)
   {
+#if defined(EPD_ASPECT_RATIO_1C1)
   case DISPLAY_EPD_1_54:
   case DISPLAY_EPD_2_7:
     int16_t  tbx, tby;
@@ -412,6 +461,7 @@ void EPD_info2(int acfts, char *reg, char *mam, char *cn)
 
     delay(3000);
     break;
+#endif /* EPD_ASPECT_RATIO_1C1 */
 
   case DISPLAY_NONE:
   default:
@@ -424,6 +474,7 @@ void EPD_loop()
   switch (hw_info.display)
   {
   case DISPLAY_EPD_1_54:
+  case DISPLAY_EPD_2_13:
 
     if (EPD_vmode_updated) {
 #if defined(USE_EPD_TASK)
@@ -502,6 +553,7 @@ void EPD_fini(int reason, bool screen_saver)
 
   switch (hw_info.display)
   {
+#if defined(EPD_ASPECT_RATIO_1C1)
   case DISPLAY_EPD_1_54:
 #if defined(USE_EPD_TASK)
       while (EPD_update_in_progress != EPD_UPDATE_NONE) delay(100);
@@ -600,6 +652,7 @@ void EPD_fini(int reason, bool screen_saver)
 
 //    SoC->Display_unlock();
     break;
+#endif /* EPD_ASPECT_RATIO_1C1 */
 
   case DISPLAY_NONE:
   default:
@@ -609,7 +662,8 @@ void EPD_fini(int reason, bool screen_saver)
 
 void EPD_Mode()
 {
-  if (hw_info.display == DISPLAY_EPD_1_54) {
+  if (hw_info.display == DISPLAY_EPD_1_54 ||
+      hw_info.display == DISPLAY_EPD_2_13) {
     for (int i=0; i < VIEW_MODES_COUNT; i++) {
       int next_view_mode = (EPD_view_mode + i) % VIEW_MODES_COUNT;
       if ((next_view_mode != EPD_view_mode) &&
