@@ -108,6 +108,7 @@ struct rst_info {
 #define BME280_ADDRESS        (0x77)
 #define MPU9250_ADDRESS       (0x68)
 #define ICM20948_ADDRESS      (0x68)
+#define QMA6100P_ADDRESS      (0x12) // 0x13 when AD0 = HIGH
 
 #if defined(ARDUINO_ARCH_MBED)
 #define PCF8563_SLAVE_ADDRESS (0x51)
@@ -285,6 +286,7 @@ struct rst_info {
 //#define EXCLUDE_GNSS_GOKE     /* 'Air530' GK9501 GPS/GLO/BDS (GAL inop.) */
 //#define EXCLUDE_GNSS_AT65     /* Quectel L76K */
 #define EXCLUDE_GNSS_UC65
+#define EXCLUDE_GNSS_AG33
 
 /* Component                         Cost */
 /* -------------------------------------- */
