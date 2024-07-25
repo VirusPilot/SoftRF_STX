@@ -12,6 +12,7 @@
 ### T-Beam and T-Beam S3 Supreme Features:
 - **USB mode** (default): enable SoftRF to work as a proper GNSS and Baro source for Stratux
 - **Bluetooth LE mode** (requires settings change, see below): enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon
+  - ![Bildschirmfoto 2024-07-25 um 12 47 56](https://github.com/user-attachments/assets/6f2d901a-7a75-46b1-9cde-e264c3a85fbe)
 
 ### T-Echo Features:
 - enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (through Bluetooth LE)
