@@ -2,7 +2,7 @@
 ## ATTENTION: only T-Beam, T-Beam S3 Supreme and T-Echo binaries are provided/tested on a regular basis
 ### It is recommended to consider the following alternatives:
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF (only for T-Beam up to v1.2 and T-Echo)
-- ADS-L/OGN/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker (WIP)
+- ADS-L/OGN/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker (WIP, only for T-Beam and T-Beam S3 Supreme)
 
 ### General Features:
 - option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.1.1/settings)
@@ -11,8 +11,8 @@
 
 ### T-Beam and T-Beam S3 Supreme Features:
 - **USB mode** (default): enable SoftRF to work as a proper GNSS and Baro source for Stratux
-- **Bluetooth LE mode** (requires settings change, see below): enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon
-  - ![Bildschirmfoto 2024-07-25 um 12 47 56](https://github.com/user-attachments/assets/6f2d901a-7a75-46b1-9cde-e264c3a85fbe)
+- **Bluetooth LE mode**: enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (TestFlight version), please use the following settings:
+  - ![1](https://github.com/user-attachments/assets/93e70aa7-cf88-4eaa-ad6e-fd0072773417)
 
 ### T-Echo Features:
 - enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (through Bluetooth LE)
