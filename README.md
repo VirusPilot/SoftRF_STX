@@ -15,7 +15,7 @@
   - ![1](https://github.com/user-attachments/assets/93e70aa7-cf88-4eaa-ad6e-fd0072773417)
 
 ### T-Echo Features:
-- enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (through Bluetooth LE)
+- **Bluetooth LE mode** (default): enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (TestFlight version)
 
 ## UF2 Binaries
 UF2 binaries are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
