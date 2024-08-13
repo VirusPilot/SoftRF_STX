@@ -808,12 +808,56 @@ static void nRF52_setup()
 
   Wire.end();
 
+#if !defined(ARDUINO_ARCH_MBED)
+  /* (Q)SPI flash init */
+  Adafruit_FlashTransport_QSPI *ft = NULL;
+
+  switch (nRF52_board)
+  {
+    case NRF52_LILYGO_TECHO_REV_0:
+      possible_devices[MX25R1635F_INDEX].max_clock_speed_mhz  = 33;
+      possible_devices[MX25R1635F_INDEX].supports_qspi        = false;
+      possible_devices[MX25R1635F_INDEX].supports_qspi_writes = false;
+    case NRF52_LILYGO_TECHO_REV_1:
+    case NRF52_LILYGO_TECHO_REV_2:
+    case NRF52_HELTEC_T114:
+      ft = new Adafruit_FlashTransport_QSPI(SOC_GPIO_PIN_SFL_SCK,
+                                            SOC_GPIO_PIN_SFL_SS,
+                                            SOC_GPIO_PIN_SFL_MOSI,
+                                            SOC_GPIO_PIN_SFL_MISO,
+                                            SOC_GPIO_PIN_SFL_WP,
+                                            SOC_GPIO_PIN_SFL_HOLD);
+      break;
+    case NRF52_LILYGO_TULTIMA:
+      ft = new Adafruit_FlashTransport_QSPI(SOC_GPIO_PIN_SFL_TULTIMA_SCK,
+                                            SOC_GPIO_PIN_SFL_TULTIMA_SS,
+                                            SOC_GPIO_PIN_SFL_TULTIMA_MOSI,
+                                            SOC_GPIO_PIN_SFL_TULTIMA_MISO,
+                                            SOC_GPIO_PIN_SFL_TULTIMA_WP,
+                                            SOC_GPIO_PIN_SFL_TULTIMA_HOLD);
+      break;
+    case NRF52_NORDIC_PCA10059:
+    case NRF52_SEEED_T1000E:
+    default:
+      break;
+  }
+
+  if (ft != NULL) {
+    SPIFlash = new Adafruit_SPIFlash(ft);
+    nRF52_has_spiflash = SPIFlash->begin(possible_devices,
+                                         EXTERNAL_FLASH_DEVICE_COUNT);
+  }
+#endif /* ARDUINO_ARCH_MBED */
+
+  hw_info.storage = nRF52_has_spiflash ? STORAGE_FLASH : STORAGE_NONE;
+
 #if defined(USE_TFT)
-  if (nRF52_board   == NRF52_LILYGO_TECHO_REV_2 /* default */ &&
+  if (nRF52_board        == NRF52_LILYGO_TECHO_REV_2 /* default */ &&
+      nRF52_has_spiflash == false                                  &&
 #if !defined(EXCLUDE_IMU)
-      nRF52_has_imu == false                                  &&
+      nRF52_has_imu      == false                                  &&
 #endif /* EXCLUDE_IMU */
-      nRF52_has_rtc == false) {
+      nRF52_has_rtc      == false) {
     nRF52_board        = NRF52_HELTEC_T114;
     hw_info.model      = SOFTRF_MODEL_COZY;
     nRF52_Device_Model = "Cozy Edition";
@@ -1072,48 +1116,6 @@ static void nRF52_setup()
     }
   }
 #endif /* EXCLUDE_IMU */
-
-#if !defined(ARDUINO_ARCH_MBED)
-  /* (Q)SPI flash init */
-  Adafruit_FlashTransport_QSPI *ft = NULL;
-
-  switch (nRF52_board)
-  {
-    case NRF52_LILYGO_TECHO_REV_0:
-      possible_devices[MX25R1635F_INDEX].max_clock_speed_mhz  = 33;
-      possible_devices[MX25R1635F_INDEX].supports_qspi        = false;
-      possible_devices[MX25R1635F_INDEX].supports_qspi_writes = false;
-    case NRF52_LILYGO_TECHO_REV_1:
-    case NRF52_LILYGO_TECHO_REV_2:
-    case NRF52_HELTEC_T114:
-      ft = new Adafruit_FlashTransport_QSPI(SOC_GPIO_PIN_SFL_SCK,
-                                            SOC_GPIO_PIN_SFL_SS,
-                                            SOC_GPIO_PIN_SFL_MOSI,
-                                            SOC_GPIO_PIN_SFL_MISO,
-                                            SOC_GPIO_PIN_SFL_WP,
-                                            SOC_GPIO_PIN_SFL_HOLD);
-      break;
-    case NRF52_LILYGO_TULTIMA:
-      ft = new Adafruit_FlashTransport_QSPI(SOC_GPIO_PIN_SFL_TULTIMA_SCK,
-                                            SOC_GPIO_PIN_SFL_TULTIMA_SS,
-                                            SOC_GPIO_PIN_SFL_TULTIMA_MOSI,
-                                            SOC_GPIO_PIN_SFL_TULTIMA_MISO,
-                                            SOC_GPIO_PIN_SFL_TULTIMA_WP,
-                                            SOC_GPIO_PIN_SFL_TULTIMA_HOLD);
-      break;
-    case NRF52_NORDIC_PCA10059:
-    default:
-      break;
-  }
-
-  if (ft != NULL) {
-    SPIFlash = new Adafruit_SPIFlash(ft);
-    nRF52_has_spiflash = SPIFlash->begin(possible_devices,
-                                         EXTERNAL_FLASH_DEVICE_COUNT);
-  }
-#endif /* ARDUINO_ARCH_MBED */
-
-  hw_info.storage = nRF52_has_spiflash ? STORAGE_FLASH : STORAGE_NONE;
 
 #if !defined(ARDUINO_ARCH_MBED)
   if (nRF52_has_spiflash) {
@@ -1628,9 +1630,34 @@ static void nRF52_fini(int reason)
   // pinMode(SOC_GPIO_PIN_BUSY, INPUT);
   pinMode(lmic_pins.rst,  INPUT);
 
+  int mode_button_pin;
+
+  switch (nRF52_board)
+  {
+    case NRF52_LILYGO_TULTIMA:
+      mode_button_pin = SOC_GPIO_PIN_TULTIMA_BUTTON1;
+      break;
+
+    case NRF52_SEEED_T1000E:
+      mode_button_pin = SOC_GPIO_PIN_T1000_BUTTON;
+      break;
+
+    case NRF52_HELTEC_T114:
+      mode_button_pin = SOC_GPIO_PIN_T114_BUTTON;
+      break;
+
+    case NRF52_LILYGO_TECHO_REV_0:
+    case NRF52_LILYGO_TECHO_REV_1:
+    case NRF52_LILYGO_TECHO_REV_2:
+    case NRF52_NORDIC_PCA10059:
+    default:
+      mode_button_pin = SOC_GPIO_PIN_BUTTON;
+      break;
+  }
+
   // pinMode(SOC_GPIO_PIN_PAD,    INPUT);
-  pinMode(SOC_GPIO_PIN_BUTTON, nRF52_board == NRF52_LILYGO_TECHO_REV_1 ? INPUT_PULLUP : INPUT);
-  while (digitalRead(SOC_GPIO_PIN_BUTTON) == LOW);
+  pinMode(mode_button_pin, nRF52_board == NRF52_LILYGO_TECHO_REV_1 ? INPUT_PULLUP : INPUT);
+  while (digitalRead(mode_button_pin) == LOW);
   delay(100);
 
 #if defined(USE_TINYUSB)
@@ -1647,7 +1674,7 @@ static void nRF52_fini(int reason)
   case SOFTRF_SHUTDOWN_LOWBAT:
     NRF_POWER->GPREGRET = DFU_MAGIC_SKIP;
 #if !defined(ARDUINO_ARCH_MBED)
-    pinMode(SOC_GPIO_PIN_BUTTON, INPUT_PULLUP_SENSE /* INPUT_SENSE_LOW */);
+    pinMode(mode_button_pin, INPUT_PULLUP_SENSE /* INPUT_SENSE_LOW */);
 #endif /* ARDUINO_ARCH_MBED */
     break;
 #if defined(USE_SERIAL_DEEP_SLEEP)
@@ -2759,7 +2786,24 @@ void handleEvent(AceButton* button, uint8_t eventType,
       if (button == &button_1) {
 
 #if defined(USE_EPAPER)
-        if (digitalRead(SOC_GPIO_PIN_PAD) == LOW) {
+        int up_button_pin = -1;
+
+        switch (nRF52_board)
+        {
+          case NRF52_LILYGO_TULTIMA:
+            up_button_pin = SOC_GPIO_PIN_TULTIMA_BUTTON2;
+            break;
+
+          case NRF52_LILYGO_TECHO_REV_0:
+          case NRF52_LILYGO_TECHO_REV_1:
+          case NRF52_LILYGO_TECHO_REV_2:
+          case NRF52_NORDIC_PCA10059:
+            up_button_pin = SOC_GPIO_PIN_PAD;
+          default:
+            break;
+        }
+
+        if (up_button_pin >= 0 && digitalRead(up_button_pin) == LOW) {
           screen_saver = true;
         }
 #endif
@@ -2783,15 +2827,40 @@ void onUpButtonEvent() {
 
 static void nRF52_Button_setup()
 {
-  int mode_button_pin = SOC_GPIO_PIN_BUTTON;
-  int up_button_pin   = SOC_GPIO_PIN_PAD;
+  int mode_button_pin;
+  int up_button_pin = -1;
+
+  switch (nRF52_board)
+  {
+    case NRF52_LILYGO_TULTIMA:
+      mode_button_pin = SOC_GPIO_PIN_TULTIMA_BUTTON1;
+      up_button_pin   = SOC_GPIO_PIN_TULTIMA_BUTTON2;
+      break;
+
+    case NRF52_SEEED_T1000E:
+      mode_button_pin = SOC_GPIO_PIN_T1000_BUTTON;
+      break;
+
+    case NRF52_HELTEC_T114:
+      mode_button_pin = SOC_GPIO_PIN_T114_BUTTON;
+      break;
+
+    case NRF52_LILYGO_TECHO_REV_0:
+    case NRF52_LILYGO_TECHO_REV_1:
+    case NRF52_LILYGO_TECHO_REV_2:
+    case NRF52_NORDIC_PCA10059:
+      up_button_pin   = SOC_GPIO_PIN_PAD;
+    default:
+      mode_button_pin = SOC_GPIO_PIN_BUTTON;
+      break;
+  }
 
   // Button(s) uses external pull up resistor.
   pinMode(mode_button_pin, nRF52_board == NRF52_LILYGO_TECHO_REV_1 ? INPUT_PULLUP : INPUT);
-  pinMode(up_button_pin, INPUT);
+  if (up_button_pin >= 0) { pinMode(up_button_pin, INPUT); }
 
   button_1.init(mode_button_pin);
-  button_2.init(up_button_pin);
+  if (up_button_pin >= 0) { button_2.init(up_button_pin); }
 
   // Configure the ButtonConfig with the event handler, and enable all higher
   // level events.
@@ -2817,19 +2886,47 @@ static void nRF52_Button_setup()
   UpButtonConfig->setLongPressDelay(2000);
 
 //  attachInterrupt(digitalPinToInterrupt(mode_button_pin), onModeButtonEvent, CHANGE );
-  attachInterrupt(digitalPinToInterrupt(up_button_pin),   onUpButtonEvent,   CHANGE );
+  if (up_button_pin >= 0) {
+    attachInterrupt(digitalPinToInterrupt(up_button_pin),   onUpButtonEvent,   CHANGE );
+  }
 }
 
 static void nRF52_Button_loop()
 {
   button_1.check();
-  button_2.check();
+
+  switch (nRF52_board)
+  {
+    case NRF52_LILYGO_TECHO_REV_0:
+    case NRF52_LILYGO_TECHO_REV_1:
+    case NRF52_LILYGO_TECHO_REV_2:
+    case NRF52_NORDIC_PCA10059:
+    case NRF52_LILYGO_TULTIMA:
+      button_2.check();
+      break;
+    default:
+      break;
+  }
 }
 
 static void nRF52_Button_fini()
 {
 //  detachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_BUTTON));
-  detachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_PAD));
+
+  switch (nRF52_board)
+  {
+    case NRF52_LILYGO_TECHO_REV_0:
+    case NRF52_LILYGO_TECHO_REV_1:
+    case NRF52_LILYGO_TECHO_REV_2:
+    case NRF52_NORDIC_PCA10059:
+      detachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_PAD));
+      break;
+    case NRF52_LILYGO_TULTIMA:
+      detachInterrupt(digitalPinToInterrupt(SOC_GPIO_PIN_TULTIMA_BUTTON2));
+      break;
+    default:
+      break;
+  }
 }
 
 #if defined(USE_WEBUSB_SERIAL) && !defined(USE_WEBUSB_SETTINGS)
