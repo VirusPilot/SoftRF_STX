@@ -40,8 +40,19 @@ enum
 #endif /* EXCLUDE_BLUETOOTH */
 #elif defined(ARDUINO_ARCH_NRF52)
 #include "../platform/bluetooth/Bluefruit.h"
-#elif defined(ARDUINO_ARCH_RP2040) && defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#elif defined(ARDUINO_ARCH_NRF52840)
+#include "../system/SoC.h"
+#if defined(USE_ARDUINOBLE)
+#include "../platform/bluetooth/ArduinoBLE.h"
+#endif /* USE_ARDUINOBLE */
+#elif defined(ARDUINO_ARCH_RP2040)
+#if defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include "../platform/bluetooth/BTstack.h"
+#elif defined(ARDUINO_NANO_RP2040_CONNECT)
+#if defined(USE_ARDUINOBLE)
+#include "../platform/bluetooth/ArduinoBLE.h"
+#endif /* USE_ARDUINOBLE */
+#endif /* PI_PICO_W NANO_RP2040_CONNECT */
 #elif defined(ARDUINO_ARCH_RENESAS) || defined(ARDUINO_ARCH_SILABS)
 #include "../platform/bluetooth/ArduinoBLE.h"
 #endif /* ESP32 or NRF52 or RP2040 or RENESAS or SILABS */
