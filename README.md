@@ -74,11 +74,12 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
 ### Arduino IDE settings for T-Beam
+- based on https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series?tab=readme-ov-file#3%EF%B8%8F⃣arduino-ide-quick-start
 - Install "esp32 by Espressif" version 2.0.9 under "BOARDS MANAGER" 
 - Select Tools -> Board -> ESP32 Dev Module
 - Select Tools -> CPU Frequency -> 240MHz
 - Select Tools -> Flash Frequency -> 80MHz
-- Select Tools -> Flash Mode -> DIO
+- Select Tools -> Flash Mode -> QIO
 - Select Tools -> Flash Size -> 4MB
 - Select Tools -> Partition Scheme -> minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)
 - Select Tools -> PSRAM -> Enabled
@@ -89,6 +90,7 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - compile/upload
 
 ### Arduino IDE settings for T-Beam S3 Supreme (Caution: the UF2 firmware upload option will no longer work after the following steps)
+- based on https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series?tab=readme-ov-file#3%EF%B8%8F⃣arduino-ide-quick-start
 - Install "esp32 by Espressif" version 2.0.9 under "BOARDS MANAGER" 
 - Select Tools -> Board -> ESP32S3 Dev Module
 - Select Tools -> CPU Frequency -> 240MHz
