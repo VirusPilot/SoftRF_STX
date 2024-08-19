@@ -1340,6 +1340,7 @@ $('form').submit(function(e){\
 
 /* FLASH memory usage optimization */
 #if !defined(ARDUINO_ARCH_RP2040)       && \
+    !defined(ARDUINO_ARCH_RP2350)       && \
     !defined(CONFIG_IDF_TARGET_ESP32C2) && \
     !defined(CONFIG_IDF_TARGET_ESP32C6) && \
     !defined(ARDUINO_ARCH_RENESAS)
@@ -1347,7 +1348,7 @@ $('form').submit(function(e){\
   server.on ( "/logo.png", []() {
     server.send_P ( 200, "image/png", Logo, sizeof(Logo) );
   } );
-#endif /* ARDUINO_ARCH_RP2040 CONFIG_IDF_TARGET_ESP32C6 ARDUINO_ARCH_RENESAS */
+#endif /* ARDUINO_ARCH_RP2XXX CONFIG_IDF_TARGET_ESP32C6 ARDUINO_ARCH_RENESAS */
 
 #if !defined(EXCLUDE_OTA)
   server.on ( "/jquery.min.js", []() {
