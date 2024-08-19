@@ -250,7 +250,7 @@ const uint8_t CFG_RATE_NAV[] PROGMEM = {0xB5, 0x62, 0x06, 0x8A, 0x0A, 0x00, 0x01
 
 // CFG-SIGNAL-..._ENA = default (The default configuration is concurrent reception of GPS, Galileo and BeiDou B1I with QZSS and SBAS enabled)
 
- /* Stratux Setup: enable GPS & Galileo & Beidou for u-blox 8 */
+/* Stratux Setup: enable GPS & Galileo & Beidou for u-blox 8 */
 #if !defined(GPS_HIGH_RATE) && !defined(GPS_MEDIUM_RATE)
 const uint8_t setGNSS_U8[] PROGMEM = {0x00, 0x00, 0xFF, 0x07,
                                       0x00, 0x08, 0x10, 0x00, 0x01, 0x00, 0x01, 0x01,  /* enable GPS */
@@ -271,23 +271,23 @@ const uint8_t setGNSS_U8[] PROGMEM = {0x00, 0x00, 0xFF, 0x07,
                                       0x06, 0x08, 0x10, 0x00, 0x01, 0x00, 0x01, 0x01}; /* enable Glonass */
 #endif
 
- /* Stratux Setup: set NMEA protocol version and numbering for u-blox 8 */
+/* Stratux Setup: set NMEA protocol version and numbering for u-blox 8 */
 const uint8_t setNMEA_U8[] PROGMEM = {0x00, 0x40, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00,  /* NMEA protocol v4.0 extended */
                                       0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
                                       0x00, 0x00, 0x00, 0x00};
 
- /* Stratux Setup: configure SBAS */
+/* Stratux Setup: configure SBAS */
 const uint8_t setSBAS[] PROGMEM = {0x01, 0x03, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00}; /* disable integrity, enable auto-scan */
 
- /* Stratux Setup */
+/* Stratux Setup */
 // load default configuration         |      clearMask     |  |     saveMask       |  |     loadMask       |  deviceMask
 const uint8_t defaultCFG[] PROGMEM = {0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x03};
 
- /* Stratux Setup */
+/* Stratux Setup */
 // save configuration              |      clearMask     |  |     saveMask       |  |     loadMask       |  deviceMask
 const uint8_t saveCFG[] PROGMEM = {0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03};
 
- /* Stratux Setup: set update rate */
+/* Stratux Setup: set update rate */
 
 #if defined(GPS_HIGH_RATE)
   const uint8_t setRATE[] PROGMEM = {0x64, 0x00, 0x01, 0x00, 0x01, 0x00}; /* set to 10Hz (10Hz measurement rate, 1 measurements per navigation solution) */
@@ -1267,14 +1267,18 @@ static bool at65_setup()
 #endif
 
   /* L76K GPS configuration commands according to Quectel_L76K_GNSS_协议规范_V1.0.pdf */
+
   //Serial_GNSS_Out.write("$PCAS10,3*1F\r\n"); /* load factory defaults */ delay(250);
   //Serial_GNSS_Out.write("$PCAS01,1*1D\r\n"); /* 9600 baud */ delay(250);
   //Serial_GNSS_Out.write("$PCAS01,3*1F\r\n"); /* 38400 baud */ delay(250);
   //Serial_GNSS_Out.write("$PCAS01,5*19\r\n"); /* 115200 baud */ delay(250);
+
   //Serial_GNSS_Out.write("$PCAS02,1000*2E\r\n"); /* 1Hz update rate */ delay(250);
   //Serial_GNSS_Out.write("$PCAS03,1,0,1,1,1,1,0,0,0,0,,,0,0*03\r\n"); /* GGA, GLL=0, GSA, GSV, RMC, VTG */ delay(250);
+
   //Serial_GNSS_Out.write("$PCAS02,500*1A\r\n"); /* 2Hz update rate */ delay(250);
   //Serial_GNSS_Out.write("$PCAS03,1,0,2,2,1,1,0,0,0,0,,,0,0*03\r\n"); /* GGA, GLL=0, GSA, GSV, RMC, VTG */ delay(250);
+
   //Serial_GNSS_Out.write("$PCAS04,1*18\r\n"); /* GPS */ delay(250);
   //Serial_GNSS_Out.write("$PCAS04,5*1C\r\n"); /* GPS + GLONASS */ delay(250);
   //Serial_GNSS_Out.write("$PCAS04,3*1A\r\n"); /* GPS + BEIDOU */ delay(250);
@@ -1282,7 +1286,8 @@ static bool at65_setup()
   
   if (SoC->id == SOC_NRF52 || SoC->id == SOC_ESP32S3 || SoC->id == SOC_PSOC4) {
     /* Badge, Prime 3 and Ham with Quectel L76K or Mini with Luat Air530Z */
-    Serial_GNSS_Out.write("$PCAS04,7*1E\r\n"); /* GPS + GLONASS + Beidou */
+    Serial_GNSS_Out.write("$PCAS03,1,0,1,1,1,1,0,0,0,0,,,0,0*03\r\n"); /* GGA, GLL=0, GSA, GSV, RMC, VTG */ delay(250);
+    Serial_GNSS_Out.write("$PCAS04,7*1E\r\n"); /* GPS + GLONASS + BEIDOU */
   } else {
     /* other AT6558 variants: 'fake' NEO, ... */
     Serial_GNSS_Out.write("$PCAS04,5*1C\r\n"); /* GPS + GLONASS */
