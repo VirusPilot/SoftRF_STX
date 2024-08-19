@@ -55,7 +55,7 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - if your T-Beam or T-Echo has a baro sensor (e.g. BMP280) included, you can omit your Stratux baro module as SoftRF is providing the baro altitude to your Stratux
 
 ## Recommendations for T-Beam S3 Supreme:
-- load OGN database: https://github.com/lyusupov/SoftRF/wiki/Prime-Edition-MkIII#aircrafts-database
+- load OGN database: https://github.com/lyusupov/SoftRF/wiki/Prime-Edition-MkIII.-Aircrafts-database
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.1.1/settings
 
 ## Recommendations for T-Beam:
