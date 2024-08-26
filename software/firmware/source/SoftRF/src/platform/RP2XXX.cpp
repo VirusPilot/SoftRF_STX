@@ -46,7 +46,9 @@ extern "C" {
 #include "pico/binary_info.h"
 }
 
+#if !defined(ARDUINO_RASPBERRY_PI_PICO_2)
 #include <pico_sleep.h>
+#endif /* ARDUINO_RASPBERRY_PI_PICO_2 */
 #else
 extern "C"
 {
@@ -548,7 +550,7 @@ static void RP2xxx_fini(int reason)
   USBDevice.detach();
 #endif /* USE_TINYUSB */
 
-#if !defined(ARDUINO_ARCH_MBED)
+#if !defined(ARDUINO_ARCH_MBED) && !defined(ARDUINO_RASPBERRY_PI_PICO_2)
   sleep_run_from_xosc();
 
 #if SOC_GPIO_PIN_BUTTON != SOC_UNUSED_PIN
@@ -976,8 +978,13 @@ static float RP2xxx_Battery_param(uint8_t param)
       uint16_t mV = 0;
 
 #if SOC_GPIO_PIN_BATTERY != SOC_UNUSED_PIN
+#if PICO_SDK_VERSION_MAJOR < 2
       enum gpio_function pin25_func;
       enum gpio_function pin29_func;
+#else
+      gpio_function_t pin25_func;
+      gpio_function_t pin29_func;
+#endif /* PICO_SDK_VERSION_MAJOR */
       uint pin25_dir;
       uint pin29_dir;
 
