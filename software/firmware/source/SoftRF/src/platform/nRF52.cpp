@@ -629,6 +629,12 @@ Adafruit_NeoPixel T114_Pixels = Adafruit_NeoPixel(2, SOC_GPIO_PIN_T114_LED,
                                                   NEO_GRB + NEO_KHZ800);
 #endif /* EXCLUDE_LED_RING */
 
+#if !defined(ARDUINO_ARCH_MBED)
+#include <ExtensionIOXL9555.hpp>
+ExtensionIOXL9555 *xl9555 = nullptr;
+bool nRF52_has_extension  = false;
+#endif /* ARDUINO_ARCH_MBED */
+
 static void nRF52_setup()
 {
   ui = &ui_settings;
@@ -787,7 +793,7 @@ static void nRF52_setup()
     case NRF52_LILYGO_TECHO_REV_1:
     case NRF52_LILYGO_TECHO_REV_2:
     case NRF52_NORDIC_PCA10059:
-    case NRF52_HELTEC_T114:
+    case NRF52_HELTEC_T114: /* internal bus */
     default:
       Wire.setPins(SOC_GPIO_PIN_SDA, SOC_GPIO_PIN_SCL);
       break;
@@ -874,6 +880,10 @@ static void nRF52_setup()
     nRF52_board        = NRF52_HELTEC_T114;
     hw_info.model      = SOFTRF_MODEL_COZY;
     nRF52_Device_Model = "Cozy Edition";
+#if !defined(ARDUINO_ARCH_MBED)
+    /* external bus */
+    Wire.setPins(SOC_GPIO_PIN_T114_SDA_EXT, SOC_GPIO_PIN_T114_SCL_EXT);
+#endif /* ARDUINO_ARCH_MBED */
   }
 #endif /* USE_TFT */
 
@@ -918,6 +928,39 @@ static void nRF52_setup()
   switch (nRF52_board)
   {
     case NRF52_LILYGO_TULTIMA:
+#if !defined(ARDUINO_ARCH_MBED)
+      xl9555 = new ExtensionIOXL9555(Wire,
+                                     SOC_GPIO_PIN_TULTIMA_SDA,
+                                     SOC_GPIO_PIN_TULTIMA_SCL,
+                                     XL9555_ADDRESS);
+      nRF52_has_extension = xl9555->init(Wire,
+                                         SOC_GPIO_PIN_TULTIMA_SDA,
+                                         SOC_GPIO_PIN_TULTIMA_SCL,
+                                         XL9555_ADDRESS);
+      if (nRF52_has_extension) {
+        xl9555->digitalWrite(ExtensionIOXL9555::I2C_EXP_PIN_GNSS_TULTIMA_PWR, HIGH);
+        xl9555->digitalWrite(ExtensionIOXL9555::I2C_EXP_PIN_SENS_TULTIMA_PWR, HIGH);
+        xl9555->digitalWrite(ExtensionIOXL9555::I2C_EXP_PIN_LORA_TULTIMA_PWR, HIGH);
+        xl9555->digitalWrite(ExtensionIOXL9555::I2C_EXP_PIN_WIFI_TULTIMA_PWR, HIGH);
+
+        xl9555->digitalWrite(ExtensionIOXL9555::I2C_EXP_PIN_MOTOR_TULTIMA_EN, HIGH);
+        xl9555->digitalWrite(ExtensionIOXL9555::I2C_EXP_PIN_AMP_TULTIMA_EN,   HIGH);
+
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_GNSS_TULTIMA_PWR, OUTPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_SENS_TULTIMA_PWR, OUTPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_LORA_TULTIMA_PWR, OUTPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_WIFI_TULTIMA_PWR, OUTPUT);
+
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_MOTOR_TULTIMA_EN, OUTPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_AMP_TULTIMA_EN,   OUTPUT);
+
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_CHG_TULTIMA_INS,   INPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_RTC_TULTIMA_INT,   INPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_GNSS_TULTIMA_IRQ,  INPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_SD_TULTIMA_DETECT, INPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_TULTIMA_BUTTON2,   INPUT);
+      }
+#endif /* ARDUINO_ARCH_MBED */
       /* TBD */
       break;
 
@@ -1719,6 +1762,21 @@ static void nRF52_fini(int reason)
       pinMode(SOC_GPIO_PIN_SFL_SS,    INPUT);
       break;
 
+    case NRF52_LILYGO_TULTIMA:
+#if !defined(ARDUINO_ARCH_MBED)
+      if (nRF52_has_extension) {
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_GNSS_TULTIMA_PWR, INPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_SENS_TULTIMA_PWR, INPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_LORA_TULTIMA_PWR, INPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_WIFI_TULTIMA_PWR, INPUT);
+
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_MOTOR_TULTIMA_EN, INPUT);
+        xl9555->pinMode(ExtensionIOXL9555::I2C_EXP_PIN_AMP_TULTIMA_EN,   INPUT);
+        xl9555->deinit();
+      }
+#endif /* ARDUINO_ARCH_MBED */
+      break;
+
     case NRF52_NORDIC_PCA10059:
     default:
 //      ledOff(SOC_GPIO_LED_PCA10059_GREEN);
@@ -1852,7 +1910,7 @@ static void nRF52_reset()
 #if defined(USE_TFT)
     case DISPLAY_TFT_TTGO_135:
       if (tft) {
-        const char *msg = " WAIT..";
+        const char *msg = "WAIT";
 
         tft->fillScreen(TFT_NAVY);
         tft->setTextFont(4);
