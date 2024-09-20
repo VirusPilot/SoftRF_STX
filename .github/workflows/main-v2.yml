@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  NRF52: 'adafruit:nrf52:pca10056:debug=pca10056_l0'
+  NRF52: 'adafruit:nrf52:pca10056'
   # arduino-cli board details -b esp32:esp32:esp32
   ESP32: 'esp32:esp32:esp32:PartitionScheme=min_spiffs,CPUFreq=240,PSRAM=enabled,FlashFreq=80,FlashMode=dio,FlashSize=4M,DebugLevel=none'
   # arduino-cli board details -b esp32:esp32:esp32s3
