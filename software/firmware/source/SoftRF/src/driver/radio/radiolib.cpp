@@ -413,6 +413,9 @@ static void lr11xx_setup()
 
     switch (RF_FreqPlan.Bandwidth)
     {
+    case RF_RX_BANDWIDTH_SS_62KHZ:
+      bw = 125.0; /* BW_125 */
+      break;
     case RF_RX_BANDWIDTH_SS_250KHZ:
       bw = 500.0; /* BW_500 */
       break;
@@ -489,6 +492,9 @@ static void lr11xx_setup()
     {
     case RF_RX_BANDWIDTH_SS_50KHZ:
       bw = 117.3;
+      break;
+    case RF_RX_BANDWIDTH_SS_62KHZ:
+      bw = 156.2;
       break;
     case RF_RX_BANDWIDTH_SS_100KHZ:
       bw = 234.3;
@@ -612,6 +618,10 @@ static void lr11xx_setup()
   switch (hw_info.model)
   {
   case SOFTRF_MODEL_CARD:
+#if 1
+    radio->setDioAsRfSwitch(0x0f, 0x0, 0x09, 0x0B, 0x0A, 0x0, 0x4, 0x0);
+    state = radio->setTCXO(1.6);
+#else
     {
       static const uint32_t rfswitch_dio_pins[] = {
           RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
@@ -634,6 +644,7 @@ static void lr11xx_setup()
       // LR1110 TCXO Voltage
       state = radio->setTCXO(1.6);
     }
+#endif
     break;
 
   case SOFTRF_MODEL_NEO:

@@ -51,22 +51,38 @@ class FreqPlan
         { BaseFreq= 978000000; ChanSepar=2000000; Channels= 1; MaxTxPower = -10; }
         break;
       case RF_PROTOCOL_FANET:
-        { ChanSepar=400000; Channels= 1; MaxTxPower = 14; }
+        { ChanSepar=400000; Channels= 1; }
         switch (Plan)
         {
           case RF_BAND_US:
           case RF_BAND_AU:
-          case RF_BAND_NZ: /* ? */
           case RF_BAND_CN: /* ? */
-          case RF_BAND_IL: /* TBD */
-          case RF_BAND_KR: /* TBD */
-            { BaseFreq=920800000; Bandwidth = RF_RX_BANDWIDTH_SS_250KHZ; } // BW500
+            BaseFreq   = 920800000;
+            Bandwidth  = RF_RX_BANDWIDTH_SS_250KHZ; // BW500
+            MaxTxPower = 15;
+            break;
+          case RF_BAND_IN:
+            BaseFreq   = 866200000;
+            Bandwidth  = RF_RX_BANDWIDTH_SS_125KHZ; // BW250
+            MaxTxPower = 14;
+            break;
+          case RF_BAND_IL:
+            BaseFreq   = 918500000;
+            Bandwidth  = RF_RX_BANDWIDTH_SS_62KHZ;  // BW125
+            MaxTxPower = 15;
+            break;
+          case RF_BAND_KR:
+            BaseFreq   = 923200000;
+            Bandwidth  = RF_RX_BANDWIDTH_SS_62KHZ;  // BW125
+            MaxTxPower = 15;
             break;
           case RF_BAND_EU:
           case RF_BAND_RU:
-          case RF_BAND_IN:
+          case RF_BAND_NZ: /* ? */
           default:
-            { BaseFreq=868200000; Bandwidth = RF_RX_BANDWIDTH_SS_125KHZ; } // BW250
+            BaseFreq   = 868200000;
+            Bandwidth  = RF_RX_BANDWIDTH_SS_125KHZ; // BW250
+            MaxTxPower = 14;
             break;
         }
         break;
