@@ -35,7 +35,7 @@ jobs:
           sudo apt-get update --fix-missing
           sudo apt-get install python3-full
 
-          pip3 install adafruit-nrfutil --user
+          pip3 install --break-system-packages adafruit-nrfutil --user
           
       - name: Install boards
         shell: bash
