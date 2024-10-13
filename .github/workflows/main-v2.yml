@@ -33,7 +33,7 @@ jobs:
           ln -s $GITHUB_WORKSPACE/software/firmware/source/libraries $HOME/Arduino/libraries
 
           sudo apt-get update --fix-missing
-          sudo apt-get install python3-full
+          sudo apt-get install python3-full python3-requests
 
           pip3 install adafruit-nrfutil --user
           
