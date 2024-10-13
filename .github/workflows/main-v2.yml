@@ -32,10 +32,10 @@ jobs:
           mkdir $HOME/Arduino
           ln -s $GITHUB_WORKSPACE/software/firmware/source/libraries $HOME/Arduino/libraries
 
-          sudo apt-get update --fix-missing
-          sudo apt-get install python3-full python3-requests
+          sudo apt update --fix-missing
+          sudo apt install python3-full
 
-          pip3 install adafruit-nrfutil --user
+          pip3 install adafruit-nrfutil --user --break-system-packages
           
       - name: Install boards
         shell: bash
