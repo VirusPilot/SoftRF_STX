@@ -313,8 +313,10 @@ ui_settings_t *ui;
 
 #include <MPU9250.h>
 #include <ICM_20948.h>
+#include <QMA6100P.h>
 MPU9250       imu_1;
 ICM_20948_I2C imu_2;
+QMA6100P      imu_3;
 
 static bool nRF52_has_imu = false;
 static unsigned long IMU_Time_Marker = 0;
@@ -696,6 +698,10 @@ static void nRF52_setup()
     }
   }
 
+  pinMode(SOC_GPIO_PIN_3V3_PWR, INPUT);
+  pinMode(SOC_GPIO_PIN_IO_PWR,  INPUT_PULLUP);
+  delay(100);
+
 #if !defined(EXCLUDE_PMU)
   nRF52_has_pmu = sy6970.init(Wire,
                               SOC_GPIO_PIN_TULTIMA_SDA,
@@ -769,7 +775,6 @@ static void nRF52_setup()
     if (nRF52_has_imu) {
       nRF52_board        = NRF52_SEEED_T1000E;
       hw_info.model      = SOFTRF_MODEL_CARD;
-      hw_info.imu        = ACC_QMA6100P;
       nRF52_Device_Model = "Card Edition";
       nRF52_USB_VID      = 0x2886; /* Seeed Technology */
       nRF52_USB_PID      = 0x0057; /* SenseCAP T1000-E */
@@ -788,11 +793,18 @@ static void nRF52_setup()
       break;
     case NRF52_SEEED_T1000E:
       Wire.setPins(SOC_GPIO_PIN_T1000_SDA, SOC_GPIO_PIN_T1000_SCL);
+#if !defined(EXCLUDE_IMU)
+      pinMode(SOC_GPIO_PIN_T1000_ACC_EN, INPUT_PULLUP);
+      delay(200);
+#endif /* EXCLUDE_IMU */
       break;
     case NRF52_LILYGO_TECHO_REV_0:
     case NRF52_LILYGO_TECHO_REV_1:
     case NRF52_LILYGO_TECHO_REV_2:
     case NRF52_NORDIC_PCA10059:
+      digitalWrite(SOC_GPIO_PIN_IO_PWR, HIGH);
+      pinMode(SOC_GPIO_PIN_IO_PWR, OUTPUT); /* VDD_POWR is ON */
+      delay(100);
     case NRF52_HELTEC_T114: /* internal bus */
     default:
       Wire.setPins(SOC_GPIO_PIN_SDA, SOC_GPIO_PIN_SCL);
@@ -992,11 +1004,6 @@ static void nRF52_setup()
     case NRF52_LILYGO_TECHO_REV_2:
     case NRF52_NORDIC_PCA10059:
     default:
-      digitalWrite(SOC_GPIO_PIN_IO_PWR,  HIGH);
-      pinMode(SOC_GPIO_PIN_IO_PWR,  OUTPUT);  /* VDD_POWR is ON */
-      digitalWrite(SOC_GPIO_PIN_3V3_PWR, INPUT);
-
-      delay(200);
       break;
   }
 
@@ -1115,7 +1122,7 @@ static void nRF52_setup()
       digitalWrite(SOC_GPIO_PIN_GNSS_T1000_RINT, LOW);
 
       pinMode(SOC_GPIO_LED_T1000_GREEN, OUTPUT);
-      ledOn (SOC_GPIO_LED_T1000_GREEN);
+      digitalWrite(SOC_GPIO_LED_T1000_GREEN, LED_STATE_ON);
 
       lmic_pins.nss  = SOC_GPIO_PIN_T1000_SS;
       lmic_pins.rst  = SOC_GPIO_PIN_T1000_RST;
@@ -1179,31 +1186,58 @@ static void nRF52_setup()
 #endif /* ARDUINO_ARCH_MBED */
 
 #if !defined(EXCLUDE_IMU)
-  if (nRF52_has_imu && nRF52_board != NRF52_SEEED_T1000E) {
+  if (nRF52_has_imu) {
+    switch (nRF52_board)
+    {
+      case NRF52_LILYGO_TECHO_REV_2:
+        Wire.begin();
 
-    Wire.begin();
-
-    if (imu_1.setup(MPU9250_ADDRESS)) {
-      imu_1.verbose(false);
-      if (imu_1.isSleeping()) {
-        imu_1.sleep(false);
-      }
-      hw_info.imu = IMU_MPU9250;
-      hw_info.mag = MAG_AK8963;
-      IMU_Time_Marker = millis();
-    } else {
-      bool ad0 = (ICM20948_ADDRESS == 0x69) ? true : false;
-
-      for (int t=0; t<3; t++) {
-        if (imu_2.begin(Wire, ad0) == ICM_20948_Stat_Ok) {
-          hw_info.imu = IMU_ICM20948;
-          hw_info.mag = MAG_AK09916;
+        if (imu_1.setup(MPU9250_ADDRESS)) {
+          imu_1.verbose(false);
+          if (imu_1.isSleeping()) {
+            imu_1.sleep(false);
+          }
+          hw_info.imu = IMU_MPU9250;
+          hw_info.mag = MAG_AK8963;
           IMU_Time_Marker = millis();
+        } else {
+          bool ad0 = (ICM20948_ADDRESS == 0x69) ? true : false;
 
-          break;
+          for (int t=0; t<3; t++) {
+            if (imu_2.begin(Wire, ad0) == ICM_20948_Stat_Ok) {
+              hw_info.imu = IMU_ICM20948;
+              hw_info.mag = MAG_AK09916;
+              IMU_Time_Marker = millis();
+
+              break;
+            }
+            delay(IMU_UPDATE_INTERVAL);
+          }
         }
-        delay(IMU_UPDATE_INTERVAL);
-      }
+        break;
+
+      case NRF52_LILYGO_TULTIMA:
+        /* TBD */
+        break;
+
+      case NRF52_SEEED_T1000E:
+        Wire.begin();
+
+        if (imu_3.begin()) {
+          imu_3.softwareReset();
+          delay(5);
+          imu_3.setRange(SFE_QMA6100P_RANGE32G);
+          imu_3.enableAccel(true);
+          // imu_3.calibrateOffsets();
+          // imu_3.setOffset();
+
+          hw_info.imu     = ACC_QMA6100P;
+          IMU_Time_Marker = millis();
+        }
+        break;
+
+      default:
+        break;
     }
   }
 #endif /* EXCLUDE_IMU */
@@ -1641,6 +1675,29 @@ static void nRF52_loop()
     }
     IMU_Time_Marker = millis();
   }
+
+  if (hw_info.imu == ACC_QMA6100P &&
+      (millis() - IMU_Time_Marker) > IMU_UPDATE_INTERVAL) {
+    outputData data;
+
+    imu_3.getAccelData(&data);
+    imu_3.offsetValues(data.xData, data.yData, data.zData);
+
+    float a_x = data.xData;
+    float a_y = data.yData;
+    float a_z = data.zData;
+#if 0
+    Serial.print("{ACCEL: ");
+    Serial.print(a_x);
+    Serial.print(",");
+    Serial.print(a_y);
+    Serial.print(",");
+    Serial.print(a_z);
+    Serial.println("}");
+#endif
+    IMU_g = sqrtf(a_x*a_x + a_y*a_y + a_z*a_z) / 1000;
+    IMU_Time_Marker = millis();
+  }
 #endif /* EXCLUDE_IMU */
 }
 
@@ -1665,6 +1722,10 @@ static void nRF52_fini(int reason)
   if (hw_info.imu == IMU_ICM20948) {
     imu_2.sleep(true);
     // imu_2.lowPower(true);
+  }
+
+  if (hw_info.imu == ACC_QMA6100P) {
+    imu_3.enableAccel(false);
   }
 #endif /* EXCLUDE_IMU */
 
@@ -1777,6 +1838,25 @@ static void nRF52_fini(int reason)
 #endif /* ARDUINO_ARCH_MBED */
       break;
 
+    case NRF52_SEEED_T1000E:
+      pinMode(SOC_GPIO_PIN_GNSS_T1000_RINT, INPUT_PULLDOWN);
+      pinMode(SOC_GPIO_PIN_GNSS_T1000_SINT, INPUT_PULLDOWN);
+      pinMode(SOC_GPIO_PIN_GNSS_T1000_RST,  INPUT_PULLDOWN);
+      pinMode(SOC_GPIO_PIN_GNSS_T1000_VRTC, INPUT_PULLDOWN);
+      pinMode(SOC_GPIO_PIN_GNSS_T1000_EN,   INPUT_PULLDOWN);
+
+#if !defined(EXCLUDE_IMU)
+      pinMode(SOC_GPIO_PIN_T1000_ACC_EN,    INPUT_PULLDOWN);
+#endif /* EXCLUDE_IMU */
+      pinMode(SOC_GPIO_PIN_T1000_BUZZER_EN, INPUT_PULLDOWN);
+      pinMode(SOC_GPIO_PIN_T1000_3V3_EN,    INPUT_PULLDOWN);
+
+      pinMode(SOC_GPIO_PIN_T1000_SS,        INPUT_PULLUP);
+
+      digitalWrite(SOC_GPIO_LED_T1000_GREEN, 1-LED_STATE_ON);
+      pinMode(SOC_GPIO_LED_T1000_GREEN,     INPUT);
+      break;
+
     case NRF52_NORDIC_PCA10059:
     default:
 //      ledOff(SOC_GPIO_LED_PCA10059_GREEN);
@@ -1808,7 +1888,10 @@ static void nRF52_fini(int reason)
   // pinMode(SOC_GPIO_PIN_MOSI, INPUT);
   // pinMode(SOC_GPIO_PIN_MISO, INPUT);
   // pinMode(SOC_GPIO_PIN_SCK,  INPUT);
-  pinMode(SOC_GPIO_PIN_SS,   INPUT_PULLUP);
+
+  /* TBD */
+  if (nRF52_board != NRF52_SEEED_T1000E) pinMode(SOC_GPIO_PIN_SS, INPUT_PULLUP);
+
   // pinMode(SOC_GPIO_PIN_BUSY, INPUT);
   pinMode(lmic_pins.rst,  INPUT);
 
@@ -1839,7 +1922,7 @@ static void nRF52_fini(int reason)
 
   // pinMode(SOC_GPIO_PIN_PAD,    INPUT);
   pinMode(mode_button_pin, nRF52_board == NRF52_LILYGO_TECHO_REV_1 ? INPUT_PULLUP : INPUT);
-  while (digitalRead(mode_button_pin) == LOW);
+  while (digitalRead(mode_button_pin) == (nRF52_board == NRF52_SEEED_T1000E ? HIGH : LOW));
   delay(100);
 
 #if defined(USE_TINYUSB)
@@ -1856,7 +1939,9 @@ static void nRF52_fini(int reason)
   case SOFTRF_SHUTDOWN_LOWBAT:
     NRF_POWER->GPREGRET = DFU_MAGIC_SKIP;
 #if !defined(ARDUINO_ARCH_MBED)
-    pinMode(mode_button_pin, INPUT_PULLUP_SENSE /* INPUT_SENSE_LOW */);
+    pinMode(mode_button_pin, nRF52_board == NRF52_SEEED_T1000E ?
+                             INPUT_SENSE_HIGH :
+                             INPUT_PULLUP_SENSE /* INPUT_SENSE_LOW */);
 #endif /* ARDUINO_ARCH_MBED */
     break;
 #if defined(USE_SERIAL_DEEP_SLEEP)
@@ -2310,7 +2395,16 @@ static void nRF52_swSer_begin(unsigned long baud)
       break;
   }
 #endif /* ARDUINO_ARCH_MBED */
+
   Serial_GNSS_In.begin(baud);
+
+  if (nRF52_board == NRF52_SEEED_T1000E)
+  {
+    for (int i=0; i<25; i++) {
+      /* Enable Sleep mode locking */
+      Serial_GNSS_Out.write("$PAIR382,1*2E\r\n"); delay(40);
+    }
+  }
 }
 
 static void nRF52_swSer_enableRx(boolean arg)
@@ -3111,7 +3205,7 @@ static void nRF52_Button_setup()
   pinMode(mode_button_pin, nRF52_board == NRF52_LILYGO_TECHO_REV_1 ? INPUT_PULLUP : INPUT);
   if (up_button_pin >= 0) { pinMode(up_button_pin, INPUT); }
 
-  button_1.init(mode_button_pin);
+  button_1.init(mode_button_pin, nRF52_board == NRF52_SEEED_T1000E ? LOW : HIGH);
   if (up_button_pin >= 0) { button_2.init(up_button_pin); }
 
   // Configure the ButtonConfig with the event handler, and enable all higher

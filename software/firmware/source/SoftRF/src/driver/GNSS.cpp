@@ -1390,29 +1390,51 @@ const gnss_chip_ops_t uc65_ops = {
 #endif /* EXCLUDE_GNSS_UC65 */
 
 #if !defined(EXCLUDE_GNSS_AG33)
+static  bool ag33_getACK(const char *message, uint32_t waitMillis)
+{
+    uint8_t buffer[768] = {0};
+    uint8_t b;
+    int bytesRead = 0;
+    uint32_t startTimeout = millis() + waitMillis;
+    while (millis() < startTimeout) {
+        if (Serial_GNSS_Out.available()) {
+            b = Serial_GNSS_Out.read();
+            buffer[bytesRead] = b;
+            bytesRead++;
+            if ((bytesRead == 767) || (b == '\r')) {
+                if (strnstr((char *)buffer, message, bytesRead) != nullptr) {
+                    return true;
+                } else {
+                    bytesRead = 0;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 static gnss_id_t ag33_probe()
 {
   /* Firmware version request */
-//  return nmea_handshake("$PAIR020*38\r\n", "$PAIR020,", true) ?
   return nmea_handshake("$PAIR021*39\r\n", "$PAIR021,", true) ?
                         GNSS_MODULE_AG33 : GNSS_MODULE_NMEA;
 }
 
 static bool ag33_setup()
 {
-  Serial_GNSS_Out.write("$PAIR002*38\r\n"); /* Powers on the GNSS system */
-  delay(250);
+  // Serial_GNSS_Out.write("$PAIR002*38\r\n"); /* Powers on the GNSS system */
+  // delay(250);
 
   /* GPS + GLONASS + Galileo + BeiDou + QZSS */
   Serial_GNSS_Out.write("$PAIR066,1,1,1,1,1,0*3B\r\n");         delay(250);
 
   Serial_GNSS_Out.write("$PAIR062,0,1*3F\r\n");   /* GGA 1s */  delay(250);
   Serial_GNSS_Out.write("$PAIR062,4,1*3B\r\n");   /* RMC 1s */  delay(250);
-#if 0
+
   Serial_GNSS_Out.write("$PAIR062,1,0*3F\r\n");   /* GLL OFF */ delay(250);
   Serial_GNSS_Out.write("$PAIR062,3,0*3D\r\n");   /* GSV OFF */ delay(250);
   Serial_GNSS_Out.write("$PAIR062,5,0*3B\r\n");   /* VTG OFF */ delay(250);
-#endif
+  Serial_GNSS_Out.write("$PAIR062,6,0*38\r\n");   /* ZDA OFF */ delay(250);
 #if defined(NMEA_TCP_SERVICE)
   if (settings->nmea_out == NMEA_TCP) {
     Serial_GNSS_Out.write("$PAIR062,2,1*3D\r\n"); /* GSA 1s */
@@ -1424,6 +1446,20 @@ static bool ag33_setup()
   }
   delay(250);
 
+  /*
+   * 0 = Normal mode
+   * For general purposes.
+   *
+   * 3 = Balloon mode
+   * Used for high-altitude balloon scenario where
+   * the vertical movement has a greater impact on the position
+   * calculation.
+   *
+   * 5 = Drone mode
+   * Used for drone applications with equivalent
+   * dynamic range and vertical acceleration at different flight phases
+   * (for example, hovering and cruising)
+   */
   Serial_GNSS_Out.write("$PAIR080,0*2E\r\n"); /* Normal Mode */ delay(250);
 
   return true;
