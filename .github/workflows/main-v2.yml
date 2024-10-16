@@ -45,7 +45,7 @@ jobs:
             arduino-cli config add board_manager.additional_urls https://adafruit.github.io/arduino-board-index/package_adafruit_index.json
             arduino-cli core update-index
             arduino-cli core install esp32:esp32@2.0.9
-            arduino-cli core install adafruit:nrf52@1.3.0
+            arduino-cli core install adafruit:nrf52
 
             if [[ ! -f ~/.local/bin/adafruit-nrfutil ]]; then
               ln -s /bin/true ~/.local/bin/adafruit-nrfutil
