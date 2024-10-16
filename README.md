@@ -1,6 +1,5 @@
 ## ATTENTION: it is strongly recommended to only use the following open standards based protocols: ADS-L, OGN or FANET
 ## ATTENTION: only T-Beam, T-Beam S3 Supreme and T-Echo binaries are provided/tested on a regular basis
-## ATTENTION: latest T-Echo firmware is bricking the device, please use https://github.com/moshe-braner/SoftRF/tree/master/software/firmware/binaries/nRF52840/SoftRF/MassStorage
 ### It is recommended to consider the following alternatives:
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF (only for T-Beam up to v1.2 and T-Echo)
 - ADS-L/OGN/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker (WIP, only for T-Beam and T-Beam S3 Supreme)
@@ -11,12 +10,12 @@
   - if **not** added, then the SoftRF factory ID remains (`AircraftID: 0`) and ADDR_TYPE_FLARM is set
 
 ### T-Beam and T-Beam S3 Supreme Features:
-- **USB mode** (default): enable SoftRF to work as a proper GNSS and Baro source for Stratux
-- **Bluetooth LE mode**: enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (TestFlight version), please use the following settings:
+- **USB mode** (default): enables SoftRF to work as a proper GNSS and Baro source for Stratux
+- **Bluetooth LE mode**: enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (TestFlight version), please use the following settings:
   - ![1](https://github.com/user-attachments/assets/93e70aa7-cf88-4eaa-ad6e-fd0072773417)
 
 ### T-Echo Features:
-- **Bluetooth LE mode** (default): enable SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (TestFlight version)
+- **Bluetooth LE mode** (default): enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (TestFlight version)
 
 ## UF2 Binaries
 UF2 binaries are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
@@ -48,7 +47,7 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - L76K GNSS configuration:
   - enable GSA, GSV, VTG
   - enable GPS, GLONASS and BEIDOU
-- LK8EX1 messages over serial connection are disabled
+- LK8EX1 messages are disabled
 
 ## Limitations:
 - GNSS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GNSS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
