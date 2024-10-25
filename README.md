@@ -1,7 +1,5 @@
 ## ATTENTION: it is strongly recommended to only use the following open standards based protocols: ADS-L, OGN or FANET
 ## ATTENTION: only T-Beam, T-Beam S3 Supreme and T-Echo binaries are provided/tested on a regular basis
-## ATTENTION: latest T-Echo firmware is bricking the device, please use:
-https://github.com/moshe-braner/SoftRF/tree/master/software/firmware/binaries/nRF52840/SoftRF/MassStorage
 ### It is recommended to consider the following alternatives:
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF (only for T-Beam up to v1.2 and T-Echo)
 - ADS-L/OGN/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker (WIP, only for T-Beam and T-Beam S3 Supreme)
