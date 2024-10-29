@@ -1,5 +1,6 @@
 ## ATTENTION: it is strongly recommended to only use the following open standards based protocols: ADS-L, OGN or FANET
-## ATTENTION: only T-Beam, T-Beam S3 Supreme and T-Echo binaries are provided/tested on a regular basis, T-Echo binaries have some unresolved issues (e.g. jumping positions and changing aircraft type ID)
+## ATTENTION: only T-Beam, T-Beam S3 Supreme and T-Echo binaries are provided/tested on a regular basis
+### ATTENTION: T-Echo binaries have some unresolved issues (e.g. jumping positions and aircraft type ID)
 ### It is recommended to consider the following alternatives:
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF (only for **T-Beam** up to v1.2 and **T-Echo**)
 - ADS-L/OGN/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker (WIP, only for **T-Beam** and **T-Beam S3 Supreme**)
@@ -15,7 +16,7 @@
   - ![1](https://github.com/user-attachments/assets/93e70aa7-cf88-4eaa-ad6e-fd0072773417)
 
 ### T-Echo Features:
-- **Bluetooth LE mode** (default): enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (TestFlight version)
+- **Bluetooth LE mode** (default): enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon
 
 ## UF2 Binaries
 UF2 binaries are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
@@ -45,8 +46,7 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 
 ## T-Echo modifications:
 - L76K GNSS configuration:
-  - enable GSA, GSV, VTG
-  - enable GPS, GLONASS and BEIDOU
+  - enable GSA, GSV, RMC
 - LK8EX1 messages are disabled
 
 ## Limitations:
