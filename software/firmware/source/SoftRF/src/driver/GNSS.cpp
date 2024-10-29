@@ -1304,7 +1304,7 @@ static bool at65_setup()
   delay(250);
 
   Serial_GNSS_Out.write("$PCAS11,6*1B\r\n"); /* Aviation < 2g */ delay(250);
-  
+
   return true;
 }
 
