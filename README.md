@@ -1,3 +1,6 @@
+# SoftRF fork
+- for Stratux use via USB: **T-Beam** and **T-Beam S3 Supreme**
+- for SkyDemon use via BLE: **T-Beam**, **T-Beam S3 Supreme**, **T-Echo** and **Seeed T1000-E**
 ## ATTENTION: it is strongly recommended to only use the following open standards based protocols: ADS-L, OGN or FANET
 ## ATTENTION: only T-Beam, T-Beam S3 Supreme and T-Echo binaries are provided/tested on a regular basis
 ## ATTENTION: T-Echo binaries have some unresolved issues (e.g. jumping positions and aircraft type ID)
@@ -15,7 +18,7 @@
 - **Bluetooth LE mode**: enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (TestFlight version), please use the following settings:
   - ![1](https://github.com/user-attachments/assets/93e70aa7-cf88-4eaa-ad6e-fd0072773417)
 
-### T-Echo Features:
+### T-Echo and Seeed T1000-E Features:
 - **Bluetooth LE mode** (default): enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon
 
 ## UF2 Binaries
@@ -44,11 +47,10 @@ UF2 binaries are available for the following platforms and can be downloaded as 
   - enable NMEA extended protocol
 - default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi (`/boot/firmware/config.txt` for Bookworm)
 
-## T-Echo modifications:
-- L76K GNSS configuration:
-  - enable GSA, GSV, RMC
+## T-Echo and Seeed T1000-E modifications:
+- GGA, GSA and RMC messges enabled
 - LK8EX1 messages are disabled
-
+ 
 ## Limitations:
 - GNSS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GNSS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
 - the L76K only supports the NMEA "strict" protocol version, therefore some extended satellite information (like elevation, azimut and numbering) is not provided for some satellites and therefore the GNSS info page in Stratux is incomplete. Furthermore BEIDOU satellites are not displayed at all but are in fact used and counted for "in solution"
