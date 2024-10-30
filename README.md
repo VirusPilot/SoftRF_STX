@@ -4,6 +4,7 @@
 ## ATTENTION: it is strongly recommended to only use the following open standards based protocols: ADS-L, OGN or FANET
 ## ATTENTION: only T-Beam, T-Beam S3 Supreme and T-Echo binaries are provided/tested on a regular basis
 ## ATTENTION: T-Echo binaries have some unresolved issues (e.g. jumping positions and aircraft type ID)
+## ATTENTION: Seeed T1000-E is WIP, binaries will be available end of 2024
 ### It is recommended to consider the following alternatives:
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF (only for **T-Beam** up to v1.2 and **T-Echo**)
 - ADS-L/OGN/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker (WIP, only for **T-Beam** and **T-Beam S3 Supreme**)
@@ -42,15 +43,15 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 
 ## T-Beam and T-Beam S3 Supreme modifications:
 - u-blox GNSS configuration:
-  - enable GSA, GSV, VTG, GST
+  - enable GSA, GSV, VTG, GST (in addition to GGA and RMC)
   - enable GPS, GALILEO, BEIDOU and SBAS (u-blox 10 default)
   - enable NMEA extended protocol
 - default connection with Stratux: **USB** (115200 baud), the USB T-Beam connection with Stratux works best if `init_uart_baud=115200` is added to the `/boot/config.txt` file on the Raspberry Pi (`/boot/firmware/config.txt` for Bookworm)
 
 ## T-Echo and Seeed T1000-E modifications:
-- GGA, GSA and RMC messges enabled
+- GSA messges enabled (in addition to GGA and RMC)
 - LK8EX1 messages are disabled
- 
+
 ## Limitations:
 - GNSS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GNSS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
 - the L76K only supports the NMEA "strict" protocol version, therefore some extended satellite information (like elevation, azimut and numbering) is not provided for some satellites and therefore the GNSS info page in Stratux is incomplete. Furthermore BEIDOU satellites are not displayed at all but are in fact used and counted for "in solution"
