@@ -83,24 +83,21 @@ void EEPROM_defaults()
   eeprom_block.field.magic                  = SOFTRF_EEPROM_MAGIC;
   eeprom_block.field.version                = SOFTRF_EEPROM_VERSION;
   eeprom_block.field.settings.mode          = SOFTRF_MODE_NORMAL;
-  eeprom_block.field.settings.rf_protocol   = hw_info.model == SOFTRF_MODEL_BRACELET ||
-                                              hw_info.model == SOFTRF_MODEL_CARD ?
+  eeprom_block.field.settings.rf_protocol   = hw_info.model == SOFTRF_MODEL_BRACELET ?
                                               RF_PROTOCOL_FANET :
                                               hw_info.model == SOFTRF_MODEL_ES ?
                                               RF_PROTOCOL_ADSB_1090 :
                                               hw_info.model == SOFTRF_MODEL_HAM ?
-                                              RF_PROTOCOL_APRS : RF_PROTOCOL_OGNTP;
+                                              RF_PROTOCOL_APRS : RF_PROTOCOL_ADSL_860;
   eeprom_block.field.settings.band          = RF_BAND_EU;
   eeprom_block.field.settings.aircraft_type = hw_info.model == SOFTRF_MODEL_BRACELET ?
                                               AIRCRAFT_TYPE_STATIC :
-                                              hw_info.model == SOFTRF_MODEL_CARD ?
-                                              AIRCRAFT_TYPE_PARAGLIDER :
-                                              AIRCRAFT_TYPE_GLIDER;
+                                              AIRCRAFT_TYPE_POWERED;
   eeprom_block.field.settings.txpower       = hw_info.model == SOFTRF_MODEL_ES ?
                                               RF_TX_POWER_OFF :
                                               hw_info.model == SOFTRF_MODEL_HAM ?
                                               RF_TX_POWER_LOW : RF_TX_POWER_FULL;
-  eeprom_block.field.settings.bluetooth     = BLUETOOTH_NONE;
+  eeprom_block.field.settings.bluetooth     = BLUETOOTH_LE_HM10_SERIAL;
   eeprom_block.field.settings.alarm         = TRAFFIC_ALARM_DISTANCE;
   eeprom_block.field.settings.aircraft_id   = 0;
 
