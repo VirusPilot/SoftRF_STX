@@ -13,6 +13,7 @@
 - option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.1.1/settings)
   - if added (`AircraftID: <ICAO hex Code>`), then ADDR_TYPE_ICAO is set (this is based on the assumtion that your airplane has a transponder)
   - if **not** added, then the SoftRF factory ID remains (`AircraftID: 0`) and ADDR_TYPE_FLARM is set
+- default protocol: **ADS-L**
 
 ### T-Beam and T-Beam S3 Supreme Features:
 - **USB mode** (default): enables SoftRF to work as a proper GNSS and Baro source for Stratux
@@ -20,7 +21,7 @@
   - ![1](https://github.com/user-attachments/assets/93e70aa7-cf88-4eaa-ad6e-fd0072773417)
 
 ### T-Echo and Seeed T1000-E Features:
-- **Bluetooth LE mode** (default): enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon
+- **Bluetooth LE mode** (enabled by default): enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon
 
 ## UF2 Binaries
 UF2 binaries are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
