@@ -34,8 +34,6 @@ jobs:
 
           sudo apt-get update --fix-missing
           sudo apt-get install python3-full
-
-          pip3 install --user adafruit-nrfutil
           
       - name: Install boards
         shell: bash
@@ -46,10 +44,6 @@ jobs:
             arduino-cli core update-index
             arduino-cli core install esp32:esp32@2.0.9
             arduino-cli core install adafruit:nrf52
-
-            if [[ ! -f ~/.local/bin/adafruit-nrfutil ]]; then
-              ln -s /bin/true ~/.local/bin/adafruit-nrfutil
-            fi
 
       - name: Build SoftRF
         run: |
