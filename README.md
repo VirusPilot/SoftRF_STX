@@ -1,23 +1,27 @@
 # SoftRF fork
 - for Stratux use via USB: **T-Beam** and **T-Beam S3 Supreme**
 - for SkyDemon use via BLE: **T-Beam**, **T-Beam S3 Supreme**, **T-Echo** and **Seeed T1000-E**
-## ATTENTION: it is strongly recommended to only use the following open standards based protocols: ADS-L, OGN or FANET
+## ATTENTION: it is strongly recommended to only use the following open standards based protocols:
+- ADS-L (default setting, using SDR860 frequency band)
+- OGN
+- FANET
 ## ATTENTION: only T-Beam, T-Beam S3 Supreme and T-Echo binaries are provided/tested on a regular basis
 ## ATTENTION: T-Echo binaries have some unresolved issues (e.g. jumping positions and aircraft type ID)
 ## ATTENTION: Seeed T1000-E is WIP, binaries will be available end of 2024
-### It is recommended to consider the following alternatives:
-- SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF (only for **T-Beam** up to v1.2 and **T-Echo**)
-- ADS-L/OGN/FANET tracker implementation: https://github.com/pjalocha/ogn-tracker (WIP, only for **T-Beam** and **T-Beam S3 Supreme**)
-
+## It is recommended to consider the following alternatives:
+- SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF
+  - only for **T-Beam** and **T-Echo**
+- ADS-L/OGN/FANET/PAW tracker implementation: https://github.com/pjalocha/ogn-tracker
+  - only for **T-Beam** and **T-Beam S3 Supreme**
+  - supports transmission of up to four protocols simultaneously
 ### General Features:
 - option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.1.1/settings)
   - if added (`AircraftID: <ICAO hex Code>`), then ADDR_TYPE_ICAO is set (this is based on the assumtion that your airplane has a transponder)
   - if **not** added, then the SoftRF factory ID remains (`AircraftID: 0`) and ADDR_TYPE_FLARM is set
-- default protocol: **ADS-L**
 
 ### T-Beam and T-Beam S3 Supreme Features:
 - **USB mode** (default): enables SoftRF to work as a proper GNSS and Baro source for Stratux
-- **Bluetooth LE mode**: enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (TestFlight version), please use the following settings:
+- **Bluetooth LE mode**: enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon (since version 4.0.0), please use the following settings:
   - ![1](https://github.com/user-attachments/assets/93e70aa7-cf88-4eaa-ad6e-fd0072773417)
 
 ### T-Echo and Seeed T1000-E Features:
@@ -70,6 +74,9 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings) by **downloading** the following scripts, **opening** them in a browser to generate the appropriate $PSRFC and $PSKVC sentences and then **sending** these generated sentences to the SoftRF device via a serial USB console (e.g. Arduino IDE comes with a nice built in serial USB console):
   - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/basic.html (e.g. Protocol, Aircraft type, Aircraft ID)
   - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/ui.html (e.g. Units, e-Paper 'ghosts' removal)
+
+## Recommendations for Seeed T1000-E:
+- tbd.
 
 ## DANGER ZONE - NOT RECOMMENDED FOR UNEXPERIENCED USERS
 ## Compiling/Flashing from Source Code
