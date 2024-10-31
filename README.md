@@ -38,7 +38,7 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - connect your T-Echo to your PC and put it in UF2 upload mode (double-click **RESET**)
 - upload the `SoftRF.zip/adafruit.nrf52.pca10056/SoftRF.ino.uf2` file to the **NRF52BOOT** or **TECHBOOT** drive that shows up on your PC, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
 
-## "classic" Binaries
+## "classic" T-Beam Binaries
 "classic" binaries are available for the **T-Beam up to v1.2** and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
 - connect your T-Beam to your PC (via USB)
 - open https://espressif.github.io/esp-launchpad/ with your **Chrome** browser, select "DIY" and "connect" your T-Beam
