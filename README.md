@@ -5,9 +5,8 @@
 - ADS-L (default setting, using SDR860 frequency band)
 - OGN
 - FANET
-## ATTENTION: only T-Beam, T-Beam S3 Supreme and T-Echo binaries are provided/tested on a regular basis
-## ATTENTION: T-Echo binaries have some unresolved issues (e.g. jumping positions and aircraft type ID)
-## ATTENTION: Seeed T1000-E is WIP, binaries will be available end of 2024
+## ATTENTION: only ESP32 (T-Beam, T-Beam S3 Supreme) and nRF52 (T-Echo, T1000-E) binaries are provided/tested on a regular basis
+## ATTENTION: Seeed T1000-E comes with pre-installed Meshtastic and needs to be prepared before flashing SoftRF for the first time (see: https://github.com/lyusupov/SoftRF/wiki/Card-Edition.-Quick-start)
 ## It is recommended to consider the following alternatives:
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF
   - only for **T-Beam** and **T-Echo**
@@ -34,9 +33,9 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - connect your T-Beam S3 Supreme to your PC and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
 - upload the `SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 
-**T-Echo - UF2 update method** (aka. USB Mass Storage method):
-- connect your T-Echo to your PC and put it in UF2 upload mode (double-click **RESET**)
-- upload the `SoftRF.zip/adafruit.nrf52.pca10056/SoftRF.ino.uf2` file to the **NRF52BOOT** or **TECHBOOT** drive that shows up on your PC, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
+**T-Echo and T1000-E - UF2 update method** (aka. USB Mass Storage method):
+- connect your T-Echo or T1000-E to your PC and put it in UF2 upload mode (T-Echo: double-click **RESET**, T1000-E: press and hold the device button, then quickly connect the charging cable twice)
+- upload the `SoftRF.zip/adafruit.nrf52.pca10056/SoftRF.ino.uf2` file to the **NRF52BOOT**, **TECHBOOT** or **T1000-E** drive that shows up on your PC, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
 
 ## "classic" T-Beam Binaries
 "classic" binaries are available for the **T-Beam up to v1.2** and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
@@ -55,7 +54,7 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 
 ## T-Echo and Seeed T1000-E modifications:
 - GSA messges enabled (in addition to GGA and RMC)
-- LK8EX1 messages are disabled
+- LK8EX1 and HEARTBEAT messages are disabled
 
 ## Limitations:
 - GNSS update rate is limited to 1 Hz in SoftRF, which is good enough for Stratux except when using GNSS as a pseudo AHRS (internally all u-blox based T-Beams use 10Hz measurement rate)
@@ -69,20 +68,15 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 ## Recommendations for T-Beam:
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.1.1/settings
 
-## Recommendations for T-Echo:
-- load OGN database: https://github.com/lyusupov/SoftRF/wiki/Badge-Edition.-Aircrafts-database
-- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings) by **downloading** the following scripts, **opening** them in a browser to generate the appropriate $PSRFC and $PSKVC sentences and then **sending** these generated sentences to the SoftRF device via a serial USB console (e.g. Arduino IDE comes with a nice built in serial USB console):
+## Recommendations for T-Echo and T1000-E:
+- modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings) by **downloading** the following scripts, **opening** them in a browser to generate the appropriate $PSRFC sentences and then **sending** these generated sentences to the SoftRF device via a serial USB console (e.g. Arduino IDE comes with a nice built in serial USB console) or via a BLE serial terminal:
   - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/basic.html (e.g. Protocol, Aircraft type, Aircraft ID)
-  - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/ui.html (e.g. Units, e-Paper 'ghosts' removal)
-
-## Recommendations for Seeed T1000-E:
-- tbd.
 
 ## DANGER ZONE - NOT RECOMMENDED FOR UNEXPERIENCED USERS
 ## Compiling/Flashing from Source Code
 You need to be familiar with Arduino to compile and flash it for your platform. You need to install the latest version of **Arduino IDE** and add the following two entries into the Additional Board Manager URLs:
 - **T-Beam and T-Beam S3 Supreme**: `https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json`
-- **T-Echo**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
+- **T-Echo** and **T1000-E**: `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
 
 ### Arduino IDE settings for T-Beam
 - based on https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series?tab=readme-ov-file#3%EF%B8%8F⃣arduino-ide-quick-start
@@ -128,7 +122,7 @@ alternative for **T-Beam S3 Supreme** (and if you want to maintain the UF2 firmw
 - connect your T-Beam S3 Supreme and put it in UF2 upload mode (press **RESET** and shortly thereafter **BOOT**)
 - upload the `SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 
-### Arduino IDE settings for T-Echo
+### Arduino IDE settings for T-Echo and T1000-E
 - Install "Adafruit nRF52 by Adafruit" under "BOARDS MANAGER" 
 - Select Tools -> Board -> Nordic nRF52840 DK
 - connect your T-Echo
