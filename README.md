@@ -34,7 +34,7 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - upload the `SoftRF.zip/esp32.esp32.esp32s3/SoftRF.ino.uf2` file to the TBEAMBOOT drive, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#esp32-s3
 
 **T-Echo and T1000-E - UF2 update method** (aka. USB Mass Storage method):
-- connect your T-Echo or T1000-E to your PC and put it in UF2 upload mode (T-Echo: double-click **RESET**, T1000-E: press and hold the device button, then quickly connect the charging cable twice)
+- connect your T-Echo or T1000-E to your PC and put it in UF2 upload mode (T-Echo: double-click RESET, T1000-E: press and hold the device button, then quickly connect the charging cable twice)
 - upload the `SoftRF.zip/adafruit.nrf52.pca10056/SoftRF.ino.uf2` file to the **NRF52BOOT**, **TECHBOOT** or **T1000-E** drive that shows up on your PC, see also: https://github.com/lyusupov/SoftRF/blob/master/software/firmware/binaries/README.md#nrf52840
 
 ## "classic" T-Beam Binaries
