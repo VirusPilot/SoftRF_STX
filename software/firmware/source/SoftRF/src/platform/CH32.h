@@ -88,8 +88,16 @@ struct rst_info {
 #if defined(CH32V30x)
 
 /* Peripherals */
-#define SOC_GPIO_PIN_CONS_RX  PB5
-#define SOC_GPIO_PIN_CONS_TX  PB8
+#if defined(PD6)
+#define SOC_GPIO_PIN_CONS_RX  PD6
+#else
+#define SOC_GPIO_PIN_CONS_RX  PD_6
+#endif
+#if defined(PD5)
+#define SOC_GPIO_PIN_CONS_TX  PD5
+#else
+#define SOC_GPIO_PIN_CONS_TX  PD_5
+#endif
 
 #define SOC_GPIO_PIN_GNSS_RX  PA10
 #define SOC_GPIO_PIN_GNSS_TX  PA9
@@ -110,21 +118,26 @@ struct rst_info {
 #define SOC_GPIO_PIN_SCK      PB13
 #define SOC_GPIO_PIN_SS       PB12
 
-//#include <SoftSPI.h>
-//extern  SoftSPI RadioSPI;
-//#undef  SPI
-//#define SPI                   RadioSPI
 //#define USE_SOFTSPI
+#if defined(USE_SOFTSPI)
+#include <SoftSPI.h>
+extern  SoftSPI RadioSPI;
+#else
+#include <SPI.h>
+extern  SPIClass RadioSPI;
+#endif /* USE_SOFTSPI */
+#undef  SPI
+#define SPI                   RadioSPI
 
 /* NRF905 */
 #define SOC_GPIO_PIN_TXE      SOC_UNUSED_PIN
 #define SOC_GPIO_PIN_CE       SOC_UNUSED_PIN
 #define SOC_GPIO_PIN_PWR      SOC_UNUSED_PIN
 
-/* SX1276 */
-#define SOC_GPIO_PIN_RST      PB0
-#define SOC_GPIO_PIN_BUSY     SOC_UNUSED_PIN
-#define SOC_GPIO_PIN_DIO1     PA8
+/* SX12XX */
+#define SOC_GPIO_PIN_RST      PB0 /* D9 */
+#define SOC_GPIO_PIN_BUSY     PB9 /* D7 */
+#define SOC_GPIO_PIN_DIO1     PA8 /* D2 */
 
 /* RF antenna switch */
 #define SOC_GPIO_PIN_ANT_RXTX SOC_UNUSED_PIN
@@ -258,6 +271,8 @@ struct rst_info {
 #define USE_TIME_SLOTS
 #define USE_OGN_ENCRYPTION
 
+#define USE_BASICMAC
+//#define EXCLUDE_SX1276         //  -    kb
 #define USE_RADIOLIB
 //#define ENABLE_RECORDER
 
