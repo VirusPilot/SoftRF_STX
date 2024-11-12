@@ -259,8 +259,7 @@ static size_t legacy_v6_encode(void *legacy_pkt, ufo_t *this_aircraft) {
     uint32_t key[4];
 
     uint32_t id = this_aircraft->addr;
-    uint8_t acft_type = this_aircraft->aircraft_type > AIRCRAFT_TYPE_STATIC ?
-            AIRCRAFT_TYPE_UNKNOWN : this_aircraft->aircraft_type;
+    uint8_t acft_type = this_aircraft->aircraft_type;
 
     int32_t lat = (int32_t) (this_aircraft->latitude  * 1e7);
     int32_t lon = (int32_t) (this_aircraft->longitude * 1e7);
@@ -558,8 +557,7 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
     uint32_t *wpkt     = (uint32_t *) legacy_pkt;
 
     uint32_t id        = this_aircraft->addr;
-    uint8_t acft_type  = this_aircraft->aircraft_type > AIRCRAFT_TYPE_STATIC ?
-                         AIRCRAFT_TYPE_UNKNOWN : this_aircraft->aircraft_type;
+    uint8_t acft_type = this_aircraft->aircraft_type;
 
     int32_t lat        = (int32_t) (this_aircraft->latitude  * 1e7);
     int32_t lon        = (int32_t) (this_aircraft->longitude * 1e7);
