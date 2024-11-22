@@ -1,8 +1,8 @@
 # SoftRF fork
 - for Stratux use via USB: **T-Beam** and **T-Beam S3 Supreme**
 - for SkyDemon use via BLE: **T-Beam**, **T-Beam S3 Supreme**, **T-Echo** and **Seeed T1000-E**
-## ATTENTION: it is strongly recommended to only use the following open standards based protocols:
-- ADS-L (default setting, using SDR860 frequency band)
+## ATTENTION: it is strongly recommended to only use the following open standards based protocols (LEGACY protocol is broken and won't be fixed):
+- ADS-L (default for all platforms)
 - OGN
 - FANET
 ## ATTENTION: only ESP32 (T-Beam, T-Beam S3 Supreme), nRF52 (T-Echo, T1000-E) and STM32 (T-Motion) binaries are provided/tested on a regular basis, they are provided as Github Actions Artifacts - a Github account is required to download them
