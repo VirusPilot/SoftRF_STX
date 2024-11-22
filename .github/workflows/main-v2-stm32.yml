@@ -1,12 +1,12 @@
 name: build-v2-stm32
 
 on:
-  #push:
-  #  branches:
-  #    - master
-  #  paths-ignore:
+  push:
+    branches:
+      - master
+    paths-ignore:
   #    - '**.md'
-  #    - '**.yml'
+      - '**.yml'
   workflow_dispatch:
 
 env:
@@ -37,7 +37,7 @@ jobs:
             arduino-cli config init
             arduino-cli config add board_manager.additional_urls https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
             arduino-cli core update-index
-            arduino-cli core install STMicroelectronics:stm32@2.0.0
+            arduino-cli core install STMicroelectronics:stm32@2.1.0
 
       - name: Build SoftRF
         run: |
