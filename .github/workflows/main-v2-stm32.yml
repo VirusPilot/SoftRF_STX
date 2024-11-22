@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 env:
-  # arduino-cli board details -b STM32:stm32:Nucleo_64
-  S76G: 'STM32:stm32:Nucleo_64:pnum=NUCLEO_L073RZ,xserial=none,usb=CDCgen,upload_method=dfuMethod'
+  # arduino-cli board details -b STMicroelectronics:stm32:Nucleo_64
+  S76G: 'STMicroelectronics:stm32:Nucleo_64:pnum=NUCLEO_L073RZ,xserial=none,usb=CDCgen,upload_method=dfuMethod'
 
 jobs:
   build-v2:
@@ -44,7 +44,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           rm $GITHUB_WORKSPACE/software/firmware/source/SoftRF/build_opt.h
           arduino-cli compile -e -b "$S76G" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/STM32.stm32.Nucleo_64"
+          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/STMicroelectronics.stm32.Nucleo_64"
           rm -f *.elf
           rm -f *.map
           rm -f *.hex
