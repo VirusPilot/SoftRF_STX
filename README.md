@@ -5,7 +5,7 @@
 - ADS-L (default setting, using SDR860 frequency band)
 - OGN
 - FANET
-## ATTENTION: only ESP32 (T-Beam, T-Beam S3 Supreme) and nRF52 (T-Echo, T1000-E) binaries are provided/tested on a regular basis
+## ATTENTION: only ESP32 (T-Beam, T-Beam S3 Supreme), nRF52 (T-Echo, T1000-E) and STM32 (T-Motion) binaries are provided/tested on a regular basis, they are provided as Github Actions Artifacts - a Github account is required to download them
 ## ATTENTION: Seeed T1000-E comes with pre-installed Meshtastic and needs to be prepared before flashing SoftRF for the first time (see: https://github.com/lyusupov/SoftRF/wiki/Card-Edition.-Quick-start)
 ## It is recommended to consider the following alternatives:
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF
