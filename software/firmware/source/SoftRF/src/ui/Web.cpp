@@ -150,7 +150,7 @@ Copyright (C) 2015-2024 &nbsp;&nbsp;&nbsp; Linar Yusupov\
 
 void handleSettings() {
 
-  size_t size = 5700;
+  size_t size = 6000;
   char *offset;
   size_t len = 0;
   char *Settings_temp = (char *) malloc(size);
