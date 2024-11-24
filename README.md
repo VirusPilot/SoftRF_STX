@@ -9,12 +9,13 @@
 ## ATTENTION: Seeed T1000-E comes with pre-installed Meshtastic and needs to be prepared before flashing SoftRF for the first time (see: https://github.com/lyusupov/SoftRF/wiki/Card-Edition.-Quick-start)
 ## It is recommended to consider the following alternatives:
 - GXAirCom: FANET+ (FANET+FLARM): https://github.com/gereic/GXAirCom
+  - only for **T-Beam** and **T-Beam S3 Supreme**
   - transmission of FANET and FLARM simultaneously
-- SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF
-  - only for **T-Beam** and **T-Echo**
 - ADS-L/OGN/FANET/PAW tracker implementation: https://github.com/pjalocha/ogn-tracker
   - only for **T-Beam** and **T-Beam S3 Supreme**
   - transmission of ADS-L/OGN/FANET/PAW simultaneously
+- SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF
+  - only for **T-Beam** and **T-Echo**
 ### General Features:
 - option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.1.1/settings)
   - if added (`AircraftID: <ICAO hex Code>`), then ADDR_TYPE_ICAO is set (this is based on the assumtion that your airplane has a transponder)
