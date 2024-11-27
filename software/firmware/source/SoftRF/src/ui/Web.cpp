@@ -379,7 +379,8 @@ void handleSettings() {
 
 #if !defined(EXCLUDE_BLUETOOTH)
   /* SoC specific part 1 */
-  if (SoC->id == SOC_ESP32 || SoC->id == SOC_RP2040) {
+  if (SoC->id == SOC_ESP32      || SoC->id == SOC_RP2040 ||
+      SoC->id == SOC_RP2350_ARM || SoC->id == SOC_RP2350_RISC) {
     snprintf_P ( offset, size,
       PSTR("\
 <tr>\
@@ -482,9 +483,10 @@ void handleSettings() {
   size -= len;
 
   /* SoC specific part 2 */
-  if (SoC->id == SOC_ESP32   || SoC->id == SOC_ESP32S3 ||
-      SoC->id == SOC_ESP32C2 || SoC->id == SOC_ESP32C3 ||
-      SoC->id == SOC_ESP32C6 || SoC->id == SOC_RP2040  ||
+  if (SoC->id == SOC_ESP32      || SoC->id == SOC_ESP32S3     ||
+      SoC->id == SOC_ESP32C2    || SoC->id == SOC_ESP32C3     ||
+      SoC->id == SOC_ESP32C6    || SoC->id == SOC_RP2040      ||
+      SoC->id == SOC_RP2350_ARM || SoC->id == SOC_RP2350_RISC ||
       SoC->id == SOC_RA4M1) {
     snprintf_P ( offset, size,
       PSTR(
@@ -501,9 +503,10 @@ void handleSettings() {
     offset += len;
     size -= len;
   }
-  if (SoC->id == SOC_ESP32S2 || SoC->id == SOC_ESP32S3 ||
-      SoC->id == SOC_ESP32C3 || SoC->id == SOC_ESP32C6 ||
-      SoC->id == SOC_RP2040) {
+  if (SoC->id == SOC_ESP32S2 || SoC->id == SOC_ESP32S3    ||
+      SoC->id == SOC_ESP32C3 || SoC->id == SOC_ESP32C6    ||
+      SoC->id == SOC_RP2040  || SoC->id == SOC_RP2350_ARM ||
+      SoC->id == SOC_RP2350_RISC) {
     snprintf_P ( offset, size,
       PSTR("<option %s value='%d'>USB</option>"),
       (settings->nmea_out == NMEA_USB       ? "selected" : ""), NMEA_USB);
@@ -536,9 +539,10 @@ void handleSettings() {
 
 #if !defined(EXCLUDE_BLUETOOTH)
   /* SoC specific part 3 */
-  if (SoC->id == SOC_ESP32   || SoC->id == SOC_ESP32S3 ||
-      SoC->id == SOC_ESP32C2 || SoC->id == SOC_ESP32C3 ||
-      SoC->id == SOC_ESP32C6 || SoC->id == SOC_RP2040  ||
+  if (SoC->id == SOC_ESP32      || SoC->id == SOC_ESP32S3     ||
+      SoC->id == SOC_ESP32C2    || SoC->id == SOC_ESP32C3     ||
+      SoC->id == SOC_ESP32C6    || SoC->id == SOC_RP2040      ||
+      SoC->id == SOC_RP2350_ARM || SoC->id == SOC_RP2350_RISC ||
       SoC->id == SOC_RA4M1) {
     snprintf_P ( offset, size,
       PSTR("<option %s value='%d'>Bluetooth</option>"),
@@ -550,9 +554,10 @@ void handleSettings() {
   }
 #endif /* EXCLUDE_BLUETOOTH */
 
-  if (SoC->id == SOC_ESP32S2 || SoC->id == SOC_ESP32S3 ||
-      SoC->id == SOC_ESP32C3 || SoC->id == SOC_ESP32C6 ||
-      SoC->id == SOC_RP2040) {
+  if (SoC->id == SOC_ESP32S2 || SoC->id == SOC_ESP32S3    ||
+      SoC->id == SOC_ESP32C3 || SoC->id == SOC_ESP32C6    ||
+      SoC->id == SOC_RP2040  || SoC->id == SOC_RP2350_ARM ||
+      SoC->id == SOC_RP2350_RISC) {
     snprintf_P ( offset, size,
       PSTR("<option %s value='%d'>USB</option>"),
       (settings->gdl90 == GDL90_USB       ? "selected" : ""), GDL90_USB);
@@ -583,9 +588,10 @@ void handleSettings() {
 
 #if !defined(EXCLUDE_BLUETOOTH)
   /* SoC specific part 4 */
-  if (SoC->id == SOC_ESP32   || SoC->id == SOC_ESP32S3 ||
-      SoC->id == SOC_ESP32C2 || SoC->id == SOC_ESP32C3 ||
-      SoC->id == SOC_ESP32C6 || SoC->id == SOC_RP2040  ||
+  if (SoC->id == SOC_ESP32      || SoC->id == SOC_ESP32S3     ||
+      SoC->id == SOC_ESP32C2    || SoC->id == SOC_ESP32C3     ||
+      SoC->id == SOC_ESP32C6    || SoC->id == SOC_RP2040      ||
+      SoC->id == SOC_RP2350_ARM || SoC->id == SOC_RP2350_RISC ||
       SoC->id == SOC_RA4M1) {
     snprintf_P ( offset, size,
       PSTR("<option %s value='%d'>Bluetooth</option>"),
@@ -597,9 +603,10 @@ void handleSettings() {
   }
 #endif /* EXCLUDE_BLUETOOTH */
 
-  if (SoC->id == SOC_ESP32S2 || SoC->id == SOC_ESP32S3 ||
-      SoC->id == SOC_ESP32C3 || SoC->id == SOC_ESP32C6 ||
-      SoC->id == SOC_RP2040) {
+  if (SoC->id == SOC_ESP32S2 || SoC->id == SOC_ESP32S3    ||
+      SoC->id == SOC_ESP32C3 || SoC->id == SOC_ESP32C6    ||
+      SoC->id == SOC_RP2040  || SoC->id == SOC_RP2350_ARM ||
+      SoC->id == SOC_RP2350_RISC) {
     snprintf_P ( offset, size,
       PSTR("<option %s value='%d'>USB</option>"),
       (settings->d1090 == D1090_USB       ? "selected" : ""), D1090_USB);
@@ -863,7 +870,8 @@ void handleRoot() {
 #endif /* ENABLE_RECORDER */
 
   /* SoC specific part 1 */
-  if (SoC->id != SOC_RP2040 && SoC->id != SOC_RA4M1) {
+  if (SoC->id != SOC_RP2040      && SoC->id != SOC_RP2350_ARM &&
+      SoC->id != SOC_RP2350_RISC && SoC->id != SOC_RA4M1) {
     snprintf_P ( offset, size, PSTR("\
     <td align=right><input type=button onClick=\"location.href='/firmware'\" value='Firmware update'></td>"));
     len = strlen(offset);
