@@ -101,18 +101,18 @@ You need to be familiar with Arduino to compile and flash it for your platform. 
 - based on https://github.com/Xinyuan-LilyGO/LilyGo-LoRa-Series?tab=readme-ov-file#3%EF%B8%8F⃣arduino-ide-quick-start
 - Install "esp32 by Espressif" version 2.0.9 under "BOARDS MANAGER" 
 - Select Tools -> Board -> ESP32S3 Dev Module
+- Select Tools -> USB CDC on Boot -> enabled
 - Select Tools -> CPU Frequency -> 240MHz
+- Select Tools -> USB DFU on Boot -> disabled
 - Select Tools -> Flash Frequency -> 80MHz
 - Select Tools -> Flash Mode -> QIO
 - Select Tools -> Flash Size -> 8MB
+- Select Tools -> USB Firmware MSC on Boot -> disabled
 - Select Tools -> Partition Scheme -> 8M with spiffs (3MB APP/1.5MB SPIFFS)
 - Select Tools -> PSRAM -> QSPI PSRAM
-- Select Tools -> Upload Speed -> 921600
 - Select Tools -> Upload Mode -> USB-OTG CDC (TinyUSB)
+- Select Tools -> Upload Speed -> 921600
 - Select Tools -> USB Mode -> USB-OTG CDC (TinyUSB)
-- Select Tools -> USB Firmware MSC on Boot -> disabled
-- Select Tools -> USB DFU on Boot -> disabled
-- Select Tools -> USB CDC on Boot -> enabled
 - connect your T-Beam S3 Supreme
 - put your T-Beam in Espressif Service Mode (press and keep holding **BOOT**, press and release **RESET**, thereafter release **BOOT**)
 - compile/upload
