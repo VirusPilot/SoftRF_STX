@@ -1,5 +1,5 @@
 # SoftRF fork
-- for Stratux use via USB: **T-Beam**, **T-Beam S3 Supreme** and **T-Motion**
+- for Stratux use via USB: **T-Beam**, **T-Beam S3 Supreme** and **T-Motion** (T-Motion only up to Stratux 1.6r1-eu032 image)
 - for SkyDemon use via BLE: **T-Beam**, **T-Beam S3 Supreme**, **T-Echo** and **Seeed T1000-E**
 ## ATTENTION: it is strongly recommended to only use the following open standards based protocols (LEGACY protocol is broken and won't be fixed):
 - ADS-L (default for all platforms)
