@@ -1,5 +1,6 @@
 # SoftRF fork
-- for Stratux use via USB: **T-Beam**, **T-Beam S3 Supreme** and **T-Motion** (T-Motion only up to Stratux 1.6r1-eu032 image)
+- for Stratux use via USB: **T-Beam**, **T-Beam S3 Supreme**
+- for Stratux use via USB: **T-Motion** (only up to Stratux 1.6r1-eu032 image)
 - for SkyDemon use via BLE: **T-Beam**, **T-Beam S3 Supreme**, **T-Echo** and **Seeed T1000-E**
 ## ATTENTION: it is strongly recommended to only use the following open standards based protocols (LEGACY protocol is broken and won't be fixed):
 - ADS-L (default for all platforms)
@@ -17,7 +18,7 @@
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF
   - only for **T-Beam** and **T-Echo**
 ### General Features:
-- option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.1.1/settings)
+- option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.1.1/settings or via serial connection, see below)
   - if added (`AircraftID: <ICAO hex Code>`), then ADDR_TYPE_ICAO is set (this is based on the assumtion that your airplane has a transponder)
   - if **not** added, then the SoftRF factory ID remains (`AircraftID: 0`) and ADDR_TYPE_FLARM is set
 
@@ -51,6 +52,12 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - upload all files from the `SoftRF.zip/esp32.esp32.esp32` folder according to the following order and execute "Program":
 ![Chrome T-Beam Flash Tool](https://github.com/VirusPilot/SoftRF/assets/43483458/bc84d81f-a71f-46e7-a4d8-c7c2ff45bc2e)
 
+## T-Motion Binaries
+prior to flashing you need to install STM32CubeProgrammer
+- connect your T-Motion to your PC (via USB)
+- put your T-Motion in DFU mode: hold **BOOT**, push **RESET**, release **BOOT**
+- flash binary as follows:`./Arduino15/packages/STMicroelectronics/tools/STM32Tools/2.2.4/stm32CubeProg.sh -i dfu -f "SoftRF.ino.bin" -o 0x0 -v 0x0483 -p 0xdf11`
+
 ## T-Beam and T-Beam S3 Supreme modifications:
 - u-blox GNSS configuration:
   - enable GSA, GSV, VTG, GST (in addition to GGA and RMC)
@@ -74,7 +81,7 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 ## Recommendations for T-Beam:
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.1.1/settings
 
-## Recommendations for T-Echo and T1000-E:
+## Recommendations for T-Echo, T1000-E and T-Motion:
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings) by **downloading** the following scripts, **opening** them in a browser to generate the appropriate $PSRFC sentences and then **sending** these generated sentences to the SoftRF device via a serial USB console (e.g. Arduino IDE comes with a nice built in serial USB console) or via a BLE serial terminal:
   - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/basic.html (e.g. Protocol, Aircraft type, Aircraft ID)
 
