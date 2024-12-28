@@ -1,5 +1,5 @@
 # SoftRF fork
-- for Stratux use via USB: **T-Beam** and **T-Beam S3 Supreme**
+- for Stratux use via USB: **T-Beam**, **T-Beam S3 Supreme** and **T-Motion**
 - for SkyDemon use via BLE: **T-Beam**, **T-Beam S3 Supreme**, **T-Echo** and **Seeed T1000-E**
 ## ATTENTION: it is strongly recommended to only use the following open standards based protocols (LEGACY protocol is broken and won't be fixed):
 - ADS-L (default for all platforms)
@@ -28,6 +28,9 @@
 
 ### T-Echo and Seeed T1000-E Features:
 - **Bluetooth LE mode** (enabled by default): enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon
+
+### T-Motion Features:
+- **USB mode**: enables SoftRF to work as a proper GNSS source for Stratux
 
 ## UF2 Binaries
 UF2 binaries are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
