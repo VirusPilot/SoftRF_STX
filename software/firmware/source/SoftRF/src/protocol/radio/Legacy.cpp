@@ -360,8 +360,8 @@ size_t legacy_encode(void *legacy_pkt, ufo_t *this_aircraft) {
  * https://pastebin.com/YB1ppAbt
  */
 
-#define USE_INTERLEAVING
-//#define EXCLUDE_AIR6
+//#define USE_INTERLEAVING
+#define EXCLUDE_AIR6
 
 static const uint16_t lon_div_table[] = {
    53,  53,  54,  54,  55,  55,
