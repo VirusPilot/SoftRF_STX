@@ -24,7 +24,7 @@
 #include "SkyWatch.h"
 #include "Platform_ESP8266.h"
 #include "Platform_ESP32.h"
-#include "Platform_RP2040.h"
+#include "Platform_RP2XXX.h"
 
 typedef struct SoC_ops_struct {
   uint8_t id;
@@ -128,8 +128,8 @@ extern const SoC_ops_t AVR_ops;
 #if defined(ARDUINO_ARCH_ASR6601)
 extern const SoC_ops_t ASR66_ops;
 #endif
-#if defined(ARDUINO_ARCH_RP2040)
-extern const SoC_ops_t RP2040_ops;
+#if defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_ARCH_RP2350)
+extern const SoC_ops_t RP2xxx_ops;
 #endif
 
 byte SoC_setup(void);
