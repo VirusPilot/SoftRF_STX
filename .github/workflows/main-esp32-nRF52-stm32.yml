@@ -57,7 +57,7 @@ jobs:
 
       - name: Build SoftRF
         run: |
-          echo "#define CURRENT_DATE \"$(date +"24%m%d")\"" > $GITHUB_WORKSPACE/software/firmware/source/SoftRF/current_date.h
+          echo "#define CURRENT_DATE \"$(date +"25%m%d")\"" > $GITHUB_WORKSPACE/software/firmware/source/SoftRF/current_date.h
 
           cd $GITHUB_WORKSPACE
           arduino-cli compile -e -b "$NRF52" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
