@@ -180,6 +180,7 @@ typedef struct stm32_backup_struct {
 //#define EXCLUDE_LR11XX
 #define EXCLUDE_CC1101
 #define EXCLUDE_SI443X
+#define EXCLUDE_SX1231
 
 //#define ENFORCE_S78G
 #define USE_TIME_SLOTS
@@ -300,6 +301,7 @@ typedef struct stm32_backup_struct {
 //#define EXCLUDE_LR11XX
 #define EXCLUDE_CC1101
 #define EXCLUDE_SI443X
+#define EXCLUDE_SX1231
 
 #define USE_TIME_SLOTS
 #define USE_OGN_ENCRYPTION
@@ -360,6 +362,7 @@ typedef struct stm32_backup_struct {
 //#define EXCLUDE_LR11XX
 #define EXCLUDE_CC1101
 #define EXCLUDE_SI443X
+#define EXCLUDE_SX1231
 
 #define USE_TIME_SLOTS
 
