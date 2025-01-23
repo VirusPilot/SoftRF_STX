@@ -17,6 +17,8 @@
  */
 #if defined(ESP32)
 
+#define EXCLUDE_AIR6
+
 #ifndef PLATFORM_ESP32_H
 #define PLATFORM_ESP32_H
 

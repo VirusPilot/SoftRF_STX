@@ -1,4 +1,4 @@
-name: esp32-nRF52-stm32
+name: ARDUINO CI
 
 on:
   push:
@@ -49,7 +49,7 @@ jobs:
             arduino-cli core update-index
             arduino-cli core install esp32:esp32@2.0.9
             arduino-cli core install adafruit:nrf52
-            arduino-cli core install STMicroelectronics:stm32@2.0.0
+            # arduino-cli core install STMicroelectronics:stm32@2.0.0
 
             if [[ ! -f ~/.local/bin/adafruit-nrfutil ]]; then
               ln -s /bin/true ~/.local/bin/adafruit-nrfutil
@@ -85,13 +85,13 @@ jobs:
           rm -f SoftRF.ino.partitions.bin
           rm -f SoftRF.ino.bootloader.bin
 
-          cd $GITHUB_WORKSPACE
-          rm $GITHUB_WORKSPACE/software/firmware/source/SoftRF/build_opt.h
-          arduino-cli compile -e -b "$S76G" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
-          cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/STMicroelectronics.stm32.Nucleo_64"
-          rm -f *.elf
-          rm -f *.map
-          rm -f *.hex
+          # cd $GITHUB_WORKSPACE
+          # rm $GITHUB_WORKSPACE/software/firmware/source/SoftRF/build_opt.h
+          # arduino-cli compile -e -b "$S76G" $GITHUB_WORKSPACE/software/firmware/source/SoftRF
+          # cd "$GITHUB_WORKSPACE/software/firmware/source/SoftRF/build/STMicroelectronics.stm32.Nucleo_64"
+          # rm -f *.elf
+          # rm -f *.map
+          # rm -f *.hex
 
       - uses: actions/upload-artifact@v4
         with:

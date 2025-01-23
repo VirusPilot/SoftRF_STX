@@ -18,6 +18,8 @@
 
 #if defined(ARDUINO_ARCH_NRF52) || defined(ARDUINO_ARCH_NRF52840)
 
+#define EXCLUDE_AIR6
+
 #ifndef PLATFORM_NRF52_H
 #define PLATFORM_NRF52_H
 

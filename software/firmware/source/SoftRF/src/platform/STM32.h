@@ -17,6 +17,8 @@
  */
 #if defined(ARDUINO_ARCH_STM32)
 
+#define EXCLUDE_AIR6
+
 #ifndef PLATFORM_STM32_H
 #define PLATFORM_STM32_H
 
