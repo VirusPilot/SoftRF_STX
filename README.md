@@ -1,11 +1,11 @@
 # SoftRF fork
-- for Stratux use via USB: **T-Beam**, **T-Beam S3 Supreme**, **T-Motion**
+- for Stratux use via USB: **T-Beam**, **T-Beam S3 Supreme**
 - for SkyDemon use via BLE: **T-Beam**, **T-Beam S3 Supreme**, **T-Echo** and **Seeed T1000-E**
 ## ATTENTION: it is strongly recommended to only use the following open standards based protocols (LEGACY protocol is broken and won't be fixed):
 - ADS-L (default for all platforms)
 - OGN
 - FANET
-## ATTENTION: only ESP32 (T-Beam, T-Beam S3 Supreme), nRF52 (T-Echo, T1000-E) and STM32 (T-Motion) binaries are provided/tested on a regular basis, they are provided as Github Actions Artifacts - a Github account is required to download them
+## ATTENTION: only ESP32 (T-Beam, T-Beam S3 Supreme) and nRF52 (T-Echo, T1000-E) binaries are provided/tested on a regular basis, they are provided as Github Actions Artifacts - a Github account is required to download them
 ## ATTENTION: Seeed T1000-E comes with pre-installed Meshtastic and needs to be prepared before flashing SoftRF for the first time (see: https://github.com/lyusupov/SoftRF/wiki/Card-Edition.-Quick-start)
 ## It is recommended to consider the following Stratux compatible alternatives:
 - GXAirCom: FANET+ (FANET+FLARM): https://github.com/gereic/GXAirCom
@@ -29,9 +29,6 @@
 ### T-Echo and Seeed T1000-E Features:
 - **Bluetooth LE mode** (enabled by default): enables SoftRF to work as a proper traffic rx/tx and GNSS source for SkyDemon
 
-### T-Motion Features:
-- **USB mode**: enables SoftRF to work as a proper GNSS source for Stratux
-
 ## UF2 Binaries
 UF2 binaries are available for the following platforms and can be downloaded as part of **`SoftRF.zip`** from here: https://github.com/VirusPilot/SoftRF/actions (click on the latest workflow run and download **`SoftRF.zip`** "Artifact"):
 
@@ -50,12 +47,6 @@ UF2 binaries are available for the following platforms and can be downloaded as 
 - it may be necessary the execute "Erase Flash" once
 - upload all files from the `SoftRF.zip/esp32.esp32.esp32` folder according to the following order and execute "Program":
 ![Chrome T-Beam Flash Tool](https://github.com/VirusPilot/SoftRF/assets/43483458/bc84d81f-a71f-46e7-a4d8-c7c2ff45bc2e)
-
-## T-Motion Binaries
-prior to flashing you need to install STM32CubeProgrammer
-- connect your T-Motion to your PC (via USB)
-- put your T-Motion in DFU mode: hold **BOOT**, push **RESET**, release **BOOT**
-- flash binary as follows:`./Arduino15/packages/STMicroelectronics/tools/STM32Tools/2.2.4/stm32CubeProg.sh -i dfu -f "SoftRF.ino.bin" -o 0x0 -v 0x0483 -p 0xdf11`
 
 ## T-Beam and T-Beam S3 Supreme modifications:
 - u-blox GNSS configuration:
@@ -80,7 +71,7 @@ prior to flashing you need to install STM32CubeProgrammer
 ## Recommendations for T-Beam:
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings), using the SoftRF WiFi settings page: http://192.168.1.1/settings
 
-## Recommendations for T-Echo, T1000-E and T-Motion:
+## Recommendations for T-Echo and T1000-E:
 - modify SoftRF settings (https://github.com/lyusupov/SoftRF/wiki/Settings) by **downloading** the following scripts, **opening** them in a browser to generate the appropriate $PSRFC sentences and then **sending** these generated sentences to the SoftRF device via a serial USB console (e.g. Arduino IDE comes with a nice built in serial USB console) or via a BLE serial terminal:
   - https://github.com/VirusPilot/SoftRF/blob/master/software/app/Settings/basic.html (e.g. Protocol, Aircraft type, Aircraft ID)
 
