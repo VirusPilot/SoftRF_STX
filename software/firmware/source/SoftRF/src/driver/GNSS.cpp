@@ -375,8 +375,8 @@ static boolean getUBX_ACK(uint8_t cl, uint8_t id) {
       return true;
     }
 
-    // Timeout if no valid response in 2 seconds
-    if (millis() - startTime > 2000) {
+    // Timeout if no valid response in 4 seconds
+    if (millis() - startTime > 4000) {
       GNSS_DEBUG_PRINTLN(F(" (FAILED!)"));
       return false;
     }
