@@ -388,7 +388,7 @@ struct rst_info {
 #define ENABLE_ADSL
 
 //#define EXCLUDE_GNSS_UBLOX    /* Neo-6/7/8, M10 */
-//#define ENABLE_UBLOX_RFS        /* revert factory settings (when necessary)  */
+#define ENABLE_UBLOX_RFS        /* revert factory settings (when necessary)  */
 #define EXCLUDE_GNSS_GOKE       /* 'Air530' GK9501 GPS/GLO/BDS (GAL inop.)   */
 //#define EXCLUDE_GNSS_AT65     /* L76K, Air530Z */
 #define EXCLUDE_GNSS_SONY
