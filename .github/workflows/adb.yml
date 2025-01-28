@@ -4,13 +4,6 @@ name: Create aircraft data
 on:
   # schedule:
   #   - cron: "0 6,18 * * *"
-  push:
-    branches:
-      - master
-    paths-ignore:
-      - '**.md'
-      - '**.yml'
-  
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
