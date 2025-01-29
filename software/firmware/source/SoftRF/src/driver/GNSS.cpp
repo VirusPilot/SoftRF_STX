@@ -361,7 +361,7 @@ static boolean getUBX_ACK(uint8_t cl, uint8_t id) {
   uint8_t ackByteID = 0;
   uint8_t ackPacket[2] = {cl, id};
   unsigned long startTime = millis();
-  GNSS_DEBUG_PRINT(F(" * Reading ACK response: "));
+  Serial.print(F(" * Reading u-blox ACK response: "));
 
   // Construct the expected ACK packet
   makeUBXCFG(0x05, 0x01, 2, ackPacket);
@@ -371,13 +371,15 @@ static boolean getUBX_ACK(uint8_t cl, uint8_t id) {
     // Test for success
     if (ackByteID > 9) {
       // All packets in order!
-      GNSS_DEBUG_PRINTLN(F(" (SUCCESS!)"));
+      Serial.print(" SUCCESS! Delay: ");
+      Serial.print(millis() - startTime);
+      Serial.println("ms");
       return true;
     }
 
     // Timeout if no valid response in 4 seconds
     if (millis() - startTime > 4000) {
-      GNSS_DEBUG_PRINTLN(F(" (FAILED!)"));
+      Serial.println(F(" FAILED! Delay > 4s"));
       return false;
     }
 
