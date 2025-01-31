@@ -1,13 +1,5 @@
-# SoftRF fork
-- for Stratux use via USB: **T-Beam**, **T-Beam S3 Supreme**
-- for SkyDemon use via BLE: **T-Beam**, **T-Beam S3 Supreme**, **T-Echo** and **Seeed T1000-E**
-## ATTENTION: it is strongly recommended to only use the following open standards based protocols (LEGACY protocol is broken and won't be fixed):
-- ADS-L (default for all platforms)
-- OGN
-- FANET
-## ATTENTION: only ESP32 (T-Beam, T-Beam S3 Supreme) and nRF52 (T-Echo, T1000-E) binaries are provided/tested on a regular basis, they are provided as Github Actions Artifacts - a Github account is required to download them
-## ATTENTION: Seeed T1000-E comes with pre-installed Meshtastic and needs to be prepared before flashing SoftRF for the first time (see: https://github.com/lyusupov/SoftRF/wiki/Card-Edition.-Quick-start)
-## It is recommended to consider the following Stratux compatible alternatives:
+# As of February 2025 this fork will no longer be maintained and therefore be archived and changed to read-only.
+# It is recommended to consider the following Stratux compatible alternatives:
 - GXAirCom: FANET+ (FANET+FLARM): https://github.com/gereic/GXAirCom
   - only for **T-Beam** and **T-Beam S3 Supreme**
   - transmission of FANET and FLARM simultaneously
@@ -16,6 +8,15 @@
   - transmission of ADS-L/OGN/FANET/PAW simultaneously
 - SoftRF fork with a lot of enhancements: https://github.com/moshe-braner/SoftRF
   - only for **T-Beam** and **T-Echo**
+## SoftRF fork
+- for Stratux use via USB: **T-Beam**, **T-Beam S3 Supreme**
+- for SkyDemon use via BLE: **T-Beam**, **T-Beam S3 Supreme**, **T-Echo** and **Seeed T1000-E**
+## ATTENTION: it is strongly recommended to only use the following open standards based protocols (LEGACY protocol is broken and won't be fixed):
+- ADS-L (default for all platforms)
+- OGN
+- FANET
+## ATTENTION: only ESP32 (T-Beam, T-Beam S3 Supreme) and nRF52 (T-Echo, T1000-E) binaries are provided/tested on a regular basis, they are provided as Github Actions Artifacts - a Github account is required to download them
+## ATTENTION: Seeed T1000-E comes with pre-installed Meshtastic and needs to be prepared before flashing SoftRF for the first time (see: https://github.com/lyusupov/SoftRF/wiki/Card-Edition.-Quick-start)
 ### General Features:
 - option to enter `AircraftID` (through SoftRF WiFi settings page: http://192.168.1.1/settings or via serial connection, see below)
   - if added (`AircraftID: <ICAO hex Code>`), then ADDR_TYPE_ICAO is set (this is based on the assumtion that your airplane has a transponder)
